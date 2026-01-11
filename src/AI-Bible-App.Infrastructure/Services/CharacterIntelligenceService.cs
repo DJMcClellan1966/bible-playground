@@ -188,11 +188,11 @@ public class CharacterIntelligenceService
         var relevantMemories = await FindRelevantMemoriesAsync(intelligence, currentContext, maxRelevantMemories);
         if (relevantMemories.Any())
         {
-            sb.AppendLine("=== RELEVANT PAST DISCUSSIONS ===");
-            sb.AppendLine("(Use these to maintain consistency, but don't repeat yourself)");
+            sb.AppendLine("=== TOPICS YOU'VE DISCUSSED BEFORE ===");
+            sb.AppendLine("(You have addressed similar questions before. AVOID repeating the same stories or examples. Use DIFFERENT anecdotes from your life.)");
             foreach (var mem in relevantMemories)
             {
-                sb.AppendLine($"- When asked about \"{TruncateString(mem.Context, 50)}\", you said: \"{TruncateString(mem.Response, 100)}...\"");
+                sb.AppendLine($"- Previously discussed: \"{TruncateString(mem.Context, 50)}\" - Find a NEW angle or story to share this time.");
             }
             sb.AppendLine();
         }

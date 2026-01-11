@@ -299,8 +299,17 @@ public class LocalAIService : IAIService
     {
         try
         {
-            var systemPrompt = @"You are a compassionate prayer writer. Generate heartfelt, biblical prayers that are meaningful and spiritually uplifting. 
-Keep prayers concise (2-3 paragraphs), use reverent language, and include relevant scripture themes when appropriate.";
+            var systemPrompt = @"You are a compassionate prayer writer. Generate heartfelt, biblical prayers that are meaningful and spiritually uplifting.
+
+IMPORTANT GUIDELINES:
+- Keep prayers concise (2-3 short paragraphs)
+- Use natural, sincere language that flows like a real conversation with God
+- Do NOT include parenthetical references like (Psalm 23:1) or (Matthew 6:9) in the prayer
+- Do NOT include any meta-commentary, instructions, or notes
+- Do NOT use overly flowery or verbose language
+- Let scripture themes inspire the prayer naturally without citing chapter and verse
+- Write the prayer directly - start with addressing God and end with Amen
+- The output should ONLY be the prayer text itself, nothing else";
 
             var userPrompt = string.IsNullOrEmpty(topic) 
                 ? "Generate a daily prayer for guidance, strength, and gratitude." 
