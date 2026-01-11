@@ -19,10 +19,13 @@
                 <Label Text="📅 Reading Plans"
                        FontSize="20"
                        FontAttributes="Bold"
-                       TextColor="{DynamicResource TextColor}"/>
+                       TextColor="{DynamicResource TextColor}"
+                       SemanticProperties.HeadingLevel="Level1"
+                       AutomationProperties.Name="Reading Plans"/>
                 <Label Text="Stay consistent with your Bible reading"
                        FontSize="13"
-                       TextColor="{DynamicResource Gray600}"/>
+                       TextColor="{DynamicResource Gray600}"
+                       SemanticProperties.Hint="Browse and start Bible reading plans"/>
             </VerticalStackLayout>
             
             <Button Grid.Column="1"
@@ -212,7 +215,9 @@
                        FontSize="18"
                        FontAttributes="Bold"
                        TextColor="{DynamicResource TextColor}"
-                       Margin="0,10,0,0"/>
+                       Margin="0,10,0,0"
+                       SemanticProperties.HeadingLevel="Level2"
+                       AutomationProperties.Name="Available Plans section"/>
                 
                 <CollectionView ItemsSource="{Binding AvailablePlans}"
                                 SelectionMode="None">
@@ -284,7 +289,9 @@
                        FontAttributes="Bold"
                        TextColor="{DynamicResource TextColor}"
                        IsVisible="{Binding HasCompletedPlans}"
-                       Margin="0,20,0,0"/>
+                       Margin="0,20,0,0"
+                       SemanticProperties.HeadingLevel="Level2"
+                       AutomationProperties.Name="Completed Plans section"/>
                 
                 <CollectionView ItemsSource="{Binding CompletedProgress}"
                                 SelectionMode="None"

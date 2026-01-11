@@ -20,10 +20,13 @@
                 <Label Text="📖 Daily Devotional"
                        FontSize="20"
                        FontAttributes="Bold"
-                       TextColor="{DynamicResource TextColor}"/>
+                       TextColor="{DynamicResource TextColor}"
+                       SemanticProperties.HeadingLevel="Level1"
+                       AutomationProperties.Name="Daily Devotional"/>
                 <Label Text="{Binding TodaysDevotional.Date, StringFormat='{0:dddd, MMMM d, yyyy}'}"
                        FontSize="13"
-                       TextColor="{DynamicResource Gray600}"/>
+                       TextColor="{DynamicResource Gray600}"
+                       AutomationProperties.Name="Date"/>
             </VerticalStackLayout>
             
             <Button Grid.Column="1"

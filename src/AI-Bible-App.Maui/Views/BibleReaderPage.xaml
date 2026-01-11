@@ -26,7 +26,9 @@
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
                    TextColor="{DynamicResource Primary}"
-                   AutomationProperties.IsInAccessibleTree="True"/>
+                   AutomationProperties.IsInAccessibleTree="True"
+                   SemanticProperties.HeadingLevel="Level1"
+                   AutomationProperties.Name="Bible Reader"/>
             <Button Grid.Column="2"
                     Text="🔖"
                     Command="{Binding ToggleBookmarksCommand}"

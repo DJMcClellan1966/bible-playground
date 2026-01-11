@@ -14,7 +14,9 @@
             <Label Text="⚙️ Settings"
                    FontSize="28"
                    FontAttributes="Bold"
-                   HorizontalOptions="Center"/>
+                   HorizontalOptions="Center"
+                   SemanticProperties.HeadingLevel="Level1"
+                   AutomationProperties.Name="Settings"/>
             
             <!-- User Profile Section -->
             <Border Padding="20"
@@ -28,7 +30,9 @@
                 <VerticalStackLayout Spacing="15">
                     <Label Text="👤 User Profile"
                            FontSize="18"
-                           FontAttributes="Bold"/>
+                           FontAttributes="Bold"
+                           SemanticProperties.HeadingLevel="Level2"
+                           AutomationProperties.Name="User Profile section"/>
                     
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="15">
                         <Frame Grid.Column="0" 

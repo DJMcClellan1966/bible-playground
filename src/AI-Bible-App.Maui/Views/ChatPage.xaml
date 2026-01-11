@@ -30,6 +30,7 @@
                                     HorizontalOptions="End"
                                     AutomationProperties.Name="Your message"
                                     AutomationProperties.IsInAccessibleTree="True"
+                                    SemanticProperties.Description="{Binding Content}"
                                     MaximumWidthRequest="500"
                                     Padding="15"
                                     BackgroundColor="{DynamicResource Primary}">
@@ -45,6 +46,8 @@
                             <Border Grid.Row="0"
                                     IsVisible="{Binding Role, Converter={StaticResource StringEqualConverter}, ConverterParameter='assistant'}"
                                     HorizontalOptions="Start"
+                                    AutomationProperties.IsInAccessibleTree="True"
+                                    SemanticProperties.Description="{Binding Content}"
                                     MaximumWidthRequest="500"
                                     Padding="15"
                                     StrokeThickness="1"
@@ -291,7 +294,8 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="20"/>
                 </Border.StrokeShape>
-                <Entry Text="{Binding UserMessage}"
+                <Entry x:Name="MessageEntry"
+                       Text="{Binding UserMessage}"
                        Placeholder="Type a message..."
                        ReturnCommand="{Binding SendMessageCommand}"
                        IsEnabled="{Binding IsAiTyping, Converter={StaticResource InvertedBoolConverter}}"
@@ -301,7 +305,8 @@
                        FontSize="14"
                        VerticalOptions="Center"
                        AutomationProperties.Name="Message input"
-                       AutomationProperties.HelpText="Type your message here and press Enter to send"/>
+                       AutomationProperties.HelpText="Type your message here and press Enter to send"
+                       SemanticProperties.Hint="Press Enter to send your message"/>
             </Border>
 
             <!-- Send Button (visible when not typing) -->

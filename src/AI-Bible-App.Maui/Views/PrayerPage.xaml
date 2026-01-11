@@ -17,13 +17,16 @@
                    FontSize="32"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   TextColor="{DynamicResource Primary}"/>
+                   TextColor="{DynamicResource Primary}"
+                   SemanticProperties.HeadingLevel="Level1"
+                   AutomationProperties.Name="Prayer Generator"/>
             
             <Label Text="Share your prayer request and receive a personalized prayer"
                    FontSize="14"
                    HorizontalOptions="Center"
                    TextColor="{DynamicResource Gray600}"
-                   Margin="0,0,0,20"/>
+                   Margin="0,0,0,20"
+                   SemanticProperties.Hint="Enter your prayer topic below to generate a personalized prayer"/>
 
             <!-- Prayer Request Input -->
             <Border Padding="15"

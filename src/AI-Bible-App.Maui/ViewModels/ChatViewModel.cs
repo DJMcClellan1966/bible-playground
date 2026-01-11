@@ -7,6 +7,7 @@ using CommunityToolkit.Maui.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Maui.Accessibility;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -346,6 +347,12 @@ public partial class ChatViewModel : BaseViewModel
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 LatestAssistantMessage = aiMessage;
+                
+                // Announce to screen readers that a new message is available
+                var preview = aiMessage.Content?.Length > 100 
+                    ? aiMessage.Content.Substring(0, 100) + "..." 
+                    : aiMessage.Content ?? "";
+                SemanticScreenReader.Announce($"New message from {Character?.Name ?? "character"}: {preview}");
             });
             
             // Request scroll to bottom after AI response

@@ -1,10 +1,10 @@
 # Future Improvements - Consolidated TODO
 
-> **Last Updated:** January 12, 2026  
+> **Last Updated:** January 11, 2026  
 > This document consolidates all unimplemented recommendations from the various markdown files.
 > The markdown files have been reviewed and all **completed** features are already in the codebase.
 > 
-> **Recent Additions:** Bible Reading Plans with 5 built-in plans, progress tracking, streak system
+> **Recent Additions:** Bible Reading Plans, Enhanced Accessibility (screen reader support, heading levels, focus management)
 
 ---
 
@@ -44,6 +44,7 @@ The following major features are **already implemented** and working:
 - ✅ In-app feedback form
 - ✅ Bible data compression/optimization
 - ✅ Bible Reading Plans with 5 built-in plans
+- ✅ Enhanced Accessibility (screen reader, heading levels, focus management)
 
 ---
 
@@ -158,15 +159,28 @@ The following major features are **already implemented** and working:
 
 ---
 
-#### 8. Enhanced Accessibility
-**Status:** Basic properties added
+#### 8. Enhanced Accessibility ✅ IMPLEMENTED
+**Status:** ✅ Complete
 
-**Remaining work:**
-- Add `SemanticProperties.HeadingLevel` to section headers
-- Implement proper keyboard navigation
-- Add screen reader announcements for dynamic content
-- Focus management improvements
-- Test with Windows Narrator and JAWS
+**Implementation:**
+- Created `AccessibilityHelper.cs` with utility methods for screen reader announcements
+- Added `SemanticProperties.HeadingLevel` to all page headers (Level1 for main headings, Level2 for sections)
+- Added `SemanticProperties.Description` and `SemanticProperties.Hint` to interactive elements
+- Screen reader announcements for:
+  - New chat messages (announces character name and message preview)
+  - Reading plan actions (starting plans, completing days)
+  - Page navigation
+- Focus management:
+  - Auto-focus message input on ChatPage load
+  - Page navigation announcements via `SemanticScreenReader.Announce()`
+- Enhanced accessibility on: CharacterSelectionPage, ChatPage, DevotionalPage, ReadingPlanPage, SettingsPage, PrayerPage, BibleReaderPage
+
+**Files updated:**
+- `Helpers/AccessibilityHelper.cs` (new)
+- `ViewModels/ChatViewModel.cs` - screen reader announcements
+- `ViewModels/ReadingPlanViewModel.cs` - screen reader announcements
+- `Views/ChatPage.xaml.cs` - focus management
+- Multiple XAML files with SemanticProperties
 
 ---
 

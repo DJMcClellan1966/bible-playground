@@ -3,6 +3,7 @@ using AI_Bible_App.Core.Models;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Accessibility;
 using System.Collections.ObjectModel;
 
 #pragma warning disable MVVMTK0045
@@ -155,6 +156,10 @@ public partial class ReadingPlanViewModel : BaseViewModel
             ActiveProgress = await _repository.StartPlanAsync(planId);
             await LoadDataAsync();
             
+            // Announce to screen readers
+            var plan = await _repository.GetPlanByIdAsync(planId);
+            SemanticScreenReader.Announce($"Started reading plan: {plan?.Name ?? "New plan"}");
+            
             await _dialogService.ShowAlertAsync("Plan Started!", "Your reading plan has begun. Happy reading! 📖", "Let's Go!");
         }
         catch (Exception ex)
@@ -178,16 +183,20 @@ public partial class ReadingPlanViewModel : BaseViewModel
         {
             ActiveProgress = await _repository.MarkDayCompletedAsync(ActiveProgress.Id, TodaysReading.DayNumber);
             
+            // Announce to screen readers
+            SemanticScreenReader.Announce($"Day {TodaysReading.DayNumber} marked complete. {ActiveProgress.CompletionPercentage:F0}% done.");
+            
             // Check if plan is complete
             if (ActiveProgress.CompletedAt != null)
             {
+                SemanticScreenReader.Announce($"Congratulations! You've completed the {ActivePlan?.Name} reading plan!");
                 await _dialogService.ShowAlertAsync(
                     "🎉 Congratulations!",
                     $"You've completed the {ActivePlan?.Name} reading plan! What an accomplishment!",
                     "Celebrate!");
             }
             
-            await LoadDataAsync();
+            await LoadDataAsync();;
         }
         catch (Exception ex)
         {

@@ -18,12 +18,15 @@
                    HorizontalOptions="Center"
                    TextColor="{DynamicResource Primary}"
                    AutomationProperties.IsInAccessibleTree="True"
-                   AutomationProperties.Name="Voices of Scripture"/>
+                   AutomationProperties.Name="Voices of Scripture"
+                   SemanticProperties.HeadingLevel="Level1"
+                   SemanticProperties.Description="Main page heading - Voices of Scripture app"/>
             <Label Text="Swipe to explore • Tap to chat"
                    FontSize="14"
                    HorizontalOptions="Center"
                    TextColor="{DynamicResource Gray600}"
-                   AutomationProperties.IsInAccessibleTree="True"/>
+                   AutomationProperties.IsInAccessibleTree="True"
+                   SemanticProperties.Hint="Use arrow keys or swipe to browse biblical characters"/>
             
             <!-- Ollama Status Indicator -->
             <Border Padding="8,5"

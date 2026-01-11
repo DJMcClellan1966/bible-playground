@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Models;
 using AI_Bible_App.Maui.ViewModels;
+using Microsoft.Maui.Accessibility;
 
 namespace AI_Bible_App.Maui.Views;
 
@@ -18,6 +19,18 @@ public partial class ChatPage : ContentPage, IQueryAttributable
         _viewModel.ScrollToBottomRequested += OnScrollToBottomRequested;
         
         System.Diagnostics.Debug.WriteLine("[DEBUG] ChatPage constructor END");
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        
+        // Set focus to message input for accessibility
+        await Task.Delay(300);
+        MessageEntry.Focus();
+        
+        // Announce page navigation to screen readers
+        SemanticScreenReader.Announce($"Chat with {_viewModel.Character?.Name ?? "character"}. Type your message below.");
     }
 
     private async void OnScrollToBottomRequested(object? sender, EventArgs e)
