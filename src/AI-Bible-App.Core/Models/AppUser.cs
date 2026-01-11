@@ -21,6 +21,52 @@ public class AppUser
     /// Whether this user has PIN protection enabled
     /// </summary>
     public bool HasPin => !string.IsNullOrEmpty(PinHash);
+    
+    /// <summary>
+    /// Cloud sync identity - shared across all devices for this user
+    /// </summary>
+    public SyncIdentity? SyncIdentity { get; set; }
+    
+    /// <summary>
+    /// Whether this user has cloud sync enabled
+    /// </summary>
+    public bool HasSyncEnabled => SyncIdentity != null && !string.IsNullOrEmpty(SyncIdentity.SyncCode);
+}
+
+/// <summary>
+/// Identity information for cross-device sync
+/// </summary>
+public class SyncIdentity
+{
+    /// <summary>
+    /// The sync code used to link devices (e.g., "FAITH-7X3K-HOPE")
+    /// </summary>
+    public string SyncCode { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Cloud-side unique identifier (stays constant across devices)
+    /// </summary>
+    public string CloudUserId { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// When sync was first enabled
+    /// </summary>
+    public DateTime SyncEnabledAt { get; set; } = DateTime.UtcNow;
+    
+    /// <summary>
+    /// Last successful sync time
+    /// </summary>
+    public DateTime? LastSyncedAt { get; set; }
+    
+    /// <summary>
+    /// Unique identifier for THIS device (for conflict resolution)
+    /// </summary>
+    public string DeviceId { get; set; } = Guid.NewGuid().ToString();
+    
+    /// <summary>
+    /// Friendly name for this device
+    /// </summary>
+    public string? DeviceName { get; set; }
 }
 
 /// <summary>

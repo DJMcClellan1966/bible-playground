@@ -95,6 +95,12 @@ public static class MauiProgram
 		// Cross-Character Learning Service - enables characters to learn from roundtable discussions
 		builder.Services.AddSingleton<ICrossCharacterLearningService, CrossCharacterLearningService>();
 		
+		// Cloud Sync Service - cross-device data synchronization via sync codes
+		builder.Services.AddSingleton<ICloudSyncService, CloudSyncService>();
+		
+		// Font Scale Service - dynamic font sizing based on user preference
+		builder.Services.AddSingleton<IFontScaleService, FontScaleService>();
+		
 		// ═══════════════════════════════════════════════════════════════════════════════
 		// CORE OPTIMIZATION SERVICES - High-performance, interconnected systems
 		// ═══════════════════════════════════════════════════════════════════════════════

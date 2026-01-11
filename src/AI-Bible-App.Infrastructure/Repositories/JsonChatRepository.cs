@@ -28,6 +28,12 @@ public class JsonChatRepository : JsonRepositoryBase<ChatSession>, IChatReposito
     public Task<List<ChatSession>> GetAllSessionsAsync()
         => LoadAllAsync();
 
+    public async Task<List<ChatSession>> GetAllSessionsForUserAsync(string userId)
+    {
+        var sessions = await LoadAllAsync();
+        return sessions.Where(s => s.UserId == userId).ToList();
+    }
+
     public Task SaveSessionAsync(ChatSession session)
         => UpsertAsync(session, session.Id);
 

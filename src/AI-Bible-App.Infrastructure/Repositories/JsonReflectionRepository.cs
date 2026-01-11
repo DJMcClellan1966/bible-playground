@@ -36,6 +36,15 @@ public class JsonReflectionRepository : IReflectionRepository
         return _cachedReflections!.OrderByDescending(r => r.CreatedAt).ToList();
     }
 
+    public async Task<List<Reflection>> GetAllForUserAsync(string userId)
+    {
+        await EnsureCacheLoadedAsync();
+        return _cachedReflections!
+            .Where(r => r.UserId == userId)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToList();
+    }
+
     public async Task<Reflection?> GetReflectionByIdAsync(string id)
     {
         await EnsureCacheLoadedAsync();
@@ -97,6 +106,12 @@ public class JsonReflectionRepository : IReflectionRepository
         await EnsureCacheLoadedAsync();
         _cachedReflections!.RemoveAll(r => r.Id == id);
         await SaveCacheAsync();
+    }
+
+    public async Task SaveAsync(Reflection reflection)
+    {
+        // SaveAsync is an alias for SaveReflectionAsync for sync operations
+        await SaveReflectionAsync(reflection);
     }
 
     private async Task EnsureCacheLoadedAsync()

@@ -1,5 +1,8 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using AI_Bible_App.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace AI_Bible_App.Infrastructure.Services;
 
@@ -9,9 +12,11 @@ namespace AI_Bible_App.Infrastructure.Services;
 public interface IBibleVerseIndexService
 {
     Task InitializeAsync();
+    Task InitializeWithVersesAsync(IEnumerable<BibleVerse> verses);
     Task<IEnumerable<VerseSearchResult>> SearchVersesAsync(string query, int maxResults = 20);
     Task<string?> GetVerseTextAsync(string reference);
     bool IsInitialized { get; }
+    int TotalVersesIndexed { get; }
 }
 
 public class VerseSearchResult
@@ -25,20 +30,61 @@ public class BibleVerseIndexService : IBibleVerseIndexService
 {
     private readonly ConcurrentDictionary<string, string> _verseIndex = new();
     private readonly ConcurrentDictionary<string, HashSet<string>> _wordIndex = new();
+    private readonly ILogger<BibleVerseIndexService>? _logger;
     private bool _isInitialized;
+    private int _totalVersesIndexed;
 
     public bool IsInitialized => _isInitialized;
+    public int TotalVersesIndexed => _totalVersesIndexed;
 
-    public async Task InitializeAsync()
+    public BibleVerseIndexService(ILogger<BibleVerseIndexService>? logger = null)
+    {
+        _logger = logger;
+    }
+
+    public Task InitializeAsync()
+    {
+        // No-op when called without verses - the MAUI layer should call InitializeWithVersesAsync
+        if (_isInitialized) return Task.CompletedTask;
+        
+        _logger?.LogDebug("[BibleIndex] InitializeAsync called - waiting for verses from MAUI layer");
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Initialize the index with pre-loaded Bible verses (called from MAUI layer)
+    /// </summary>
+    public async Task InitializeWithVersesAsync(IEnumerable<BibleVerse> verses)
     {
         if (_isInitialized) return;
 
-        await Task.Run(() =>
+        try
         {
-            // This would normally load from a Bible database or API
-            // For now, we'll create a basic structure that can be populated
+            _logger?.LogInformation("[BibleIndex] Starting Bible verse indexing...");
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            // Index all verses in parallel for speed
+            await Task.Run(() =>
+            {
+                Parallel.ForEach(verses, verse =>
+                {
+                    IndexVerse(verse.Reference, verse.Text);
+                });
+            });
+
+            sw.Stop();
+            _totalVersesIndexed = _verseIndex.Count;
             _isInitialized = true;
-        });
+            
+            _logger?.LogInformation($"[BibleIndex] Completed indexing {_totalVersesIndexed} verses in {sw.ElapsedMilliseconds}ms");
+            System.Diagnostics.Debug.WriteLine($"[BibleIndex] Completed indexing {_totalVersesIndexed} verses in {sw.ElapsedMilliseconds}ms");
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "[BibleIndex] Failed to initialize Bible index");
+            System.Diagnostics.Debug.WriteLine($"[BibleIndex] Failed to initialize: {ex.Message}");
+            _isInitialized = true; // Mark as initialized to prevent repeated failures
+        }
     }
 
     public async Task<IEnumerable<VerseSearchResult>> SearchVersesAsync(string query, int maxResults = 20)

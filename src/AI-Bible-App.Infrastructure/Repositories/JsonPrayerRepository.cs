@@ -28,8 +28,39 @@ public class JsonPrayerRepository : JsonRepositoryBase<Prayer>, IPrayerRepositor
     public Task<List<Prayer>> GetAllPrayersAsync()
         => LoadAllAsync();
 
+    public async Task<List<SavedPrayer>> GetAllForUserAsync(string userId)
+    {
+        var prayers = await LoadAllAsync();
+        return prayers
+            .Where(p => p.UserId == userId)
+            .Select(p => new SavedPrayer
+            {
+                Id = p.Id,
+                UserId = userId,
+                Content = p.Content,
+                Topic = p.Topic,
+                CreatedAt = p.CreatedAt,
+                Tags = p.Tags
+            })
+            .ToList();
+    }
+
     public Task SavePrayerAsync(Prayer prayer)
         => UpsertAsync(prayer, prayer.Id);
+
+    public Task SaveAsync(SavedPrayer prayer)
+    {
+        var p = new Prayer
+        {
+            Id = prayer.Id,
+            UserId = prayer.UserId,
+            Content = prayer.Content,
+            Topic = prayer.Topic,
+            CreatedAt = prayer.CreatedAt,
+            Tags = prayer.Tags
+        };
+        return UpsertAsync(p, p.Id);
+    }
 
     public Task DeletePrayerAsync(string prayerId)
         => DeleteByIdAsync(prayerId);

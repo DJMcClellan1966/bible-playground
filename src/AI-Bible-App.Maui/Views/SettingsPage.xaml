@@ -215,6 +215,130 @@
                 </VerticalStackLayout>
             </Border>
             
+            <!-- Cross-Device Sync Section -->
+            <Border Padding="20"
+                    StrokeThickness="1"
+                    Stroke="{DynamicResource Gray300}"
+                    BackgroundColor="{DynamicResource CardBackground}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="15"/>
+                </Border.StrokeShape>
+                
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="☁️ Cross-Device Sync"
+                           FontSize="18"
+                           FontAttributes="Bold"/>
+                    
+                    <Label Text="Access your chats, prayers, and reflections from any device. No account needed - just share a simple sync code."
+                           FontSize="13"
+                           TextColor="{DynamicResource Gray600}"/>
+                    
+                    <!-- Sync Status -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="{Binding IsSyncEnabled, Converter={StaticResource BoolToYesNoConverter}, StringFormat='Sync: {0}'}"
+                                   FontSize="14"/>
+                            <Label Text="{Binding SyncStatusText, StringFormat='Last synced: {0}'}"
+                                   FontSize="11"
+                                   TextColor="{DynamicResource Gray500}"
+                                   IsVisible="{Binding IsSyncEnabled}"/>
+                        </VerticalStackLayout>
+                        
+                        <!-- Sync Now Button (only when sync is enabled) -->
+                        <Button Grid.Column="1"
+                                Text="⟳ Sync"
+                                Command="{Binding SyncNowCommand}"
+                                BackgroundColor="{DynamicResource Primary}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Padding="15,8"
+                                WidthRequest="90"
+                                IsVisible="{Binding IsSyncEnabled}"
+                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}"/>
+                    </Grid>
+                    
+                    <!-- Current Sync Code (if enabled) -->
+                    <Border Padding="15"
+                            StrokeThickness="1"
+                            Stroke="{DynamicResource Primary}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            Opacity="0.1"
+                            IsVisible="{Binding IsSyncEnabled}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Label Text="Your Sync Code"
+                                   FontSize="12"
+                                   TextColor="{DynamicResource Gray600}"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="{Binding SyncCode}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{DynamicResource Primary}"
+                                   HorizontalOptions="Center"
+                                   FontFamily="Consolas"/>
+                            <Label Text="Share this with your other devices"
+                                   FontSize="10"
+                                   TextColor="{DynamicResource Gray500}"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    
+                    <!-- Setup Buttons (when not enabled) -->
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding IsSyncEnabled, Converter={StaticResource InvertedBoolConverter}}">
+                        <Button Text="📱 Generate Sync Code"
+                                Command="{Binding GenerateSyncCodeCommand}"
+                                BackgroundColor="{DynamicResource Primary}"
+                                TextColor="White"
+                                CornerRadius="10"
+                                HeightRequest="50"
+                                FontAttributes="Bold"
+                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}"/>
+                        
+                        <Label Text="or"
+                               FontSize="12"
+                               TextColor="{DynamicResource Gray500}"
+                               HorizontalOptions="Center"/>
+                        
+                        <Button Text="🔗 Link to Another Device"
+                                Command="{Binding LinkDeviceCommand}"
+                                BackgroundColor="{DynamicResource Gray200}"
+                                TextColor="{DynamicResource TextColor}"
+                                CornerRadius="10"
+                                HeightRequest="45"
+                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}"/>
+                    </VerticalStackLayout>
+                    
+                    <!-- Remove Sync Button -->
+                    <Button Text="Remove Sync"
+                            Command="{Binding RemoveSyncCommand}"
+                            BackgroundColor="{DynamicResource Gray200}"
+                            TextColor="{DynamicResource Gray700}"
+                            CornerRadius="8"
+                            IsVisible="{Binding IsSyncEnabled}"
+                            HorizontalOptions="Start"/>
+                    
+                    <!-- Syncing Indicator -->
+                    <HorizontalStackLayout Spacing="10" 
+                                           IsVisible="{Binding IsSyncing}"
+                                           HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="True" 
+                                          Color="{DynamicResource Primary}"
+                                          WidthRequest="20" HeightRequest="20"/>
+                        <Label Text="{Binding SyncStatusText}"
+                               FontSize="13"
+                               TextColor="{DynamicResource Primary}"/>
+                    </HorizontalStackLayout>
+                    
+                    <Label Text="💡 Tip: Generate a sync code on one device, then link from your other devices using that code."
+                           FontSize="11"
+                           FontAttributes="Italic"
+                           TextColor="{DynamicResource Gray500}"/>
+                </VerticalStackLayout>
+            </Border>
+            
             <!-- Training Data Section -->
             <Border Padding="20"
                     StrokeThickness="1"

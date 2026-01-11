@@ -12,6 +12,26 @@
                 <ResourceDictionary Source="Resources/Styles/EnhancedTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
+            <!-- Scaled Font Sizes (dynamically updated by FontScaleService) -->
+            <x:Double x:Key="ScaledCaptionSize">10</x:Double>
+            <x:Double x:Key="ScaledBodySize">14</x:Double>
+            <x:Double x:Key="ScaledSubtitleSize">16</x:Double>
+            <x:Double x:Key="ScaledTitleSize">18</x:Double>
+            <x:Double x:Key="ScaledHeaderSize">24</x:Double>
+            <x:Double x:Key="ScaledDisplaySize">28</x:Double>
+            <x:Double x:Key="ScaledSize10">10</x:Double>
+            <x:Double x:Key="ScaledSize11">11</x:Double>
+            <x:Double x:Key="ScaledSize12">12</x:Double>
+            <x:Double x:Key="ScaledSize13">13</x:Double>
+            <x:Double x:Key="ScaledSize14">14</x:Double>
+            <x:Double x:Key="ScaledSize15">15</x:Double>
+            <x:Double x:Key="ScaledSize16">16</x:Double>
+            <x:Double x:Key="ScaledSize18">18</x:Double>
+            <x:Double x:Key="ScaledSize20">20</x:Double>
+            <x:Double x:Key="ScaledSize24">24</x:Double>
+            <x:Double x:Key="ScaledSize28">28</x:Double>
+            <x:Double x:Key="ScaledSize32">32</x:Double>
+            
             <!-- Converters -->
             <converters:StringEqualConverter x:Key="StringEqualConverter"/>
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter"/>

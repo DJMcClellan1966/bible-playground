@@ -6,6 +6,7 @@ namespace AI_Bible_App.Core.Models;
 public class ChatSession
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string? UserId { get; set; }
     public string CharacterId { get; set; } = string.Empty;
     
     /// <summary>

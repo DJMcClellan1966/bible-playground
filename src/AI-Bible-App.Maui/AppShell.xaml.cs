@@ -1,12 +1,20 @@
 ﻿using AI_Bible_App.Maui.Views;
+using AI_Bible_App.Maui.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AI_Bible_App.Maui;
 
 public partial class AppShell : Shell
 {
+	private readonly IKeyboardShortcutService? _keyboardService;
+
 	public AppShell()
 	{
 		InitializeComponent();
+		
+		// Get keyboard service and register shortcuts
+		_keyboardService = Application.Current?.Handler?.MauiContext?.Services.GetService<IKeyboardShortcutService>();
+		_keyboardService?.RegisterDefaultShortcuts();
 
 		// Core production routes
 		Routing.RegisterRoute("chat", typeof(ChatPage));
@@ -33,5 +41,13 @@ public partial class AppShell : Shell
 		
 		// Labs hub
 		Routing.RegisterRoute("labs", typeof(ExperimentalLabsPage));
+	}
+	
+	/// <summary>
+	/// Handle keyboard shortcuts from platform-specific handlers
+	/// </summary>
+	public bool HandleKeyboardShortcut(string key, bool ctrl, bool shift, bool alt)
+	{
+		return _keyboardService?.HandleKeyPress(key, ctrl, shift, alt) ?? false;
 	}
 }

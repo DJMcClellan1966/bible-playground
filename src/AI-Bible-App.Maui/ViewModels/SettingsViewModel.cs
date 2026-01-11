@@ -13,6 +13,8 @@ public partial class SettingsViewModel : BaseViewModel
     private readonly IDialogService _dialogService;
     private readonly IUserService _userService;
     private readonly INavigationService _navigationService;
+    private readonly ICloudSyncService _cloudSyncService;
+    private readonly IFontScaleService? _fontScaleService;
 
     [ObservableProperty]
     private int totalSessions;
@@ -54,15 +56,39 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty]
     private string selectedFontSize = "Medium";
 
+    // Cross-Device Sync Properties
+    [ObservableProperty]
+    private bool isSyncEnabled;
+
+    [ObservableProperty]
+    private string? syncCode;
+
+    [ObservableProperty]
+    private DateTime? lastSyncedAt;
+
+    [ObservableProperty]
+    private bool isSyncing;
+
+    [ObservableProperty]
+    private string syncStatusText = "Not synced";
+
     public List<string> ThemeOptions { get; } = new() { "System", "Light", "Dark" };
     public List<string> FontSizeOptions { get; } = new() { "Small", "Medium", "Large", "Extra Large" };
 
-    public SettingsViewModel(ITrainingDataExporter exporter, IDialogService dialogService, IUserService userService, INavigationService navigationService)
+    public SettingsViewModel(
+        ITrainingDataExporter exporter, 
+        IDialogService dialogService, 
+        IUserService userService, 
+        INavigationService navigationService,
+        ICloudSyncService cloudSyncService,
+        IFontScaleService? fontScaleService = null)
     {
         _exporter = exporter;
         _dialogService = dialogService;
         _userService = userService;
         _navigationService = navigationService;
+        _cloudSyncService = cloudSyncService;
+        _fontScaleService = fontScaleService;
         Title = "Settings";
         
         // Subscribe to user changes
@@ -87,6 +113,19 @@ public partial class SettingsViewModel : BaseViewModel
             HasPinEnabled = user.HasPin;
             SelectedTheme = user.Settings.ThemePreference;
             SelectedFontSize = user.Settings.FontSizePreference;
+            
+            // Load sync information
+            IsSyncEnabled = user.HasSyncEnabled;
+            if (user.SyncIdentity != null)
+            {
+                SyncCode = user.SyncIdentity.SyncCode;
+                UpdateSyncStatus();
+            }
+            else
+            {
+                SyncCode = null;
+                SyncStatusText = "Not set up";
+            }
         }
         else
         {
@@ -97,6 +136,52 @@ public partial class SettingsViewModel : BaseViewModel
             HasPinEnabled = false;
             SelectedTheme = "System";
             SelectedFontSize = "Medium";
+            IsSyncEnabled = false;
+            SyncCode = null;
+            SyncStatusText = "Not set up";
+        }
+    }
+
+    private void UpdateSyncStatus()
+    {
+        var user = _userService.CurrentUser;
+        if (user?.SyncIdentity != null)
+        {
+            // Check last sync from async call
+            _ = UpdateSyncStatusAsync();
+        }
+    }
+
+    private async Task UpdateSyncStatusAsync()
+    {
+        try
+        {
+            var user = _userService.CurrentUser;
+            if (user == null) return;
+
+            var status = await _cloudSyncService.GetSyncStatusAsync(user.Id);
+            LastSyncedAt = status.LastSyncedAt;
+            
+            if (status.LastSyncedAt.HasValue)
+            {
+                var timeAgo = DateTime.UtcNow - status.LastSyncedAt.Value;
+                if (timeAgo.TotalMinutes < 1)
+                    SyncStatusText = "Just now";
+                else if (timeAgo.TotalHours < 1)
+                    SyncStatusText = $"{(int)timeAgo.TotalMinutes}m ago";
+                else if (timeAgo.TotalDays < 1)
+                    SyncStatusText = $"{(int)timeAgo.TotalHours}h ago";
+                else
+                    SyncStatusText = status.LastSyncedAt.Value.ToString("MMM d");
+            }
+            else
+            {
+                SyncStatusText = "Never synced";
+            }
+        }
+        catch
+        {
+            SyncStatusText = "Unknown";
         }
     }
 
@@ -155,6 +240,9 @@ public partial class SettingsViewModel : BaseViewModel
             {
                 user.Settings.FontSizePreference = fontSize;
             });
+            
+            // Apply font scale immediately
+            _fontScaleService?.ApplyScale(fontSize);
         }
         catch (Exception ex)
         {
@@ -399,5 +487,228 @@ public partial class SettingsViewModel : BaseViewModel
     private async Task NavigateToOfflineModelsAsync()
     {
         await _navigationService.NavigateToAsync("OfflineModelsPage");
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // CROSS-DEVICE SYNC COMMANDS
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    [RelayCommand]
+    private async Task GenerateSyncCodeAsync()
+    {
+        var user = _userService.CurrentUser;
+        if (user == null)
+        {
+            await _dialogService.ShowAlertAsync("Error", "Please select a user first.");
+            return;
+        }
+
+        try
+        {
+            IsSyncing = true;
+            SyncStatusText = "Generating code...";
+
+            var result = await _cloudSyncService.GenerateSyncCodeAsync(user.Id);
+            
+            if (result.Success && result.SyncCode != null)
+            {
+                // Refresh the user to get updated SyncIdentity (set by the service)
+                LoadUserProfile();
+                
+                SyncCode = result.SyncCode;
+                IsSyncEnabled = true;
+                SyncStatusText = "Ready to sync";
+
+                await _dialogService.ShowAlertAsync(
+                    "☁️ Sync Code Generated",
+                    $"Your sync code is:\n\n{result.SyncCode}\n\n" +
+                    "Enter this code on your other devices to sync your data.\n\n" +
+                    "💡 Tip: This code links all your devices together.",
+                    "Got it!");
+            }
+            else
+            {
+                await _dialogService.ShowAlertAsync("Error", result.ErrorMessage ?? "Failed to generate sync code.");
+                SyncStatusText = "Error";
+            }
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Error", $"Failed to generate sync code: {ex.Message}");
+            SyncStatusText = "Error";
+        }
+        finally
+        {
+            IsSyncing = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task LinkDeviceAsync()
+    {
+        var user = _userService.CurrentUser;
+        if (user == null)
+        {
+            await _dialogService.ShowAlertAsync("Error", "Please select a user first.");
+            return;
+        }
+
+        // Prompt for sync code from another device
+        var syncCode = await _dialogService.ShowPromptAsync(
+            "🔗 Link Device",
+            "Enter the sync code from your other device:\n\n(Example: FAITH-7X3K-HOPE)",
+            maxLength: 20);
+
+        if (string.IsNullOrWhiteSpace(syncCode))
+            return;
+
+        // Normalize the code (uppercase, handle missing dashes)
+        syncCode = syncCode.Trim().ToUpperInvariant();
+
+        try
+        {
+            IsSyncing = true;
+            SyncStatusText = "Linking device...";
+
+            var result = await _cloudSyncService.LinkWithSyncCodeAsync(syncCode);
+            
+            if (result.Success)
+            {
+                // Refresh user to get updated sync identity
+                LoadUserProfile();
+                
+                SyncCode = syncCode;
+                IsSyncEnabled = true;
+                
+                // Ask if user wants to sync now
+                var syncNow = await _dialogService.ShowConfirmAsync(
+                    "✅ Device Linked",
+                    $"Your device has been linked successfully!\n\n" +
+                    $"Synced {result.ItemsSynced} items from {result.UserName ?? "your account"}.\n\n" +
+                    "Would you like to sync your data now?",
+                    "Sync Now", "Later");
+
+                if (syncNow)
+                {
+                    await PerformSyncAsync();
+                }
+                else
+                {
+                    SyncStatusText = "Linked";
+                }
+            }
+            else
+            {
+                await _dialogService.ShowAlertAsync("Link Failed", result.ErrorMessage ?? "Could not link with that sync code.");
+                SyncStatusText = "Link failed";
+            }
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Error", $"Failed to link device: {ex.Message}");
+            SyncStatusText = "Error";
+        }
+        finally
+        {
+            IsSyncing = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SyncNowAsync()
+    {
+        var user = _userService.CurrentUser;
+        if (user == null || !user.HasSyncEnabled)
+        {
+            await _dialogService.ShowAlertAsync(
+                "Sync Not Set Up",
+                "Please generate a sync code or link your device first.");
+            return;
+        }
+
+        await PerformSyncAsync();
+    }
+
+    private async Task PerformSyncAsync()
+    {
+        var user = _userService.CurrentUser;
+        if (user == null) return;
+
+        try
+        {
+            IsSyncing = true;
+            SyncStatusText = "Syncing...";
+
+            var result = await _cloudSyncService.FullSyncAsync(user.Id);
+            
+            if (result.Success)
+            {
+                LastSyncedAt = DateTime.UtcNow;
+                
+                var changes = new List<string>();
+                if (result.ItemsUploaded > 0)
+                    changes.Add($"{result.ItemsUploaded} uploaded");
+                if (result.ItemsDownloaded > 0)
+                    changes.Add($"{result.ItemsDownloaded} downloaded");
+                
+                var summary = changes.Count > 0 
+                    ? string.Join(", ", changes)
+                    : "Everything up to date";
+
+                SyncStatusText = "Just now";
+                
+                await _dialogService.ShowAlertAsync(
+                    "✅ Sync Complete",
+                    $"{summary}\n\nYour data is now synchronized across your devices.");
+
+                // Reload profile to reflect any downloaded changes
+                LoadUserProfile();
+            }
+            else
+            {
+                SyncStatusText = "Sync failed";
+                await _dialogService.ShowAlertAsync("Sync Failed", result.ErrorMessage ?? "Unknown error during sync.");
+            }
+        }
+        catch (Exception ex)
+        {
+            SyncStatusText = "Sync error";
+            await _dialogService.ShowAlertAsync("Error", $"Sync failed: {ex.Message}");
+        }
+        finally
+        {
+            IsSyncing = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task RemoveSyncAsync()
+    {
+        var user = _userService.CurrentUser;
+        if (user == null || !user.HasSyncEnabled) return;
+
+        var confirm = await _dialogService.ShowConfirmAsync(
+            "Remove Sync",
+            "This will unlink this device from cloud sync. Your local data will remain, but won't sync to other devices.\n\nContinue?",
+            "Remove Sync", "Cancel");
+
+        if (!confirm) return;
+
+        try
+        {
+            user.SyncIdentity = null;
+            await _userService.UpdateCurrentUserAsync(u => u.SyncIdentity = null);
+            
+            IsSyncEnabled = false;
+            SyncCode = null;
+            LastSyncedAt = null;
+            SyncStatusText = "Not set up";
+            
+            await _dialogService.ShowAlertAsync("Sync Removed", "This device has been unlinked from cloud sync.");
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Error", $"Failed to remove sync: {ex.Message}");
+        }
     }
 }
