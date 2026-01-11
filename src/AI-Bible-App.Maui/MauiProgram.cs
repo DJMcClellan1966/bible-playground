@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Core.Services;
 using AI_Bible_App.Infrastructure.Repositories;
 using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
@@ -84,6 +85,12 @@ public static class MauiProgram
 		
 		// Character Intelligence Service - evolving character personalities
 		builder.Services.AddSingleton<CharacterIntelligenceService>();
+		
+		// Character Memory Service - remembers what characters learn about users
+		builder.Services.AddSingleton<ICharacterMemoryService, CharacterMemoryService>();
+		
+		// Personalized Prompt Service - enhances character prompts with user context
+		builder.Services.AddSingleton<PersonalizedPromptService>();
 		
 		// Cross-Character Learning Service - enables characters to learn from roundtable discussions
 		builder.Services.AddSingleton<ICrossCharacterLearningService, CrossCharacterLearningService>();

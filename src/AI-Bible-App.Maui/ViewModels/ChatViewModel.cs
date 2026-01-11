@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Core.Services;
 using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Maui.Media;
@@ -8,7 +9,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using AI_Bible_App.Infrastructure.Services;
 
 #pragma warning disable MVVMTK0045 // AOT compatibility warning for WinRT scenarios
 
@@ -26,12 +26,14 @@ public partial class ChatViewModel : BaseViewModel
     private readonly IUserService _userService;
     private readonly ICharacterVoiceService _voiceService;
     private readonly CharacterIntelligenceService? _intelligenceService;
+    private readonly PersonalizedPromptService? _personalizedPromptService;
     private readonly bool _enableContextualReferences;
     private ChatSession? _currentSession;
     private CancellationTokenSource? _speechCancellationTokenSource;
     private CancellationTokenSource? _aiResponseCancellationTokenSource;
     private CancellationTokenSource? _voiceCancellationTokenSource;
     private ChatMessage? _currentlySpeakingMessage;
+    private BiblicalCharacter? _personalizedCharacter;
 
     // Event to request scroll to bottom
     public event EventHandler? ScrollToBottomRequested;
@@ -69,7 +71,7 @@ public partial class ChatViewModel : BaseViewModel
     [ObservableProperty]
     private bool isActionInProgress;
 
-    public ChatViewModel(IAIService aiService, IChatRepository chatRepository, IBibleLookupService bibleLookupService, IReflectionRepository reflectionRepository, IPrayerRepository prayerRepository, IDialogService dialogService, IContentModerationService moderationService, IUserService userService, ICharacterVoiceService voiceService, IConfiguration configuration, CharacterIntelligenceService? intelligenceService = null)
+    public ChatViewModel(IAIService aiService, IChatRepository chatRepository, IBibleLookupService bibleLookupService, IReflectionRepository reflectionRepository, IPrayerRepository prayerRepository, IDialogService dialogService, IContentModerationService moderationService, IUserService userService, ICharacterVoiceService voiceService, IConfiguration configuration, CharacterIntelligenceService? intelligenceService = null, PersonalizedPromptService? personalizedPromptService = null)
     {
         _aiService = aiService;
         _chatRepository = chatRepository;
@@ -81,6 +83,7 @@ public partial class ChatViewModel : BaseViewModel
         _userService = userService;
         _voiceService = voiceService;
         _intelligenceService = intelligenceService;
+        _personalizedPromptService = personalizedPromptService;
         _enableContextualReferences = configuration["Features:ContextualReferences"]?.ToLower() == "true";
     }
 
@@ -92,6 +95,18 @@ public partial class ChatViewModel : BaseViewModel
             
             Character = character;
             Title = $"Chat with {character.Name}";
+            
+            // Get personalized character with user context injected into system prompt
+            var currentUserId = _userService.CurrentUser?.Id ?? "default";
+            if (_personalizedPromptService != null)
+            {
+                _personalizedCharacter = await _personalizedPromptService.GetPersonalizedCharacterAsync(character, currentUserId);
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Personalized character loaded for user {currentUserId}");
+            }
+            else
+            {
+                _personalizedCharacter = character;
+            }
             
             // If forcing new chat, don't look for existing session
             if (!forceNewChat && existingSession == null)
@@ -273,6 +288,9 @@ public partial class ChatViewModel : BaseViewModel
             System.Diagnostics.Debug.WriteLine("[DEBUG] Starting streaming response...");
             var conversationHistory = Messages.Where(m => m != aiMessage).ToList();
             
+            // Use personalized character (with user context) if available
+            var characterForAI = _personalizedCharacter ?? Character;
+            
             // Stream the response on background thread, update UI on main thread
             // Use ConfigureAwait(false) to not block UI thread while waiting for tokens
             try
@@ -280,7 +298,7 @@ public partial class ChatViewModel : BaseViewModel
                 var tokenBuffer = new System.Text.StringBuilder();
                 var lastUpdateTime = DateTime.UtcNow;
                 
-                await foreach (var token in _aiService.StreamChatResponseAsync(Character, conversationHistory, userMsg, cancellationToken).ConfigureAwait(false))
+                await foreach (var token in _aiService.StreamChatResponseAsync(characterForAI, conversationHistory, userMsg, cancellationToken).ConfigureAwait(false))
                 {
                     if (cancellationToken.IsCancellationRequested) break;
                     
@@ -374,6 +392,28 @@ public partial class ChatViewModel : BaseViewModel
             if (_currentSession != null)
             {
                 await _chatRepository.SaveSessionAsync(_currentSession);
+            }
+            
+            // Record this interaction to build user memory (in background)
+            if (_personalizedPromptService != null && Character != null && !string.IsNullOrEmpty(aiMessage.Content))
+            {
+                var currentUserId = _userService.CurrentUser?.Id ?? "default";
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _personalizedPromptService.RecordInteractionAsync(
+                            currentUserId, 
+                            Character.Id, 
+                            userMsg, 
+                            aiMessage.Content);
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG] Recorded interaction for user memory");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG] Error recording interaction: {ex.Message}");
+                    }
+                });
             }
         }
         catch (Exception ex)

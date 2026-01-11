@@ -249,7 +249,7 @@ public class MultiCharacterChatService : IMultiCharacterChatService
         List<BiblicalCharacter> characters,
         List<ChatMessage> conversationHistory,
         string userMessage,
-        CancellationToken cancellationToken = default)
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         // Add user message to history
         var updatedHistory = new List<ChatMessage>(conversationHistory)

@@ -7,6 +7,11 @@
     Title="Voices of Scripture"
     FlyoutBehavior="Flyout">
 
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- PRODUCTION-READY FEATURES                                           -->
+    <!-- These are stable, tested, and ready for users                       -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    
     <FlyoutItem Title="Characters" Icon="{OnPlatform Default='👤'}">
         <ShellContent
             Title="Characters"
@@ -35,25 +40,23 @@
             Route="reflections" />
     </FlyoutItem>
     
-    <FlyoutItem Title="Character Growth" Icon="{OnPlatform Default='🌱'}">
-        <ShellContent
-            Title="Character Growth"
-            ContentTemplate="{DataTemplate views:CharacterEvolutionPage}"
-            Route="evolution" />
-    </FlyoutItem>
-    
-    <FlyoutItem Title="System Diagnostics" Icon="{OnPlatform Default='📊'}">
-        <ShellContent
-            Title="System Diagnostics"
-            ContentTemplate="{DataTemplate views:SystemDiagnosticsPage}"
-            Route="diagnostics" />
-    </FlyoutItem>
-    
     <FlyoutItem Title="Settings" Icon="{OnPlatform Default='⚙️'}">
         <ShellContent
             Title="Settings"
             ContentTemplate="{DataTemplate views:SettingsPage}"
             Route="settings" />
+    </FlyoutItem>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- EXPERIMENTAL FEATURES                                                -->
+    <!-- Access experimental/beta features from a single hub                  -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    
+    <FlyoutItem Title="🧪 Experimental Labs" Icon="{OnPlatform Default='🧪'}">
+        <ShellContent
+            Title="Experimental Labs"
+            ContentTemplate="{DataTemplate views:ExperimentalLabsPage}"
+            Route="labs" />
     </FlyoutItem>
 
 </Shell>

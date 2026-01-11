@@ -8,15 +8,30 @@ public partial class AppShell : Shell
 	{
 		InitializeComponent();
 
-		// Register routes
+		// Core production routes
 		Routing.RegisterRoute("chat", typeof(ChatPage));
 		Routing.RegisterRoute("prayer", typeof(PrayerPage));
 		Routing.RegisterRoute("userselection", typeof(UserSelectionPage));
 		
-		// Multi-character routes
+		// ═══════════════════════════════════════════════════════════════════
+		// EXPERIMENTAL FEATURE ROUTES
+		// These are accessible via the Experimental Labs page
+		// ═══════════════════════════════════════════════════════════════════
+		
+		// Multi-character experiences (BETA)
+		Routing.RegisterRoute("roundtable", typeof(RoundtableChatPage));
+		Routing.RegisterRoute("wisdomcouncil", typeof(WisdomCouncilPage));
+		Routing.RegisterRoute("prayerchain", typeof(PrayerChainPage));
 		Routing.RegisterRoute("MultiCharacterSelectionPage", typeof(MultiCharacterSelectionPage));
-		Routing.RegisterRoute("RoundtableChatPage", typeof(RoundtableChatPage));
-		Routing.RegisterRoute("WisdomCouncilPage", typeof(WisdomCouncilPage));
-		Routing.RegisterRoute("PrayerChainPage", typeof(PrayerChainPage));
+		
+		// AI Learning & Evolution (ALPHA)
+		Routing.RegisterRoute("evolution", typeof(CharacterEvolutionPage));
+		
+		// Developer Tools (DEV)
+		Routing.RegisterRoute("diagnostics", typeof(SystemDiagnosticsPage));
+		Routing.RegisterRoute("offlinemodels", typeof(OfflineModelsPage));
+		
+		// Labs hub
+		Routing.RegisterRoute("labs", typeof(ExperimentalLabsPage));
 	}
 }

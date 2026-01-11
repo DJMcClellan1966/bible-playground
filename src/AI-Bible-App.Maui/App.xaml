@@ -38,6 +38,7 @@
             <converters:BoolToDoubleConverter x:Key="BoolToDoubleConverter"/>
             <converters:PercentToDecimalConverter x:Key="PercentToDecimalConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:ShortNameConverter x:Key="ShortNameConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

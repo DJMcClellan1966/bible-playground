@@ -211,7 +211,7 @@ Be specific and thoughtful. Focus on genuine insights that would help {myCharact
 
             // Parse the JSON response
             var result = ParseLearningAnalysis(analysis);
-            if (result != null)
+            if (result?.KeyTeachings != null)
             {
                 // Add learned teachings
                 foreach (var teaching in result.KeyTeachings)

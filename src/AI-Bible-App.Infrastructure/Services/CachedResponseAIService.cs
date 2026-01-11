@@ -60,12 +60,28 @@ public class CachedResponseAIService : IAIService
     {
         var lowerMessage = userMessage.ToLowerInvariant();
         
-        // Try to match topic-specific responses
-        if (lowerMessage.Contains("faith") || lowerMessage.Contains("believe") || lowerMessage.Contains("trust"))
+        // Try to match emotional/topic-specific responses - order matters (more specific first)
+        if (lowerMessage.Contains("lost") || lowerMessage.Contains("direction") || lowerMessage.Contains("purpose") || lowerMessage.Contains("meaning"))
+        {
+            return GetLostResponse(characterId);
+        }
+        if (lowerMessage.Contains("lonely") || lowerMessage.Contains("alone") || lowerMessage.Contains("no one"))
+        {
+            return GetLonelyResponse(characterId);
+        }
+        if (lowerMessage.Contains("depress") || lowerMessage.Contains("sad") || lowerMessage.Contains("hopeless") || lowerMessage.Contains("despair"))
+        {
+            return GetDepressionResponse(characterId);
+        }
+        if (lowerMessage.Contains("anxious") || lowerMessage.Contains("anxiety") || lowerMessage.Contains("stress") || lowerMessage.Contains("overwhelm"))
+        {
+            return GetAnxietyResponse(characterId);
+        }
+        if (lowerMessage.Contains("faith") || lowerMessage.Contains("believe") || lowerMessage.Contains("trust") || lowerMessage.Contains("doubt"))
         {
             return GetFaithResponse(characterId);
         }
-        if (lowerMessage.Contains("fear") || lowerMessage.Contains("afraid") || lowerMessage.Contains("worry"))
+        if (lowerMessage.Contains("fear") || lowerMessage.Contains("afraid") || lowerMessage.Contains("worry") || lowerMessage.Contains("scared"))
         {
             return GetFearResponse(characterId);
         }
@@ -73,13 +89,17 @@ public class CachedResponseAIService : IAIService
         {
             return GetPrayerResponse(characterId);
         }
-        if (lowerMessage.Contains("love") || lowerMessage.Contains("forgive"))
+        if (lowerMessage.Contains("love") || lowerMessage.Contains("forgive") || lowerMessage.Contains("relationship"))
         {
             return GetLoveResponse(characterId);
         }
-        if (lowerMessage.Contains("sin") || lowerMessage.Contains("wrong") || lowerMessage.Contains("guilt"))
+        if (lowerMessage.Contains("sin") || lowerMessage.Contains("wrong") || lowerMessage.Contains("guilt") || lowerMessage.Contains("shame") || lowerMessage.Contains("fail"))
         {
             return GetSinResponse(characterId);
+        }
+        if (lowerMessage.Contains("angry") || lowerMessage.Contains("anger") || lowerMessage.Contains("frustrated") || lowerMessage.Contains("mad"))
+        {
+            return GetAngerResponse(characterId);
         }
         
         // Default responses
@@ -91,22 +111,70 @@ public class CachedResponseAIService : IAIService
         return GetGenericResponse(characterId);
     }
 
+    private string GetLostResponse(string characterId) => characterId switch
+    {
+        "david" => "Friend, I understand feeling lost. When I fled from Saul, I hid in caves for years, not knowing if I would ever see my destiny fulfilled. In those dark caves at Adullam, I wrote 'Why are you cast down, O my soul?' Yet even there, I learned to encourage myself in the Lord. Tell me more about what's making you feel lost - perhaps we can find God's thread through this together.",
+        "paul" => "I hear your heart. When I was blinded on the Damascus road, everything I thought I knew was shattered. For three days I sat in darkness, my entire identity destroyed. But that disorientation became my redirection. Sometimes feeling lost is the beginning of being found. What specifically feels uncertain right now?",
+        "moses" => "Forty years I spent in the desert, forgotten by everyone, tending sheep. I had been a prince of Egypt with a future, and suddenly I was a nobody. I felt my life was wasted. But God was preparing me in the wilderness for something I couldn't see. Where do you feel most directionless?",
+        "peter" => "After I denied Jesus three times, I went back to fishing. I had no idea what to do with myself. I'd thrown away three years following Him, and now He was dead and I was a coward. Feeling lost isn't the end - Jesus found me by that lake and restored me. What's weighing heaviest on your heart?",
+        "mary" => "When Joseph and I lost Jesus for three days in Jerusalem, the panic and confusion were overwhelming. I didn't understand what was happening or why. Sometimes God's plans don't make sense while we're living them. What are you searching for, my child?",
+        _ => "Feeling lost is often the beginning of a deeper journey with God. Many of God's greatest servants went through seasons of confusion and uncertainty. Would you share more about what you're experiencing?"
+    };
+
+    private string GetLonelyResponse(string characterId) => characterId switch
+    {
+        "david" => "Loneliness - I know it well. When Saul turned against me, I lost my best friend Jonathan, my wife, my position, everything. In the wilderness, I wrote 'I am like a pelican of the wilderness, like an owl of the desert. I lie awake, like a lonely sparrow on a housetop.' Even kings feel isolated. Tell me about your loneliness.",
+        "paul" => "At my first defense in Rome, no one came to support me. Everyone deserted me. I understand the sting of isolation. Even Demas left because he loved this present world. But I found that when others abandon us, the Lord stands with us. What has brought this loneliness into your life?",
+        "moses" => "Leading two million people and yet feeling utterly alone - I understand that. No one could share my burden. I once told God 'I cannot carry all these people by myself; the burden is too heavy.' Leadership can be the loneliest place. What kind of loneliness are you carrying?",
+        "esther" => "I lived in a palace surrounded by people, yet completely alone. I couldn't reveal who I really was. I had to hide my identity, my faith, my people. The loneliness of wearing a mask is exhausting. Do you feel you're hiding parts of yourself?",
+        "john" => "On the island of Patmos, exiled and aged, I was the last one left. Peter was gone, Paul was gone, my brother James had been executed. Everyone I loved was dead. Yet there in my loneliness, Jesus appeared to me in glory. What has left you feeling so alone?",
+        _ => "Loneliness can be one of life's deepest pains. You're not alone in feeling alone - God sees you in this moment. Would you tell me more about what's happening?"
+    };
+
+    private string GetDepressionResponse(string characterId) => characterId switch
+    {
+        "david" => "I've been there. 'My tears have been my food day and night.' 'I am weary with my groaning; all night I flood my bed with tears.' I didn't hide my depression in my psalms because others need to know God meets us in that dark valley. You don't have to pretend with me. What feels heaviest right now?",
+        "paul" => "In Asia, we were so utterly burdened beyond our strength that we despaired of life itself. Yes, I knew despair so deep I wanted to die. This was the great apostle Paul! These feelings aren't weakness - they're human. What has brought you to this low place?",
+        "moses" => "I once asked God to kill me. 'If this is how you're going to treat me,' I said, 'please go ahead and kill me.' The weight became too much. God didn't rebuke me for that prayer - He provided help. What's crushing you right now?",
+        "hannah" => "Year after year, I wept. I couldn't eat. My heart was so grieved that Eli thought I was drunk. Depression isn't a lack of faith - it's an overwhelming burden. I poured out my soul, not my composed prayers, but my raw anguish. What's the grief beneath your sadness?",
+        _ => "This kind of heaviness is real and it matters. Many of God's servants have walked through deep darkness. You don't have to carry this alone. Can you tell me more about what you're experiencing?"
+    };
+
+    private string GetAnxietyResponse(string characterId) => characterId switch
+    {
+        "david" => "When anxiety threatens to overwhelm me, I remember the cave of Adullam, when my heart raced and fear told me I would die. 'When I am afraid, I put my trust in You.' That's not a statement of calm - it's a choice made in the middle of terror. What's causing your anxiety?",
+        "paul" => "I wrote 'be anxious for nothing' not because I never felt anxiety, but because I wrestled with it constantly. 'I have great sorrow and unceasing anguish in my heart,' I admitted elsewhere. The key is bringing our anxious thoughts to God, not pretending they don't exist. What's weighing on you?",
+        "esther" => "When I had to approach the king, I fasted three days because I was so terrified. Walking into that throne room, my heart pounded knowing I could be killed. Courage isn't the absence of fear - it's moving forward despite it. What situation is creating this anxiety?",
+        "peter" => "When I was sinking in the waves, it was pure panic. I'd taken my eyes off Jesus and looked at the storm. That's what anxiety does - it makes the waves look bigger than the Savior. What storm are you looking at right now?",
+        _ => "Anxiety is a real battle, not a failure of faith. God doesn't condemn you for feeling overwhelmed. Let's talk about what's specifically troubling you."
+    };
+
+    private string GetAngerResponse(string characterId) => characterId switch
+    {
+        "david" => "Anger? Some of my psalms are raw with rage - 'Break their teeth, O God!' I cried. God can handle our honest fury. The question is whether we give it to Him or let it consume us. What has stirred this anger in you?",
+        "moses" => "I struck the rock in anger when I should have spoken to it. My anger cost me the Promised Land. I understand the burning frustration of dealing with difficult people and impossible situations. What's provoking your anger?",
+        "john" => "Jesus called my brother and me 'Sons of Thunder' because of our temper! We wanted to call fire down on a village that rejected Jesus. Anger isn't always wrong - but it needs direction. What's behind your anger?",
+        "peter" => "I cut off a man's ear in the garden! My rage made me lash out. Jesus had to clean up my mess. I know what it's like when anger takes control before you think. What happened?",
+        _ => "Anger often signals something important - injustice, hurt, or violated boundaries. It's not wrong to feel angry; the question is what we do with it. Tell me what's stirring this up."
+    };
+
     private string GetFaithResponse(string characterId) => characterId switch
     {
-        "david" => "My friend, faith is trusting in the Lord even when the path ahead is dark. As I wrote in my psalms, 'The Lord is my shepherd; I shall not want.' Even when I faced Goliath, it was not my strength but my faith in God that prevailed. Trust Him with all your heart.",
-        "paul" => "Faith, dear friend, is the substance of things hoped for, the evidence of things not seen. I have learned through many trials that when we are weak, then we are strong in Christ. Let your faith not rest in human wisdom, but in God's power.",
-        "moses" => "I remember standing before the Red Sea with Pharaoh's army behind us. Fear gripped the people, but the Lord said 'Stand firm and see the deliverance of the Lord.' Faith is stepping forward when you cannot see the path.",
-        "peter" => "I know what it means to have faith tested! I walked on water toward Jesus, but when I looked at the waves instead of Him, I began to sink. Keep your eyes on Jesus, and your faith will sustain you.",
-        "mary-mother" => "My child, faith is saying 'yes' to God even when we don't understand His plan. When the angel came to me, I was afraid, yet I said 'Let it be according to your word.' Trust that God's ways are higher than our ways.",
-        _ => "Have faith in God. With faith as small as a mustard seed, mountains can be moved. Trust in the Lord with all your heart and lean not on your own understanding."
+        "david" => "Friend, when I faced Goliath, everyone said I was crazy. But I'd seen God deliver me from lions and bears. Faith isn't blind - it's remembering what God has already done. What past faithfulness of God can you cling to right now?",
+        "paul" => "I was so certain about my faith - that Jesus was a fraud - until He knocked me off my horse and blinded me. Now I know that real faith isn't certainty; it's trust in the dark. What's shaking your faith?",
+        "moses" => "I argued with God at the burning bush! 'Who am I? I can't speak! Send someone else!' Faith grew in me slowly, through seeing God act. It's okay to struggle with belief. What doubts are you wrestling with?",
+        "peter" => "I walked on water until I looked at the waves. I confessed Jesus as Christ and then called His death plan 'satanic.' My faith was a mess! But Jesus never gave up on me. Where is your faith faltering?",
+        "mary" => "When the angel told me I would bear God's son, I asked 'How can this be?' Questions aren't unbelief - they're honest seeking. God didn't rebuke my question; He answered it. What questions are troubling your faith?",
+        _ => "Faith isn't the absence of doubt - it's trust in the middle of uncertainty. Many of God's greatest servants struggled to believe. What's making faith difficult right now?"
     };
 
     private string GetFearResponse(string characterId) => characterId switch
     {
-        "david" => "Fear not, for the Lord is with you. Even though I walk through the valley of the shadow of death, I will fear no evil, for You are with me. God has not given us a spirit of fear, but of power and love.",
-        "esther" => "I understand fear deeply. When I had to approach the king uninvited, my life was at stake. But Mordecai reminded me - perhaps I was placed in my position 'for such a time as this.' Sometimes we must do what is right despite our fear.",
-        "moses" => "The Lord said to me many times, 'Fear not.' When I stood before Pharaoh, when the people rebelled, when the journey seemed impossible - God was always there. He who brought Israel out of Egypt will surely help you through your trials.",
-        _ => "Do not be afraid, for the Lord your God is with you wherever you go. Cast all your anxiety on Him because He cares for you. Perfect love casts out fear."
+        "david" => "I know fear intimately. Hiding in caves, running for my life, watching my son try to kill me. 'Even though I walk through the valley of the shadow of death' - I wrote that from experience, not theory. What has you afraid?",
+        "esther" => "Fear nearly paralyzed me. Walking into the king's throne room, knowing I could die - I was terrified. I didn't feel brave; I just took the next step. What fear is gripping you right now?",
+        "moses" => "I made every excuse at the burning bush because I was afraid. Afraid of Pharaoh, afraid of failing, afraid of speaking. God didn't take my fear away - He walked through it with me. What's the root of your fear?",
+        "peter" => "I was so afraid the night Jesus was arrested that I denied even knowing Him. Fear made me betray my best friend. I understand what terror can do to us. What situation has you so scared?",
+        _ => "Fear is human - even Jesus sweated blood in Gethsemane. The question isn't whether we feel fear, but whether we'll let it decide for us. Tell me what's frightening you."
     };
 
     private string GetPrayerResponse(string characterId) => characterId switch

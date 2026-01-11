@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AI_Bible_App.Maui.Views.ExperimentalLabsPage"
+             Title="🧪 Experimental Labs"
+             BackgroundColor="#1a1f2e">
+    
+    <ScrollView Padding="20">
+        <VerticalStackLayout Spacing="20">
+            
+            <!-- Warning Banner -->
+            <Border BackgroundColor="#3d2d1f"
+                    StrokeShape="RoundRectangle 12"
+                    Stroke="#FFA500"
+                    StrokeThickness="2"
+                    Padding="16">
+                <HorizontalStackLayout Spacing="12">
+                    <Label Text="⚠️" FontSize="24" VerticalOptions="Center"/>
+                    <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                        <Label Text="Experimental Features" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#FFA500"/>
+                        <Label Text="These features are under development. They may be unstable or change significantly." 
+                               FontSize="12" 
+                               TextColor="#cccccc"
+                               LineBreakMode="WordWrap"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+            
+            <!-- Header -->
+            <Label Text="🧪 Experimental Labs"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="Center"/>
+            
+            <Label Text="Test new features before they're ready for everyone"
+                   FontSize="14"
+                   TextColor="#a0aec0"
+                   HorizontalOptions="Center"/>
+            
+            <!-- Multi-Character Experiences Section -->
+            <Border BackgroundColor="#2d3548"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="20"
+                    Margin="0,10,0,0">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="👥 Multi-Character Experiences"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    <Label Text="Have multiple biblical characters discuss topics together"
+                           FontSize="12"
+                           TextColor="#a0aec0"/>
+                    
+                    <!-- Roundtable Discussion -->
+                    <Border BackgroundColor="#3d4557"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="#4169E1"
+                                   CornerRadius="8"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Padding="0">
+                                <Label Text="🗣️" FontSize="24" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="Roundtable Discussion" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="White"/>
+                                <Label Text="Characters discuss and debate topics" 
+                                       FontSize="11" 
+                                       TextColor="#a0aec0"/>
+                                <Border BackgroundColor="#FFA500" 
+                                        StrokeShape="RoundRectangle 4" 
+                                        Padding="4,2"
+                                        HorizontalOptions="Start">
+                                    <Label Text="BETA" FontSize="9" TextColor="White" FontAttributes="Bold"/>
+                                </Border>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2"
+                                    Text="Try"
+                                    Clicked="OnRoundtableClicked"
+                                    BackgroundColor="#4169E1"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    WidthRequest="60"
+                                    HeightRequest="36"/>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Wisdom Council -->
+                    <Border BackgroundColor="#3d4557"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="#9932CC"
+                                   CornerRadius="8"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Padding="0">
+                                <Label Text="🦉" FontSize="24" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="Wisdom Council" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="White"/>
+                                <Label Text="Get collective wisdom on a question" 
+                                       FontSize="11" 
+                                       TextColor="#a0aec0"/>
+                                <Border BackgroundColor="#FFA500" 
+                                        StrokeShape="RoundRectangle 4" 
+                                        Padding="4,2"
+                                        HorizontalOptions="Start">
+                                    <Label Text="BETA" FontSize="9" TextColor="White" FontAttributes="Bold"/>
+                                </Border>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2"
+                                    Text="Try"
+                                    Clicked="OnWisdomCouncilClicked"
+                                    BackgroundColor="#9932CC"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    WidthRequest="60"
+                                    HeightRequest="36"/>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Prayer Chain -->
+                    <Border BackgroundColor="#3d4557"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="#2E8B57"
+                                   CornerRadius="8"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Padding="0">
+                                <Label Text="🙏" FontSize="24" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="Prayer Chain" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="White"/>
+                                <Label Text="Multiple characters pray for you" 
+                                       FontSize="11" 
+                                       TextColor="#a0aec0"/>
+                                <Border BackgroundColor="#FFA500" 
+                                        StrokeShape="RoundRectangle 4" 
+                                        Padding="4,2"
+                                        HorizontalOptions="Start">
+                                    <Label Text="BETA" FontSize="9" TextColor="White" FontAttributes="Bold"/>
+                                </Border>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2"
+                                    Text="Try"
+                                    Clicked="OnPrayerChainClicked"
+                                    BackgroundColor="#2E8B57"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    WidthRequest="60"
+                                    HeightRequest="36"/>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- AI Learning Section -->
+            <Border BackgroundColor="#2d3548"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="🧠 AI Learning &amp; Evolution"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    <Label Text="Characters that grow and learn from conversations"
+                           FontSize="12"
+                           TextColor="#a0aec0"/>
+                    
+                    <!-- Character Evolution -->
+                    <Border BackgroundColor="#3d4557"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="#FF6347"
+                                   CornerRadius="8"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Padding="0">
+                                <Label Text="🌱" FontSize="24" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="Character Growth" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="White"/>
+                                <Label Text="See how characters evolve over time" 
+                                       FontSize="11" 
+                                       TextColor="#a0aec0"/>
+                                <Border BackgroundColor="#FF6347" 
+                                        StrokeShape="RoundRectangle 4" 
+                                        Padding="4,2"
+                                        HorizontalOptions="Start">
+                                    <Label Text="ALPHA" FontSize="9" TextColor="White" FontAttributes="Bold"/>
+                                </Border>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2"
+                                    Text="View"
+                                    Clicked="OnCharacterEvolutionClicked"
+                                    BackgroundColor="#FF6347"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    WidthRequest="60"
+                                    HeightRequest="36"/>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Developer Tools Section -->
+            <Border BackgroundColor="#2d3548"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="🔧 Developer Tools"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    <Label Text="Technical tools for monitoring and debugging"
+                           FontSize="12"
+                           TextColor="#a0aec0"/>
+                    
+                    <!-- System Diagnostics -->
+                    <Border BackgroundColor="#3d4557"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="#4682B4"
+                                   CornerRadius="8"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Padding="0">
+                                <Label Text="📊" FontSize="24" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="System Diagnostics" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="White"/>
+                                <Label Text="Performance metrics and cache stats" 
+                                       FontSize="11" 
+                                       TextColor="#a0aec0"/>
+                                <Border BackgroundColor="#4682B4" 
+                                        StrokeShape="RoundRectangle 4" 
+                                        Padding="4,2"
+                                        HorizontalOptions="Start">
+                                    <Label Text="DEV" FontSize="9" TextColor="White" FontAttributes="Bold"/>
+                                </Border>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2"
+                                    Text="Open"
+                                    Clicked="OnDiagnosticsClicked"
+                                    BackgroundColor="#4682B4"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    WidthRequest="60"
+                                    HeightRequest="36"/>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Offline AI Models -->
+                    <Border BackgroundColor="#3d4557"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="#708090"
+                                   CornerRadius="8"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Padding="0">
+                                <Label Text="🤖" FontSize="24" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="Offline AI Models" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="White"/>
+                                <Label Text="Manage local AI models" 
+                                       FontSize="11" 
+                                       TextColor="#a0aec0"/>
+                                <Border BackgroundColor="#708090" 
+                                        StrokeShape="RoundRectangle 4" 
+                                        Padding="4,2"
+                                        HorizontalOptions="Start">
+                                    <Label Text="DEV" FontSize="9" TextColor="White" FontAttributes="Bold"/>
+                                </Border>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2"
+                                    Text="Open"
+                                    Clicked="OnOfflineModelsClicked"
+                                    BackgroundColor="#708090"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    WidthRequest="60"
+                                    HeightRequest="36"/>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Coming Soon Section -->
+            <Border BackgroundColor="#2d3548"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="20"
+                    Opacity="0.7">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="🔮 Coming Soon"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    <Label Text="Features currently in development"
+                           FontSize="12"
+                           TextColor="#a0aec0"/>
+                    
+                    <!-- AI Image Generation -->
+                    <Border BackgroundColor="#3d4557"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16"
+                            Opacity="0.5">
+                        <HorizontalStackLayout Spacing="12">
+                            <Frame BackgroundColor="#333"
+                                   CornerRadius="8"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Padding="0">
+                                <Label Text="🎨" FontSize="24" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="4">
+                                <Label Text="AI Image Generation" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#888"/>
+                                <Label Text="Generate character portraits and scenes" 
+                                       FontSize="11" 
+                                       TextColor="#666"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+                    
+                    <!-- Enhanced Visual Theme -->
+                    <Border BackgroundColor="#3d4557"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="16"
+                            Opacity="0.5">
+                        <HorizontalStackLayout Spacing="12">
+                            <Frame BackgroundColor="#333"
+                                   CornerRadius="8"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Padding="0">
+                                <Label Text="✨" FontSize="24" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="4">
+                                <Label Text="Enhanced Visual Theme" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#888"/>
+                                <Label Text="Beautiful new UI with animations" 
+                                       FontSize="11" 
+                                       TextColor="#666"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Feedback Section -->
+            <Border BackgroundColor="#1a3d2e"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="16"
+                    Margin="0,10,0,20">
+                <HorizontalStackLayout Spacing="12">
+                    <Label Text="💬" FontSize="24" VerticalOptions="Center"/>
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="4">
+                        <Label Text="Have feedback?" 
+                               FontSize="14" 
+                               FontAttributes="Bold" 
+                               TextColor="#90EE90"/>
+                        <Label Text="Let me know which features you'd like to see improved!" 
+                               FontSize="12" 
+                               TextColor="#a0aec0"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

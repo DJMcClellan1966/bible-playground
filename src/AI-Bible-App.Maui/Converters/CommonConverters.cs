@@ -264,3 +264,32 @@ public class BoolToGeneratingPrayerTextConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Extracts the short name from a full name by removing parenthetical descriptors.
+/// Example: "Paul (Saul of Tarsus)" -> "Paul"
+/// Example: "Mary (Mother of Jesus)" -> "Mary"
+/// Example: "John (the Beloved)" -> "John"
+/// </summary>
+public class ShortNameConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is string fullName && !string.IsNullOrWhiteSpace(fullName))
+        {
+            // Remove anything in parentheses and trim
+            var parenIndex = fullName.IndexOf('(');
+            if (parenIndex > 0)
+            {
+                return fullName.Substring(0, parenIndex).Trim();
+            }
+            return fullName.Trim();
+        }
+        return value;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
