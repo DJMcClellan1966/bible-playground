@@ -47,6 +47,13 @@
             Route="devotional" />
     </FlyoutItem>
     
+    <FlyoutItem Title="Reading Plans" Icon="{OnPlatform Default='📅'}">
+        <ShellContent
+            Title="Reading Plans"
+            ContentTemplate="{DataTemplate views:ReadingPlanPage}"
+            Route="readingplan" />
+    </FlyoutItem>
+    
     <FlyoutItem Title="Bible Reader" Icon="{OnPlatform Default='📜'}">
         <ShellContent
             Title="Bible Reader"

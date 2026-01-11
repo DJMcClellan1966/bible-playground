@@ -60,6 +60,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IVerseBookmarkRepository, VerseBookmarkRepository>();
 		builder.Services.AddSingleton<IBibleVerseIndexService, BibleVerseIndexService>();
 		builder.Services.AddSingleton<ISecureConfigService, SecureConfigService>();
+		builder.Services.AddSingleton<AI_Bible_App.Core.Interfaces.IReadingPlanRepository, AI_Bible_App.Infrastructure.Repositories.ReadingPlanRepository>();
 		
 		// Custom character services
 		builder.Services.AddSingleton<ICustomCharacterRepository, CustomCharacterRepository>();
@@ -188,6 +189,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<DevotionalViewModel>();
 		builder.Services.AddTransient<BookmarksViewModel>();
 		builder.Services.AddTransient<CustomCharacterViewModel>();
+		builder.Services.AddTransient<ReadingPlanViewModel>();
 
 		// Register Pages
 		builder.Services.AddTransient<UserSelectionPage>();
@@ -207,6 +209,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<DevotionalPage>();
 		builder.Services.AddTransient<BookmarksPage>();
 		builder.Services.AddTransient<CustomCharacterPage>();
+		builder.Services.AddTransient<ReadingPlanPage>();
 		
 		// New UI Enhancement Pages and ViewModels
 		builder.Services.AddSingleton<IAccessibilityService, AccessibilityService>();

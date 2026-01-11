@@ -1,10 +1,10 @@
 # Future Improvements - Consolidated TODO
 
-> **Last Updated:** January 11, 2026 (Evening)  
+> **Last Updated:** January 12, 2026  
 > This document consolidates all unimplemented recommendations from the various markdown files.
 > The markdown files have been reviewed and all **completed** features are already in the codebase.
 > 
-> **Recent Additions:** CI/CD pipeline, Azure OpenAI, Serilog logging, SQLite storage, usage metrics, feedback form, expanded tests (84+)
+> **Recent Additions:** Bible Reading Plans with 5 built-in plans, progress tracking, streak system
 
 ---
 
@@ -43,6 +43,7 @@ The following major features are **already implemented** and working:
 - ✅ Usage metrics service (local, anonymized)
 - ✅ In-app feedback form
 - ✅ Bible data compression/optimization
+- ✅ Bible Reading Plans with 5 built-in plans
 
 ---
 
@@ -78,16 +79,23 @@ The following major features are **already implemented** and working:
 
 ---
 
-#### 3. Bible Reading Plan
-**Backend:** ❌ Not implemented  
-**UI:** ❌ Not implemented
+#### 3. Bible Reading Plan ✅ IMPLEMENTED
+**Backend:** ✅ Complete (`ReadingPlanRepository`, `ReadingPlan` models)  
+**UI:** ✅ Complete (`ReadingPlanPage.xaml`, `ReadingPlanViewModel.cs`)
 
-**Features to implement:**
-- 365-day reading plan data
-- Progress tracking (visual bar, day counter)
-- Mark day as complete
-- Navigation between days
-- Multiple plan options (chronological, thematic, etc.)
+**Features implemented:**
+- 5 built-in reading plans (Bible in 90 Days, Psalms in 30 Days, Gospels in 60 Days, New Testament in 90 Days, Proverbs in 31 Days)
+- Progress tracking with visual progress bar
+- Streak tracking (current and longest streak)
+- Mark day as complete/incomplete
+- Navigation between days (Previous/Next)
+- Day-by-day passages with titles and key verses
+- Reflection prompts for each day
+- Multiple plan types (Canonical, Chronological, Thematic, Gospel, Wisdom)
+- Difficulty levels (Light, Medium, Intensive)
+- Estimated reading time per day
+- Completed plans history with dates
+- Accessible via flyout menu "📅 Reading Plans"
 
 ---
 

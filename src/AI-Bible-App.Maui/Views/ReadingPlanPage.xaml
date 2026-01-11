@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             x:Class="AI_Bible_App.Maui.Views.ReadingPlanPage"
+             x:DataType="vm:ReadingPlanViewModel"
+             Title="Reading Plans"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <Grid RowDefinitions="Auto,*">
+        
+        <!-- Header -->
+        <Grid Grid.Row="0" 
+              ColumnDefinitions="*,Auto"
+              Padding="15"
+              BackgroundColor="{DynamicResource CardBackground}">
+            
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="📅 Reading Plans"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource TextColor}"/>
+                <Label Text="Stay consistent with your Bible reading"
+                       FontSize="13"
+                       TextColor="{DynamicResource Gray600}"/>
+            </VerticalStackLayout>
+            
+            <Button Grid.Column="1"
+                    Text="🔄"
+                    Command="{Binding RefreshCommand}"
+                    ToolTipProperties.Text="Refresh"
+                    HeightRequest="44"
+                    WidthRequest="44"
+                    CornerRadius="22"
+                    Padding="0"
+                    BackgroundColor="{DynamicResource Primary}"
+                    TextColor="White"/>
+        </Grid>
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="15" Spacing="15">
+                
+                <!-- Loading State -->
+                <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                   IsVisible="{Binding IsLoading}"
+                                   Color="{DynamicResource Primary}"
+                                   HeightRequest="40"/>
+
+                <!-- Active Plan Section -->
+                <Border IsVisible="{Binding HasActivePlan}"
+                        Padding="20"
+                        BackgroundColor="{DynamicResource CardBackground}"
+                        Stroke="{DynamicResource Primary}"
+                        StrokeThickness="2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="15"/>
+                    </Border.StrokeShape>
+                    
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="📖 Your Current Plan"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="{DynamicResource Primary}"/>
+                        
+                        <Label Text="{Binding ActivePlan.Name}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{DynamicResource TextColor}"/>
+                        
+                        <!-- Progress Bar -->
+                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
+                            <ProgressBar Grid.Row="0" Grid.Column="0"
+                                         Progress="{Binding ProgressPercent}"
+                                         ProgressColor="{DynamicResource Primary}"
+                                         HeightRequest="10"/>
+                            <Label Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding ProgressText}"
+                                   FontSize="13"
+                                   Margin="10,0,0,0"
+                                   TextColor="{DynamicResource Gray600}"/>
+                            <Label Grid.Row="1" Grid.ColumnSpan="2"
+                                   Text="{Binding StreakText}"
+                                   FontSize="13"
+                                   TextColor="{DynamicResource Gray600}"
+                                   Margin="0,5,0,0"/>
+                        </Grid>
+                        
+                        <!-- Today's Reading -->
+                        <Border Padding="15"
+                                BackgroundColor="{DynamicResource Gray100}"
+                                Stroke="Transparent">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="{Binding TodaysReading.Title, StringFormat='Day {0}: {1}'}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource TextColor}">
+                                    <Label.Text>
+                                        <MultiBinding StringFormat="Day {0}: {1}">
+                                            <Binding Path="ActiveProgress.CurrentDay"/>
+                                            <Binding Path="TodaysReading.Title"/>
+                                        </MultiBinding>
+                                    </Label.Text>
+                                </Label>
+                                
+                                <Label Text="{Binding TodaysPassagesText}"
+                                       FontSize="14"
+                                       TextColor="{DynamicResource TextColor}"/>
+                                
+                                <Label Text="{Binding TodaysReading.KeyVerse}"
+                                       FontSize="13"
+                                       FontAttributes="Italic"
+                                       IsVisible="{Binding HasKeyVerse}"
+                                       TextColor="{DynamicResource Gray600}"/>
+                                
+                                <Label Text="{Binding TodaysReading.ReflectionPrompt}"
+                                       FontSize="13"
+                                       IsVisible="{Binding HasReflectionPrompt}"
+                                       TextColor="{DynamicResource Gray600}"/>
+                                
+                                <HorizontalStackLayout Spacing="10" Margin="0,10,0,0">
+                                    <Button Text="✅ Mark Complete"
+                                            Command="{Binding MarkCompletedCommand}"
+                                            IsVisible="{Binding CanMarkComplete}"
+                                            BackgroundColor="{DynamicResource Primary}"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            Padding="15,10"/>
+                                    
+                                    <Button Text="📖 Read Passage"
+                                            Command="{Binding OpenPassageCommand}"
+                                            BackgroundColor="{DynamicResource Gray300}"
+                                            TextColor="{DynamicResource TextColor}"
+                                            CornerRadius="8"
+                                            Padding="15,10"/>
+                                </HorizontalStackLayout>
+                                
+                                <Label Text="✓ Completed Today!"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       IsVisible="{Binding IsTodayCompleted}"
+                                       TextColor="{DynamicResource Primary}"/>
+                            </VerticalStackLayout>
+                        </Border>
+                        
+                        <!-- Navigation -->
+                        <Grid ColumnDefinitions="*,Auto,*">
+                            <Button Grid.Column="0"
+                                    Text="◀ Previous Day"
+                                    Command="{Binding PreviousDayCommand}"
+                                    IsEnabled="{Binding CanGoPrevious}"
+                                    HorizontalOptions="Start"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{DynamicResource Primary}"/>
+                            
+                            <Label Grid.Column="1"
+                                   Text="{Binding ActiveProgress.CurrentDay, StringFormat='Day {0}'}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"
+                                   TextColor="{DynamicResource TextColor}"/>
+                            
+                            <Button Grid.Column="2"
+                                    Text="Next Day ▶"
+                                    Command="{Binding NextDayCommand}"
+                                    IsEnabled="{Binding CanGoNext}"
+                                    HorizontalOptions="End"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{DynamicResource Primary}"/>
+                        </Grid>
+                        
+                        <Button Text="🗑️ Abandon Plan"
+                                Command="{Binding AbandonPlanCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource Gray600}"
+                                FontSize="12"
+                                HorizontalOptions="End"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- No Active Plan Message -->
+                <Border IsVisible="{Binding ShowNoPlanMessage}"
+                        Padding="30"
+                        BackgroundColor="{DynamicResource CardBackground}"
+                        Stroke="{DynamicResource Gray300}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="15"/>
+                    </Border.StrokeShape>
+                    
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                        <Label Text="📚"
+                               FontSize="48"
+                               HorizontalOptions="Center"/>
+                        <Label Text="No Active Reading Plan"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{DynamicResource TextColor}"/>
+                        <Label Text="Choose a plan below to start your Bible reading journey!"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{DynamicResource Gray600}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Available Plans Section -->
+                <Label Text="📋 Available Plans"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource TextColor}"
+                       Margin="0,10,0,0"/>
+                
+                <CollectionView ItemsSource="{Binding AvailablePlans}"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
+                    </CollectionView.ItemsLayout>
+                    
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ReadingPlanItemViewModel">
+                            <Border Padding="15"
+                                    BackgroundColor="{DynamicResource CardBackground}"
+                                    Stroke="{DynamicResource Gray300}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12"/>
+                                </Border.StrokeShape>
+                                
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
+                                    <Label Grid.Row="0" Grid.Column="0"
+                                           Text="{Binding Name}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="{DynamicResource TextColor}"/>
+                                    
+                                    <Label Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding DifficultyBadge}"
+                                           FontSize="12"
+                                           Padding="8,4"
+                                           BackgroundColor="{Binding DifficultyColor}"
+                                           TextColor="White"/>
+                                    
+                                    <Label Grid.Row="1" Grid.ColumnSpan="2"
+                                           Text="{Binding Description}"
+                                           FontSize="13"
+                                           TextColor="{DynamicResource Gray600}"
+                                           LineBreakMode="WordWrap"
+                                           Margin="0,5,0,0"/>
+                                    
+                                    <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2"
+                                                           Spacing="15"
+                                                           Margin="0,8,0,0">
+                                        <Label Text="{Binding TotalDays, StringFormat='📅 {0} days'}"
+                                               FontSize="12"
+                                               TextColor="{DynamicResource Gray600}"/>
+                                        <Label Text="{Binding EstimatedMinutesPerDay, StringFormat='⏱️ ~{0} min/day'}"
+                                               FontSize="12"
+                                               TextColor="{DynamicResource Gray600}"/>
+                                        <Label Text="{Binding TypeBadge}"
+                                               FontSize="12"
+                                               TextColor="{DynamicResource Gray600}"/>
+                                    </HorizontalStackLayout>
+                                    
+                                    <Button Grid.Row="3" Grid.ColumnSpan="2"
+                                            Text="Start This Plan"
+                                            Command="{Binding StartCommand}"
+                                            Margin="0,10,0,0"
+                                            BackgroundColor="{DynamicResource Primary}"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            HorizontalOptions="Fill"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                
+                <!-- Completed Plans Section -->
+                <Label Text="✅ Completed Plans"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource TextColor}"
+                       IsVisible="{Binding HasCompletedPlans}"
+                       Margin="0,20,0,0"/>
+                
+                <CollectionView ItemsSource="{Binding CompletedProgress}"
+                                SelectionMode="None"
+                                IsVisible="{Binding HasCompletedPlans}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+                    </CollectionView.ItemsLayout>
+                    
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CompletedPlanViewModel">
+                            <Border Padding="12"
+                                    BackgroundColor="{DynamicResource Gray100}"
+                                    Stroke="{DynamicResource Gray300}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+                                
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="🏆"
+                                           FontSize="24"
+                                           VerticalOptions="Center"/>
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding PlanName}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               TextColor="{DynamicResource TextColor}"/>
+                                        <Label Text="{Binding CompletedDate, StringFormat='Completed {0:MMM d, yyyy}'}"
+                                               FontSize="12"
+                                               TextColor="{DynamicResource Gray600}"/>
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
