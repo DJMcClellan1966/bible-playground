@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             xmlns:models="clr-namespace:AI_Bible_App.Core.Models;assembly=AI-Bible-App.Core"
+             x:Class="AI_Bible_App.Maui.Views.CustomCharacterPage"
+             x:DataType="vm:CustomCharacterViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <Grid RowDefinitions="Auto,*">
+        
+        <!-- Header -->
+        <Grid Grid.Row="0" 
+              ColumnDefinitions="*,Auto,Auto,Auto"
+              Padding="15"
+              BackgroundColor="{DynamicResource CardBackground}">
+            
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="✨ Custom Characters"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource TextColor}"/>
+                <Label Text="Create your own biblical figures"
+                       FontSize="13"
+                       TextColor="{DynamicResource Gray600}"/>
+            </VerticalStackLayout>
+            
+            <Button Grid.Column="1"
+                    Text="📤"
+                    Command="{Binding ExportCharactersCommand}"
+                    ToolTipProperties.Text="Export to JSON"
+                    HeightRequest="44"
+                    WidthRequest="44"
+                    CornerRadius="22"
+                    Padding="0"
+                    BackgroundColor="{DynamicResource Gray200}"
+                    TextColor="{DynamicResource TextColor}"/>
+            
+            <Button Grid.Column="2"
+                    Text="📥"
+                    Command="{Binding ImportCharactersCommand}"
+                    ToolTipProperties.Text="Import from JSON"
+                    HeightRequest="44"
+                    WidthRequest="44"
+                    CornerRadius="22"
+                    Padding="0"
+                    Margin="8,0,0,0"
+                    BackgroundColor="{DynamicResource Gray200}"
+                    TextColor="{DynamicResource TextColor}"/>
+            
+            <Button Grid.Column="3"
+                    Text="➕"
+                    Command="{Binding NewCharacterCommand}"
+                    ToolTipProperties.Text="Create New Character"
+                    HeightRequest="44"
+                    WidthRequest="44"
+                    CornerRadius="22"
+                    Padding="0"
+                    Margin="8,0,0,0"
+                    BackgroundColor="{DynamicResource Primary}"
+                    TextColor="White"/>
+        </Grid>
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1">
+            <Grid>
+                
+                <!-- Character List (when not editing) -->
+                <VerticalStackLayout IsVisible="{Binding IsEditing, Converter={StaticResource InvertedBoolConverter}}"
+                                    Padding="15"
+                                    Spacing="10">
+                    
+                    <CollectionView ItemsSource="{Binding Characters}"
+                                   SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:CustomCharacter">
+                                <Border Margin="0,5"
+                                        Padding="15"
+                                        BackgroundColor="{DynamicResource CardBackground}"
+                                        StrokeThickness="1"
+                                        Stroke="{DynamicResource Gray300}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12"/>
+                                    </Border.StrokeShape>
+                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                            <Label Text="{Binding Name}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{DynamicResource TextColor}"/>
+                                            <Label Text="{Binding Title}"
+                                                   FontSize="13"
+                                                   TextColor="{DynamicResource Primary}"/>
+                                            <Label Text="{Binding Description}"
+                                                   FontSize="12"
+                                                   TextColor="{DynamicResource Gray600}"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="2"/>
+                                        </VerticalStackLayout>
+                                        
+                                        <Button Grid.Column="1"
+                                                Text="✏️"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomCharacterViewModel}}, Path=EditCharacterCommand}"
+                                                CommandParameter="{Binding .}"
+                                                HeightRequest="40"
+                                                WidthRequest="40"
+                                                CornerRadius="20"
+                                                Padding="0"
+                                                BackgroundColor="{DynamicResource Gray200}"
+                                                VerticalOptions="Center"/>
+                                        
+                                        <Button Grid.Column="2"
+                                                Text="🗑️"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CustomCharacterViewModel}}, Path=DeleteCharacterCommand}"
+                                                CommandParameter="{Binding .}"
+                                                HeightRequest="40"
+                                                WidthRequest="40"
+                                                CornerRadius="20"
+                                                Padding="0"
+                                                Margin="8,0,0,0"
+                                                BackgroundColor="{DynamicResource ErrorLight}"
+                                                VerticalOptions="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               Spacing="10"
+                                               Padding="30">
+                                <Label Text="✨" FontSize="48" HorizontalOptions="Center"/>
+                                <Label Text="No Custom Characters Yet"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Center"
+                                       TextColor="{DynamicResource TextColor}"/>
+                                <Label Text="Tap the + button to create your first custom biblical character"
+                                       FontSize="14"
+                                       HorizontalTextAlignment="Center"
+                                       TextColor="{DynamicResource Gray500}"/>
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Edit Form (when editing) -->
+                <VerticalStackLayout IsVisible="{Binding IsEditing}"
+                                    Padding="15"
+                                    Spacing="15">
+                    
+                    <Label Text="Create / Edit Character"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextColor}"/>
+
+                    <!-- Name -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Name *" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Entry Text="{Binding EditName}"
+                               Placeholder="e.g., Jonah"
+                               BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Title -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Title" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Entry Text="{Binding EditTitle}"
+                               Placeholder="e.g., Prophet, Reluctant Messenger"
+                               BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Description -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Description" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Editor Text="{Binding EditDescription}"
+                                Placeholder="A brief description of the character..."
+                                HeightRequest="80"
+                                BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Era -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Era" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Entry Text="{Binding EditEra}"
+                               Placeholder="e.g., circa 800 BC"
+                               BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Biblical References -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Biblical References (one per line)" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Editor Text="{Binding EditBiblicalReferences}"
+                                Placeholder="Jonah 1-4&#x0a;2 Kings 14:25"
+                                HeightRequest="80"
+                                BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Life Experiences -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Life Experiences (one per line)" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Label Text="These stories will be used in conversations" FontSize="11" TextColor="{DynamicResource Gray500}"/>
+                        <Editor Text="{Binding EditLifeExperiences}"
+                                Placeholder="Running from God's call to Nineveh&#x0a;Three days in the belly of a fish&#x0a;Watching the city repent"
+                                HeightRequest="150"
+                                BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Personality Traits -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Personality Traits (comma separated)" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Entry Text="{Binding EditPersonalityTraits}"
+                               Placeholder="e.g., Reluctant, Honest, Emotional"
+                               BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Key Virtues -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Key Virtues (comma separated)" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Entry Text="{Binding EditKeyVirtues}"
+                               Placeholder="e.g., Obedience, Compassion, Repentance"
+                               BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Known For -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Known For" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Entry Text="{Binding EditKnownFor}"
+                               Placeholder="e.g., Swallowed by a fish, Nineveh's repentance"
+                               BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Custom Prompt Toggle -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,10">
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Use Custom System Prompt"
+                                   FontSize="14"
+                                   TextColor="{DynamicResource TextColor}"/>
+                            <Label Text="Advanced: Override auto-generated prompt"
+                                   FontSize="11"
+                                   TextColor="{DynamicResource Gray500}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding UseCustomPrompt}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+
+                    <!-- Custom Prompt Editor -->
+                    <VerticalStackLayout Spacing="5" IsVisible="{Binding UseCustomPrompt}">
+                        <Label Text="Custom System Prompt" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Editor Text="{Binding EditCustomPrompt}"
+                                Placeholder="You are [Name] from the Bible..."
+                                HeightRequest="200"
+                                BackgroundColor="{DynamicResource InputBackground}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Action Buttons -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20">
+                        <Button Grid.Column="0"
+                                Text="Cancel"
+                                Command="{Binding CancelEditCommand}"
+                                HeightRequest="50"
+                                CornerRadius="12"
+                                BackgroundColor="{DynamicResource Gray200}"
+                                TextColor="{DynamicResource TextColor}"/>
+                        <Button Grid.Column="1"
+                                Text="💾 Save Character"
+                                Command="{Binding SaveCharacterCommand}"
+                                HeightRequest="50"
+                                CornerRadius="12"
+                                BackgroundColor="{DynamicResource Primary}"
+                                TextColor="White"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Grid>
+        </ScrollView>
+    </Grid>
+</ContentPage>

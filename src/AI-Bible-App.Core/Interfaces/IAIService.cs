@@ -23,6 +23,11 @@ public interface IAIService
     Task<string> GeneratePrayerAsync(string topic, CancellationToken cancellationToken = default);
     
     /// <summary>
+    /// Generates a personalized prayer with detailed options
+    /// </summary>
+    Task<string> GeneratePersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken = default);
+    
+    /// <summary>
     /// Generates a daily devotional with structured content
     /// </summary>
     Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default);

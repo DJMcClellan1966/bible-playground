@@ -5,7 +5,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.Connectors.Ollama;
 using OllamaSharp;
+using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 #pragma warning disable SKEXP0001
 #pragma warning disable SKEXP0070
@@ -14,6 +16,7 @@ namespace AI_Bible_App.Infrastructure.Services;
 
 /// <summary>
 /// RAG service for retrieving relevant Bible verses using semantic search
+/// with intelligent fallback to keyword search when embeddings fail
 /// </summary>
 public class BibleRAGService : IBibleRAGService
 {
@@ -23,11 +26,25 @@ public class BibleRAGService : IBibleRAGService
     private readonly string _ollamaUrl;
     private readonly string _embeddingModel;
     private readonly ChunkingStrategy _chunkingStrategy;
-    private readonly ITextEmbeddingGenerationService _embeddingService;
+    private ITextEmbeddingGenerationService? _embeddingService;
     private readonly Dictionary<string, (BibleChunk Chunk, ReadOnlyMemory<float> Embedding)> _vectorStore;
+    private List<BibleChunk>? _allChunks; // For keyword fallback
     private bool _isInitialized;
+    private bool _embeddingsAvailable = true;
+    private SearchStatistics _lastSearchStats = new();
 
     public bool IsInitialized => _isInitialized;
+    public SearchStatistics LastSearchStats => _lastSearchStats;
+
+    // Common biblical keywords for better keyword matching
+    private static readonly HashSet<string> _biblicalKeywords = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "faith", "hope", "love", "grace", "mercy", "forgiveness", "salvation", "sin", "redemption",
+        "prayer", "praise", "worship", "trust", "fear", "peace", "joy", "comfort", "strength",
+        "wisdom", "truth", "light", "darkness", "life", "death", "resurrection", "cross",
+        "covenant", "promise", "blessing", "curse", "righteousness", "holiness", "spirit",
+        "kingdom", "heaven", "hell", "judgment", "healing", "miracle", "prophecy", "angel"
+    };
 
     public BibleRAGService(
         IBibleRepository bibleRepository,
@@ -45,18 +62,27 @@ public class BibleRAGService : IBibleRAGService
         var strategyStr = configuration["RAG:ChunkingStrategy"] ?? "SingleVerse";
         _chunkingStrategy = Enum.Parse<ChunkingStrategy>(strategyStr, ignoreCase: true);
         
-        // Initialize embedding service using OllamaApiClient (recommended approach)
-        var ollamaClient = new OllamaApiClient(new Uri(_ollamaUrl))
+        // Try to initialize embedding service
+        try
         {
-            SelectedModel = _embeddingModel
-        };
-        _embeddingService = ollamaClient.AsTextEmbeddingGenerationService();
+            var ollamaClient = new OllamaApiClient(new Uri(_ollamaUrl))
+            {
+                SelectedModel = _embeddingModel
+            };
+            _embeddingService = ollamaClient.AsTextEmbeddingGenerationService();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not initialize embedding service. Will use keyword fallback only.");
+            _embeddingsAvailable = false;
+        }
 
         _logger.LogInformation(
-            "BibleRAGService created with embedding model: {Model} at {Url}, Chunking: {Strategy}", 
+            "BibleRAGService created with embedding model: {Model} at {Url}, Chunking: {Strategy}, Embeddings: {Available}", 
             _embeddingModel, 
             _ollamaUrl,
-            _chunkingStrategy);
+            _chunkingStrategy,
+            _embeddingsAvailable ? "Available" : "Fallback Only");
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -75,41 +101,60 @@ public class BibleRAGService : IBibleRAGService
             var verses = await _bibleRepository.LoadAllVersesAsync(cancellationToken);
             _logger.LogInformation("Loaded {Count} verses from repository", verses.Count);
 
-            // Chunk verses into meaningful groups (3-5 verses per chunk for context)
+            // Chunk verses into meaningful groups
             var chunks = CreateChunks(verses);
+            _allChunks = chunks; // Store for keyword fallback
             _logger.LogInformation("Created {Count} chunks from verses", chunks.Count);
 
-            // Generate embeddings for each chunk
-            _logger.LogInformation("Generating embeddings for {Count} chunks...", chunks.Count);
-            var embeddingTasks = chunks.Select(async chunk =>
+            // Only generate embeddings if service is available
+            if (_embeddingsAvailable && _embeddingService != null)
             {
                 try
                 {
-                    var embedding = await _embeddingService.GenerateEmbeddingAsync(chunk.Text, cancellationToken: cancellationToken);
-                    return (chunk, embedding);
+                    _logger.LogInformation("Generating embeddings for {Count} chunks...", chunks.Count);
+                    var embeddingTasks = chunks.Select(async chunk =>
+                    {
+                        try
+                        {
+                            var embedding = await _embeddingService.GenerateEmbeddingAsync(chunk.Text, cancellationToken: cancellationToken);
+                            return (chunk, embedding);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error generating embedding for chunk {ChunkId}", chunk.Id);
+                            return (chunk, ReadOnlyMemory<float>.Empty);
+                        }
+                    });
+
+                    var embeddingResults = await Task.WhenAll(embeddingTasks);
+
+                    // Store in vector store
+                    foreach (var result in embeddingResults)
+                    {
+                        if (!result.Item2.IsEmpty)
+                        {
+                            _vectorStore[result.Item1.Id] = (result.Item1, result.Item2);
+                        }
+                    }
+                    
+                    _logger.LogInformation("Generated {Count} embeddings successfully", _vectorStore.Count);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error generating embedding for chunk {ChunkId}", chunk.Id);
-                    return (chunk, ReadOnlyMemory<float>.Empty);
+                    _logger.LogWarning(ex, "Embedding generation failed. Will use keyword fallback.");
+                    _embeddingsAvailable = false;
                 }
-            });
-
-            var embeddingResults = await Task.WhenAll(embeddingTasks);
-
-            // Store in vector store
-            foreach (var result in embeddingResults)
+            }
+            else
             {
-                if (!result.Item2.IsEmpty)
-                {
-                    _vectorStore[result.Item1.Id] = (result.Item1, result.Item2);
-                }
+                _logger.LogInformation("Embeddings not available - using keyword search only");
             }
 
             _isInitialized = true;
             _logger.LogInformation(
-                "BibleRAGService initialized successfully with {Count} indexed chunks", 
-                _vectorStore.Count);
+                "BibleRAGService initialized: {Embeddings} embeddings, {Chunks} chunks available for keyword search", 
+                _vectorStore.Count,
+                _allChunks?.Count ?? 0);
         }
         catch (Exception ex)
         {
@@ -122,42 +167,218 @@ public class BibleRAGService : IBibleRAGService
         string query,
         int limit = 5,
         double minRelevanceScore = 0.7,
+        SearchStrictness strictness = SearchStrictness.Balanced,
         CancellationToken cancellationToken = default)
     {
+        var stopwatch = Stopwatch.StartNew();
+        var stats = new SearchStatistics
+        {
+            Query = query,
+            StrictnessUsed = strictness
+        };
+
         if (!_isInitialized)
         {
             _logger.LogWarning("BibleRAGService not initialized. Returning empty results.");
+            _lastSearchStats = stats;
             return new List<BibleChunk>();
         }
 
-        try
+        // Adjust thresholds based on strictness
+        var effectiveMinScore = strictness switch
         {
-            // Generate embedding for the query
-            var queryEmbedding = await _embeddingService.GenerateEmbeddingAsync(query, cancellationToken: cancellationToken);
+            SearchStrictness.Strict => minRelevanceScore,
+            SearchStrictness.Balanced => Math.Max(0.5, minRelevanceScore - 0.1),
+            SearchStrictness.Relaxed => Math.Max(0.3, minRelevanceScore - 0.2),
+            _ => minRelevanceScore
+        };
 
-            // Calculate cosine similarity with all chunks
-            var similarities = _vectorStore.Select(kvp =>
+        var results = new List<(BibleChunk Chunk, double Score, bool FromSemantic)>();
+
+        // Try semantic search first if embeddings available
+        if (_embeddingsAvailable && _vectorStore.Count > 0 && _embeddingService != null)
+        {
+            try
             {
-                var similarity = CosineSimilarity(queryEmbedding, kvp.Value.Embedding);
-                return (Chunk: kvp.Value.Chunk, Similarity: similarity);
-            })
-            .Where(x => x.Similarity >= minRelevanceScore)
-            .OrderByDescending(x => x.Similarity)
+                var queryEmbedding = await _embeddingService.GenerateEmbeddingAsync(query, cancellationToken: cancellationToken);
+
+                var semanticResults = _vectorStore.Select(kvp =>
+                {
+                    var similarity = CosineSimilarity(queryEmbedding, kvp.Value.Embedding);
+                    return (Chunk: kvp.Value.Chunk, Similarity: similarity);
+                })
+                .Where(x => x.Similarity >= effectiveMinScore)
+                .OrderByDescending(x => x.Similarity)
+                .Take(limit * 2) // Get extra for merging with keyword results
+                .ToList();
+
+                foreach (var r in semanticResults)
+                {
+                    results.Add((r.Chunk, r.Similarity, true));
+                }
+                
+                stats.SemanticResults = semanticResults.Count;
+                _logger.LogInformation("Semantic search found {Count} results", semanticResults.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Semantic search failed, falling back to keyword search");
+                stats.UsedFallback = true;
+            }
+        }
+
+        // Fallback to keyword search if:
+        // 1. Embeddings not available
+        // 2. Semantic search returned too few results
+        // 3. Strictness is not Strict
+        var needsKeywordFallback = strictness != SearchStrictness.Strict && 
+            (results.Count < limit || !_embeddingsAvailable);
+
+        if (needsKeywordFallback && _allChunks != null)
+        {
+            stats.UsedFallback = true;
+            var keywordResults = PerformKeywordSearch(query, limit * 2, effectiveMinScore);
+            
+            foreach (var r in keywordResults)
+            {
+                // Don't add duplicates
+                if (!results.Any(existing => existing.Chunk.Id == r.Chunk.Id))
+                {
+                    results.Add((r.Chunk, r.Score, false));
+                }
+            }
+            
+            stats.KeywordFallbackResults = keywordResults.Count;
+            _logger.LogInformation("Keyword fallback added {Count} results", keywordResults.Count);
+        }
+
+        // Combine and sort results
+        var finalResults = results
+            .OrderByDescending(r => r.Score)
             .Take(limit)
+            .Select(r => r.Chunk)
             .ToList();
 
-            _logger.LogInformation(
-                "Retrieved {Count} relevant chunks for query (min score: {MinScore})", 
-                similarities.Count, 
-                minRelevanceScore);
-
-            return similarities.Select(x => x.Chunk).ToList();
-        }
-        catch (Exception ex)
+        // Update statistics
+        stopwatch.Stop();
+        stats.TotalResults = finalResults.Count;
+        stats.SearchDuration = stopwatch.Elapsed;
+        if (results.Any())
         {
-            _logger.LogError(ex, "Error retrieving relevant verses for query: {Query}", query);
-            return new List<BibleChunk>();
+            stats.HighestScore = results.Max(r => r.Score);
+            stats.LowestScore = results.Min(r => r.Score);
         }
+        _lastSearchStats = stats;
+
+        _logger.LogInformation(
+            "Search completed: {Total} results ({Semantic} semantic, {Keyword} keyword) in {Duration}ms",
+            stats.TotalResults, stats.SemanticResults, stats.KeywordFallbackResults, 
+            stats.SearchDuration.TotalMilliseconds);
+
+        return finalResults;
+    }
+
+    /// <summary>
+    /// Perform keyword-based search as fallback when embeddings fail
+    /// </summary>
+    private List<(BibleChunk Chunk, double Score)> PerformKeywordSearch(string query, int limit, double minScore)
+    {
+        if (_allChunks == null || _allChunks.Count == 0)
+            return new List<(BibleChunk, double)>();
+
+        // Extract keywords from query
+        var queryWords = ExtractKeywords(query);
+        if (queryWords.Count == 0)
+            return new List<(BibleChunk, double)>();
+
+        var scored = new List<(BibleChunk Chunk, double Score)>();
+
+        foreach (var chunk in _allChunks)
+        {
+            var score = CalculateKeywordScore(chunk.Text, queryWords);
+            if (score >= minScore)
+            {
+                scored.Add((chunk, score));
+            }
+        }
+
+        return scored
+            .OrderByDescending(x => x.Score)
+            .Take(limit)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Extract meaningful keywords from a query
+    /// </summary>
+    private List<string> ExtractKeywords(string query)
+    {
+        // Remove common stop words and extract meaningful terms
+        var stopWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
+            "have", "has", "had", "do", "does", "did", "will", "would", "could",
+            "should", "may", "might", "must", "shall", "can", "need", "dare",
+            "to", "of", "in", "for", "on", "with", "at", "by", "from", "as",
+            "into", "through", "during", "before", "after", "above", "below",
+            "between", "under", "again", "further", "then", "once", "here",
+            "there", "when", "where", "why", "how", "all", "each", "few",
+            "more", "most", "other", "some", "such", "no", "nor", "not", "only",
+            "own", "same", "so", "than", "too", "very", "just", "and", "but",
+            "if", "or", "because", "until", "while", "about", "what", "which",
+            "who", "whom", "this", "that", "these", "those", "am", "i", "me",
+            "my", "myself", "we", "our", "ours", "ourselves", "you", "your",
+            "yours", "yourself", "yourselves", "he", "him", "his", "himself",
+            "she", "her", "hers", "herself", "it", "its", "itself", "they",
+            "them", "their", "theirs", "themselves"
+        };
+
+        var words = Regex.Split(query.ToLowerInvariant(), @"\W+")
+            .Where(w => w.Length > 2 && !stopWords.Contains(w))
+            .Distinct()
+            .ToList();
+
+        // Boost biblical keywords
+        var boosted = words
+            .OrderByDescending(w => _biblicalKeywords.Contains(w) ? 1 : 0)
+            .ToList();
+
+        return boosted;
+    }
+
+    /// <summary>
+    /// Calculate a relevance score based on keyword matching
+    /// </summary>
+    private double CalculateKeywordScore(string text, List<string> keywords)
+    {
+        if (keywords.Count == 0) return 0;
+
+        var textLower = text.ToLowerInvariant();
+        var matchCount = 0;
+        var exactMatchBonus = 0.0;
+
+        foreach (var keyword in keywords)
+        {
+            if (textLower.Contains(keyword))
+            {
+                matchCount++;
+                
+                // Bonus for biblical keywords
+                if (_biblicalKeywords.Contains(keyword))
+                {
+                    exactMatchBonus += 0.1;
+                }
+                
+                // Bonus for exact word match (not just substring)
+                if (Regex.IsMatch(textLower, $@"\b{Regex.Escape(keyword)}\b"))
+                {
+                    exactMatchBonus += 0.05;
+                }
+            }
+        }
+
+        var baseScore = (double)matchCount / keywords.Count;
+        return Math.Min(1.0, baseScore + exactMatchBonus);
     }
 
     /// <summary>

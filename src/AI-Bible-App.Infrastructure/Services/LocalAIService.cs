@@ -381,6 +381,140 @@ IMPORTANT GUIDELINES:
         }
     }
 
+    public async Task<string> GeneratePersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Build personalized prompt based on options
+            var promptParts = new List<string>();
+            
+            // Style/type instruction
+            if (options.RequestType != PrayerRequestType.General)
+            {
+                promptParts.Add($"Write {options.RequestType.GetDescription()}.");
+            }
+            
+            // Tradition style hint
+            promptParts.Add(options.Tradition.GetStyleHint());
+            
+            // Mood context
+            if (options.Mood.HasValue)
+            {
+                promptParts.Add($"The person praying is {options.Mood.Value.GetDescription()}.");
+            }
+            
+            // Time context
+            if (options.TimeContext.HasValue)
+            {
+                promptParts.Add($"This prayer is {options.TimeContext.Value.GetTimeGreeting()}.");
+            }
+            
+            // Life circumstances
+            if (!string.IsNullOrEmpty(options.LifeCircumstances))
+            {
+                promptParts.Add($"Life context: {options.LifeCircumstances}");
+            }
+            
+            // Prayer intentions
+            if (options.Intentions.Any())
+            {
+                promptParts.Add($"Include these intentions: {string.Join(", ", options.Intentions)}");
+            }
+            
+            // Praying for someone specific
+            if (!string.IsNullOrEmpty(options.PrayingFor))
+            {
+                promptParts.Add($"This prayer is for/about: {options.PrayingFor}");
+            }
+            
+            // Scripture preference
+            if (options.IncludeScripture)
+            {
+                promptParts.Add("Let Scripture themes inspire the prayer naturally, but don't cite chapter and verse.");
+            }
+            else
+            {
+                promptParts.Add("Do not include Scripture references.");
+            }
+            
+            // Length guidance
+            var wordCount = options.Length.GetWordCount();
+            promptParts.Add($"Keep the prayer approximately {wordCount} words.");
+
+            var systemPrompt = $@"You are a compassionate prayer writer. Generate heartfelt, biblically-grounded prayers.
+
+{string.Join("\n", promptParts)}
+
+IMPORTANT GUIDELINES:
+- Write the prayer directly - start with addressing God and end with Amen
+- Use natural, sincere language that flows like a real conversation with God
+- Do NOT include parenthetical references or meta-commentary
+- The output should ONLY be the prayer text itself";
+
+            var userPrompt = string.IsNullOrEmpty(options.Topic) 
+                ? "Generate a personalized prayer." 
+                : $"Generate a prayer about: {options.Topic}";
+
+            var messages = new List<Message>
+            {
+                new Message { Role = ChatRole.System, Content = systemPrompt }
+            };
+
+            // RAG: Retrieve relevant Bible verses for prayer context
+            if (_useRAG && _ragService != null && _ragService.IsInitialized && options.IncludeScripture)
+            {
+                var searchQuery = options.Topic;
+                if (options.Mood.HasValue)
+                    searchQuery += " " + options.Mood.Value.ToString().ToLower();
+                if (options.RequestType != PrayerRequestType.General)
+                    searchQuery += " " + options.RequestType.ToString().ToLower();
+                    
+                var retrievedContext = await GetRelevantScriptureContextAsync(searchQuery, cancellationToken);
+                
+                if (!string.IsNullOrEmpty(retrievedContext))
+                {
+                    messages.Add(new Message
+                    {
+                        Role = ChatRole.System,
+                        Content = $"Relevant Scripture passages to inspire the prayer:\n{retrievedContext}"
+                    });
+                }
+            }
+
+            messages.Add(new Message { Role = ChatRole.User, Content = userPrompt });
+
+            var request = new ChatRequest
+            {
+                Model = _modelName,
+                Messages = messages
+            };
+
+            _logger.LogDebug("Generating personalized prayer with style: {Style}, mood: {Mood}", options.RequestType, options.Mood);
+
+            var responseText = string.Empty;
+            
+            await foreach (var response in GetClient().ChatAsync(request, cancellationToken))
+            {
+                if (response?.Message?.Content != null)
+                {
+                    responseText += response.Message.Content;
+                }
+            }
+            
+            if (string.IsNullOrEmpty(responseText))
+            {
+                throw new InvalidOperationException("Received null or empty response from Ollama");
+            }
+
+            return responseText;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating personalized prayer from local AI model");
+            throw;
+        }
+    }
+
     public async Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default)
     {
         try

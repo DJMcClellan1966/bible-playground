@@ -56,6 +56,19 @@ public class CachedResponseAIService : IAIService
         return Task.FromResult(prayer);
     }
 
+    public Task<string> GeneratePersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken = default)
+    {
+        // For cached responses, use the topic with mood-based selection
+        var topic = options.Topic;
+        if (string.IsNullOrEmpty(topic) && options.Mood.HasValue)
+        {
+            topic = options.Mood.Value.ToString().ToLower();
+        }
+        
+        var prayer = GetCachedPrayer(topic);
+        return Task.FromResult(prayer);
+    }
+
     public Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default)
     {
         // Return a fallback devotional as JSON

@@ -48,6 +48,98 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!-- Personalization Toggle -->
+            <Grid ColumnDefinitions="*,Auto" Margin="0,5">
+                <Label Grid.Column="0"
+                       Text="✨ Personalization Options"
+                       FontSize="14"
+                       VerticalOptions="Center"
+                       TextColor="{DynamicResource Primary}"/>
+                <Switch Grid.Column="1"
+                        IsToggled="{Binding ShowAdvancedOptions}"
+                        OnColor="{DynamicResource Primary}"/>
+            </Grid>
+
+            <!-- Advanced Personalization Options (Collapsible) -->
+            <Border IsVisible="{Binding ShowAdvancedOptions}"
+                    Padding="15"
+                    StrokeThickness="1"
+                    Stroke="{DynamicResource Primary}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="15">
+                    
+                    <!-- Mood Selection -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="How are you feeling?" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Picker ItemsSource="{Binding AvailableMoods}"
+                                SelectedItem="{Binding SelectedMood}"
+                                Title="Select mood (optional)"
+                                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Prayer Style -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Prayer Type" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Picker ItemsSource="{Binding AvailableStyles}"
+                                SelectedItem="{Binding SelectedStyle}"
+                                Title="Select type"
+                                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Two Column Layout -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <!-- Prayer Length -->
+                        <VerticalStackLayout Grid.Column="0" Spacing="5">
+                            <Label Text="Length" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                            <Picker ItemsSource="{Binding AvailableLengths}"
+                                    SelectedItem="{Binding SelectedLength}"
+                                    TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Prayer Tradition -->
+                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="Style" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                            <Picker ItemsSource="{Binding AvailableTraditions}"
+                                    SelectedItem="{Binding SelectedTradition}"
+                                    TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Praying For -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Praying for (name or relationship)" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Entry Text="{Binding PrayingFor}"
+                               Placeholder="e.g., my mother, John, my team"
+                               PlaceholderColor="{DynamicResource Gray400}"
+                               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Life Circumstances -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Life circumstances (optional context)" FontSize="13" TextColor="{DynamicResource Gray600}"/>
+                        <Entry Text="{Binding LifeCircumstances}"
+                               Placeholder="e.g., new job, health challenge, upcoming wedding"
+                               PlaceholderColor="{DynamicResource Gray400}"
+                               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Include Scripture Toggle -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Include Scripture inspiration"
+                               FontSize="13"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IncludeScripture}"
+                                OnColor="{DynamicResource Primary}"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
             <!-- Generate Button -->
             <Button Text="Generate Prayer"
                     Command="{Binding GeneratePrayerCommand}"

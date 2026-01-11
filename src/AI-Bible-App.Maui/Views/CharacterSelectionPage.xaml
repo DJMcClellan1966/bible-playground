@@ -8,7 +8,7 @@
              Title="{Binding Title}"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
     
-    <Grid RowDefinitions="Auto,*,Auto" Padding="15">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Padding="15">
         
         <!-- Header -->
         <VerticalStackLayout Grid.Row="0" Spacing="8" Margin="0,10,0,15">
@@ -16,11 +16,14 @@
                    FontSize="28"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   TextColor="{DynamicResource Primary}"/>
-            <Label Text="Converse with Biblical Characters"
-                   FontSize="15"
+                   TextColor="{DynamicResource Primary}"
+                   AutomationProperties.IsInAccessibleTree="True"
+                   AutomationProperties.Name="Voices of Scripture"/>
+            <Label Text="Swipe to explore • Tap to chat"
+                   FontSize="14"
                    HorizontalOptions="Center"
-                   TextColor="{DynamicResource Gray600}"/>
+                   TextColor="{DynamicResource Gray600}"
+                   AutomationProperties.IsInAccessibleTree="True"/>
             
             <!-- Ollama Status Indicator -->
             <Border Padding="8,5"
@@ -38,106 +41,305 @@
                 <Label Text="{Binding OllamaStatusText}"
                        FontSize="11"
                        TextColor="{Binding OllamaStatusColor}"
-                       HorizontalOptions="Center"/>
+                       HorizontalOptions="Center"
+                       AutomationProperties.IsInAccessibleTree="True"/>
             </Border>
         </VerticalStackLayout>
 
-        <!-- Character List -->
-        <ScrollView Grid.Row="1">
-            <VerticalStackLayout Spacing="15">
-                <Label Text="Choose a Character:"
-                       FontSize="20"
-                       FontAttributes="Bold"
-                       Margin="0,0,0,10"/>
-                
-                <!-- Empty state / loading message -->
-                <Label Text="Loading characters..."
-                       IsVisible="{Binding IsBusy}"
-                       FontSize="16"
-                       TextColor="{DynamicResource Gray600}"
-                       HorizontalOptions="Center"
-                       Margin="0,20,0,0"/>
-                
+        <!-- View Mode Toggle -->
+        <HorizontalStackLayout Grid.Row="1" 
+                               HorizontalOptions="Center" 
+                               Spacing="10"
+                               Margin="0,0,0,10">
+            <Button Text="🎴 Cards"
+                    x:Name="CardsViewButton"
+                    Clicked="OnCardsViewClicked"
+                    BackgroundColor="{DynamicResource Primary}"
+                    TextColor="White"
+                    HeightRequest="36"
+                    CornerRadius="18"
+                    FontSize="13"
+                    Padding="15,0"
+                    AutomationProperties.Name="Card view"/>
+            <Button Text="📋 List"
+                    x:Name="ListViewButton"
+                    Clicked="OnListViewClicked"
+                    BackgroundColor="{DynamicResource Gray300}"
+                    TextColor="{DynamicResource Gray800}"
+                    HeightRequest="36"
+                    CornerRadius="18"
+                    FontSize="13"
+                    Padding="15,0"
+                    AutomationProperties.Name="List view"/>
+        </HorizontalStackLayout>
+
+        <!-- Swipe Character Carousel (Card View) -->
+        <Grid Grid.Row="2" x:Name="CarouselContainer">
+            <CarouselView x:Name="CharacterCarousel"
+                          ItemsSource="{Binding Characters}"
+                          Loop="True"
+                          PeekAreaInsets="40"
+                          CurrentItemChanged="OnCarouselItemChanged"
+                          AutomationProperties.Name="Character selector carousel">
+                <CarouselView.ItemTemplate>
+                    <DataTemplate x:DataType="models:BiblicalCharacter">
+                        <Border Padding="20"
+                                Margin="10,20"
+                                BackgroundColor="{DynamicResource CardBackground}"
+                                Shadow="{Shadow Brush=Black, Offset='0,4', Radius=8, Opacity=0.4}"
+                                AutomationProperties.IsInAccessibleTree="True"
+                                AutomationProperties.Name="{Binding Name}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="20"/>
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCharacterCardTapped"/>
+                            </Border.GestureRecognizers>
+                            
+                            <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                                <!-- Large Avatar -->
+                                <Border WidthRequest="120"
+                                        HeightRequest="120"
+                                        Padding="0"
+                                        HorizontalOptions="Center"
+                                        BackgroundColor="{DynamicResource Primary}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="60"/>
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Name, StringFormat='{0:substring(0,1)}'}"
+                                           FontSize="50"
+                                           FontAttributes="Bold"
+                                           TextColor="White"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"/>
+                                </Border>
+                                
+                                <!-- Character Name -->
+                                <Label Text="{Binding Name, Converter={StaticResource ShortNameConverter}}"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource Primary}"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center"/>
+                                
+                                <!-- Title/Role -->
+                                <Label Text="{Binding Title}"
+                                       FontSize="16"
+                                       FontAttributes="Italic"
+                                       TextColor="{DynamicResource Gray600}"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center"/>
+                                
+                                <!-- Decorative Divider -->
+                                <Label Text="✦ ─────── ✦"
+                                       FontSize="14"
+                                       TextColor="{DynamicResource Gray400}"
+                                       HorizontalOptions="Center"
+                                       Margin="0,5"/>
+                                
+                                <!-- Description -->
+                                <Label Text="{Binding Description}"
+                                       FontSize="14"
+                                       TextColor="{DynamicResource Gray600}"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center"
+                                       LineBreakMode="WordWrap"
+                                       MaxLines="4"
+                                       Margin="10,0"/>
+                                
+                                <!-- Era Badge -->
+                                <Border Padding="12,6"
+                                        BackgroundColor="{DynamicResource PrimaryLight}"
+                                        HorizontalOptions="Center"
+                                        Margin="0,10,0,0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="15"/>
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Era}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="{DynamicResource Primary}"
+                                           HorizontalOptions="Center"/>
+                                </Border>
+                                
+                                <!-- Tap to Chat Hint -->
+                                <Label Text="👆 Tap to start conversation"
+                                       FontSize="13"
+                                       TextColor="{DynamicResource Gray500}"
+                                       HorizontalOptions="Center"
+                                       Margin="0,15,0,0"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CarouselView.ItemTemplate>
+            </CarouselView>
+            
+            <!-- Swipe Indicators -->
+            <HorizontalStackLayout HorizontalOptions="Center" 
+                                   VerticalOptions="End"
+                                   Spacing="8"
+                                   Margin="0,0,0,10">
+                <Label Text="◀ Swipe"
+                       FontSize="12"
+                       TextColor="{DynamicResource Gray500}"/>
+                <IndicatorView x:Name="CharacterIndicator"
+                               IndicatorColor="{DynamicResource Gray400}"
+                               SelectedIndicatorColor="{DynamicResource Primary}"
+                               IndicatorSize="8"
+                               HorizontalOptions="Center"/>
+                <Label Text="Swipe ▶"
+                       FontSize="12"
+                       TextColor="{DynamicResource Gray500}"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- List View (Alternative) -->
+        <ScrollView Grid.Row="2" x:Name="ListContainer" IsVisible="False">
+            <VerticalStackLayout Spacing="10" Padding="0,10">
                 <CollectionView ItemsSource="{Binding Characters}"
                                 SelectionMode="Single"
                                 SelectionChanged="OnCharacterSelected">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:BiblicalCharacter">
-                            <Border Padding="12"
-                                    Margin="0,0,0,10"
-                                    BackgroundColor="{DynamicResource CardBackground}"
-                                    Shadow="{Shadow Brush=Black, Offset='0,2', Radius=4, Opacity=0.3}">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="12"/>
-                                </Border.StrokeShape>
+                            <SwipeView AutomationProperties.Name="{Binding Name}">
+                                <SwipeView.LeftItems>
+                                    <SwipeItems Mode="Execute">
+                                        <SwipeItem Text="💬 Chat"
+                                                   BackgroundColor="{DynamicResource Primary}"
+                                                   Invoked="OnSwipeChatInvoked"/>
+                                    </SwipeItems>
+                                </SwipeView.LeftItems>
+                                <SwipeView.RightItems>
+                                    <SwipeItems Mode="Execute">
+                                        <SwipeItem Text="ℹ️ Info"
+                                                   BackgroundColor="{DynamicResource Secondary}"
+                                                   Invoked="OnSwipeInfoInvoked"/>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
                                 
-                                <Grid ColumnDefinitions="70,*" ColumnSpacing="12">
-                                    <!-- Avatar with Name Below -->
-                                    <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
-                                        <Border WidthRequest="55"
-                                                HeightRequest="55"
-                                                Padding="0"
-                                                HorizontalOptions="Center"
-                                                BackgroundColor="{DynamicResource Primary}">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="27"/>
-                                            </Border.StrokeShape>
-                                            <Label Text="{Binding Name, StringFormat='{0:substring(0,1)}'}"
-                                                   FontSize="26"
-                                                   FontAttributes="Bold"
-                                                   TextColor="White"
-                                                   HorizontalOptions="Center"
-                                                   VerticalOptions="Center"/>
-                                        </Border>
-                                        <!-- Name under avatar -->
-                                        <Label Text="{Binding Name, Converter={StaticResource ShortNameConverter}}"
-                                               FontSize="10"
-                                               FontAttributes="Bold"
-                                               TextColor="{DynamicResource Primary}"
-                                               HorizontalOptions="Center"
-                                               HorizontalTextAlignment="Center"
-                                               LineBreakMode="TailTruncation"
-                                               MaxLines="1"/>
-                                    </VerticalStackLayout>
+                                <Border Padding="12"
+                                        Margin="5,0"
+                                        BackgroundColor="{DynamicResource CardBackground}"
+                                        Shadow="{Shadow Brush=Black, Offset='0,2', Radius=4, Opacity=0.3}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12"/>
+                                    </Border.StrokeShape>
                                     
-                                    <!-- Character Info -->
-                                    <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
-                                        <Label Text="{Binding Name, Converter={StaticResource ShortNameConverter}}"
+                                    <Grid ColumnDefinitions="70,*,Auto" ColumnSpacing="12">
+                                        <!-- Avatar with Name Below -->
+                                        <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
+                                            <Border WidthRequest="55"
+                                                    HeightRequest="55"
+                                                    Padding="0"
+                                                    HorizontalOptions="Center"
+                                                    BackgroundColor="{DynamicResource Primary}">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="27"/>
+                                                </Border.StrokeShape>
+                                                <Label Text="{Binding Name, StringFormat='{0:substring(0,1)}'}"
+                                                       FontSize="26"
+                                                       FontAttributes="Bold"
+                                                       TextColor="White"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center"/>
+                                            </Border>
+                                        </VerticalStackLayout>
+                                        
+                                        <!-- Character Info -->
+                                        <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                            <Label Text="{Binding Name, Converter={StaticResource ShortNameConverter}}"
+                                                   FontSize="18"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{DynamicResource Primary}"
+                                                   LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Title}"
+                                                   FontSize="13"
+                                                   TextColor="{DynamicResource Gray600}"
+                                                   LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Description}"
+                                                   FontSize="11"
+                                                   TextColor="{DynamicResource Gray500}"
+                                                   LineBreakMode="WordWrap"
+                                                   MaxLines="2"/>
+                                        </VerticalStackLayout>
+                                        
+                                        <!-- Swipe Hint Arrow -->
+                                        <Label Grid.Column="2"
+                                               Text="⟷"
                                                FontSize="18"
-                                               FontAttributes="Bold"
-                                               TextColor="White"
-                                               LineBreakMode="TailTruncation"/>
-                                        <Label Text="{Binding Title}"
-                                               FontSize="13"
-                                               TextColor="{DynamicResource Primary}"
-                                               LineBreakMode="TailTruncation"/>
-                                        <Label Text="{Binding Description}"
-                                               FontSize="11"
-                                               TextColor="{DynamicResource Gray600}"
-                                               LineBreakMode="WordWrap"
-                                               MaxLines="2"/>
-                                    </VerticalStackLayout>
-                                </Grid>
-                            </Border>
+                                               TextColor="{DynamicResource Gray400}"
+                                               VerticalOptions="Center"/>
+                                    </Grid>
+                                </Border>
+                            </SwipeView>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </VerticalStackLayout>
         </ScrollView>
 
+        <!-- Loading Indicator -->
+        <Label Grid.Row="2"
+               Text="Loading characters..."
+               IsVisible="{Binding IsBusy}"
+               FontSize="16"
+               TextColor="{DynamicResource Gray600}"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"/>
+
         <!-- Action Buttons -->
-        <VerticalStackLayout Grid.Row="2" Spacing="8" Margin="0,10,0,0">
-            <Button Text="� Generate a Prayer"
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,15,0,0">
+            <Button Grid.Column="0"
+                    Text="🙏 Prayer"
                     Command="{Binding NavigateToPrayerCommand}"
                     HeightRequest="48"
-                    FontSize="16"
+                    FontSize="15"
                     BackgroundColor="{DynamicResource Primary}"
                     TextColor="White"
-                    CornerRadius="10"/>
-        </VerticalStackLayout>
+                    CornerRadius="10"
+                    AutomationProperties.Name="Generate a Prayer"/>
+            <Button Grid.Column="1"
+                    Text="📖 Bible"
+                    Clicked="OnBibleReaderClicked"
+                    HeightRequest="48"
+                    FontSize="15"
+                    BackgroundColor="{DynamicResource Secondary}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    AutomationProperties.Name="Open Bible Reader"/>
+        </Grid>
         
-        <!-- Loading Indicator -->
-        <ActivityIndicator Grid.RowSpan="3"
+        <!-- Bottom Navigation -->
+        <Grid Grid.Row="4" ColumnDefinitions="*,*,*" Margin="0,10,0,0">
+            <Button Grid.Column="0"
+                    Text="📊"
+                    Clicked="OnHistoryClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Gray600}"
+                    FontSize="24"
+                    HeightRequest="50"
+                    AutomationProperties.Name="View History"/>
+            <Button Grid.Column="1"
+                    Text="➕"
+                    Clicked="OnCreateCharacterClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Primary}"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    AutomationProperties.Name="Create Custom Character"/>
+            <Button Grid.Column="2"
+                    Text="⚙️"
+                    Command="{Binding NavigateToSettingsCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Gray600}"
+                    FontSize="24"
+                    HeightRequest="50"
+                    AutomationProperties.Name="Settings"/>
+        </Grid>
+        
+        <!-- Loading Overlay -->
+        <ActivityIndicator Grid.RowSpan="5"
                           IsRunning="{Binding IsBusy}"
                           IsVisible="{Binding IsBusy}"
                           Color="{DynamicResource Primary}"

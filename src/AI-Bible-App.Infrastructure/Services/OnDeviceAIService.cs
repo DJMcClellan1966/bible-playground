@@ -182,6 +182,56 @@ Write a short, sincere prayer about: {topic}
         return response.ToString().Trim();
     }
 
+    public async Task<string> GeneratePersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync();
+        
+        if (_context == null || _model == null)
+        {
+            return GetFallbackPrayer(options.Topic);
+        }
+
+        // Build context hints
+        var hints = new List<string>();
+        if (options.Mood.HasValue)
+            hints.Add($"The person is feeling {options.Mood.Value.ToString().ToLower()}");
+        if (options.RequestType != PrayerRequestType.General)
+            hints.Add($"Type: {options.RequestType.ToString().ToLower()} prayer");
+        if (!string.IsNullOrEmpty(options.PrayingFor))
+            hints.Add($"Praying for: {options.PrayingFor}");
+
+        var contextHint = hints.Any() ? $"Context: {string.Join(". ", hints)}." : "";
+
+        var prompt = $@"<|im_start|>system
+You are a devoted Christian prayer writer. Write sincere, heartfelt prayers. {contextHint}
+<|im_end|>
+<|im_start|>user
+Write a {options.Length.ToString().ToLower()}, sincere prayer about: {options.Topic}
+<|im_end|>
+<|im_start|>assistant
+";
+
+        var executor = new InteractiveExecutor(_context);
+        var inferenceParams = new InferenceParams
+        {
+            MaxTokens = options.Length.GetWordCount() * 2,
+            AntiPrompts = new[] { "<|im_end|>", "\n\n\n" },
+            SamplingPipeline = new DefaultSamplingPipeline
+            {
+                Temperature = 0.8f,
+                TopP = 0.9f
+            }
+        };
+
+        var response = new StringBuilder();
+        await foreach (var token in executor.InferAsync(prompt, inferenceParams, cancellationToken))
+        {
+            response.Append(token);
+        }
+
+        return response.ToString().Trim();
+    }
+
     public async Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default)
     {
         await InitializeAsync();

@@ -206,6 +206,43 @@ public class SmartAIService : IAIService
         }
     }
 
+    public async Task<string> GeneratePersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken = default)
+    {
+        var useOffline = await ShouldUseOfflineModeAsync();
+
+        try
+        {
+            if (useOffline)
+            {
+                _logger.LogInformation("Generating personalized prayer offline");
+                
+                var promptParts = new List<string>();
+                if (options.RequestType != PrayerRequestType.General)
+                    promptParts.Add($"Write {options.RequestType.GetDescription()}.");
+                if (options.Mood.HasValue)
+                    promptParts.Add($"The person is {options.Mood.Value.GetDescription()}.");
+                if (!string.IsNullOrEmpty(options.PrayingFor))
+                    promptParts.Add($"Praying for: {options.PrayingFor}");
+                    
+                var systemPrompt = $"You are a spiritual guide helping to compose heartfelt prayers. {string.Join(" ", promptParts)}";
+                var userMessage = $"Please help me write a prayer about: {options.Topic}";
+                
+                return await _offlineService.GetCompletionAsync(systemPrompt, userMessage, cancellationToken);
+            }
+            else
+            {
+                return await _onlineService.GeneratePersonalizedPrayerAsync(options, cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Personalized prayer generation failed, attempting fallback");
+
+            // Fallback to simple prayer
+            return await GeneratePrayerAsync(options.Topic, cancellationToken);
+        }
+    }
+
     public async Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default)
     {
         var useOffline = await ShouldUseOfflineModeAsync();

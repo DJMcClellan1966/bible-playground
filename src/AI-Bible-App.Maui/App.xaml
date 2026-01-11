@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
                 <ResourceDictionary Source="Resources/Styles/EnhancedTheme.xaml" />
+                <ResourceDictionary Source="Resources/Styles/ScriptureThemes.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
             <!-- Scaled Font Sizes (dynamically updated by FontScaleService) -->

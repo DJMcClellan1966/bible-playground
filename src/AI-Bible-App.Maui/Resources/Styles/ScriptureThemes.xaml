@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!--                     SCRIPTURE-INSPIRED THEMES                        -->
+    <!-- Rich, warm aesthetics inspired by ancient manuscripts and holy texts -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- ═══════════════ PARCHMENT THEME (Light) ═══════════════ -->
+    <Color x:Key="ParchmentPrimary">#8B4513</Color>
+    <Color x:Key="ParchmentSecondary">#D2691E</Color>
+    <Color x:Key="ParchmentAccent">#B8860B</Color>
+    <Color x:Key="ParchmentBackground">#FFF8E7</Color>
+    <Color x:Key="ParchmentSurface">#FFFDF5</Color>
+    <Color x:Key="ParchmentText">#3E2723</Color>
+    <Color x:Key="ParchmentTextSecondary">#5D4037</Color>
+    <Color x:Key="ParchmentBorder">#D7CCC8</Color>
+    <Color x:Key="ParchmentDivider">#BCAAA4</Color>
+    
+    <!-- ═══════════════ MIDNIGHT SANCTUARY (Dark) ═══════════════ -->
+    <Color x:Key="SanctuaryPrimary">#C9A227</Color>
+    <Color x:Key="SanctuarySecondary">#7B68EE</Color>
+    <Color x:Key="SanctuaryAccent">#FFD700</Color>
+    <Color x:Key="SanctuaryBackground">#0D1117</Color>
+    <Color x:Key="SanctuarySurface">#161B22</Color>
+    <Color x:Key="SanctuaryText">#E6EDF3</Color>
+    <Color x:Key="SanctuaryTextSecondary">#8B949E</Color>
+    <Color x:Key="SanctuaryBorder">#30363D</Color>
+    <Color x:Key="SanctuaryDivider">#21262D</Color>
+    
+    <!-- ═══════════════ TEMPLE GOLD THEME ═══════════════ -->
+    <Color x:Key="TempleGoldPrimary">#DAA520</Color>
+    <Color x:Key="TempleGoldSecondary">#B8860B</Color>
+    <Color x:Key="TempleGoldBackground">#FFFEF0</Color>
+    <Color x:Key="TempleGoldSurface">#FFF8DC</Color>
+    <Color x:Key="TempleGoldText">#4A3C00</Color>
+    <Color x:Key="TempleGoldBorder">#E6D5A8</Color>
+    
+    <!-- ═══════════════ OLIVE GROVE THEME ═══════════════ -->
+    <Color x:Key="OliveGrovePrimary">#6B8E23</Color>
+    <Color x:Key="OliveGroveSecondary">#556B2F</Color>
+    <Color x:Key="OliveGroveBackground">#F5F7F0</Color>
+    <Color x:Key="OliveGroveSurface">#FFFFFF</Color>
+    <Color x:Key="OliveGroveText">#2E3D1F</Color>
+    <Color x:Key="OliveGroveBorder">#C5D5A8</Color>
+    
+    <!-- ═══════════════ ROYAL PURPLE THEME ═══════════════ -->
+    <Color x:Key="RoyalPurplePrimary">#6B5B95</Color>
+    <Color x:Key="RoyalPurpleSecondary">#4A4063</Color>
+    <Color x:Key="RoyalPurpleAccent">#FFD700</Color>
+    <Color x:Key="RoyalPurpleBackground">#F8F6FA</Color>
+    <Color x:Key="RoyalPurpleSurface">#FFFFFF</Color>
+    <Color x:Key="RoyalPurpleText">#2D2235</Color>
+    <Color x:Key="RoyalPurpleBorder">#D4C8E0</Color>
+    
+    <!-- ═══════════════ HIGH CONTRAST (Accessibility) ═══════════════ -->
+    <Color x:Key="HighContrastPrimary">#0000FF</Color>
+    <Color x:Key="HighContrastSecondary">#008000</Color>
+    <Color x:Key="HighContrastBackground">#FFFFFF</Color>
+    <Color x:Key="HighContrastSurface">#FFFFFF</Color>
+    <Color x:Key="HighContrastText">#000000</Color>
+    <Color x:Key="HighContrastBorder">#000000</Color>
+    
+    <Color x:Key="HighContrastDarkPrimary">#FFFF00</Color>
+    <Color x:Key="HighContrastDarkSecondary">#00FFFF</Color>
+    <Color x:Key="HighContrastDarkBackground">#000000</Color>
+    <Color x:Key="HighContrastDarkSurface">#1A1A1A</Color>
+    <Color x:Key="HighContrastDarkText">#FFFFFF</Color>
+    <Color x:Key="HighContrastDarkBorder">#FFFFFF</Color>
+    
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!--                     SCRIPTURE ICONS & DECORATIONS                    -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Chapter Ornaments (using Unicode) -->
+    <x:String x:Key="OrnamentCross">✝</x:String>
+    <x:String x:Key="OrnamentDove">🕊️</x:String>
+    <x:String x:Key="OrnamentScroll">📜</x:String>
+    <x:String x:Key="OrnamentBook">📖</x:String>
+    <x:String x:Key="OrnamentPrayer">🙏</x:String>
+    <x:String x:Key="OrnamentCandle">🕯️</x:String>
+    <x:String x:Key="OrnamentOlive">🫒</x:String>
+    <x:String x:Key="OrnamentLamb">🐑</x:String>
+    <x:String x:Key="OrnamentCrown">👑</x:String>
+    <x:String x:Key="OrnamentStar">⭐</x:String>
+    <x:String x:Key="OrnamentFleur">⚜️</x:String>
+    <x:String x:Key="OrnamentHeart">❤️</x:String>
+    <x:String x:Key="OrnamentLight">💡</x:String>
+    <x:String x:Key="OrnamentChurch">⛪</x:String>
+    
+    <!-- Decorative Borders (Unicode art) -->
+    <x:String x:Key="BorderTop">═══════════════════════════════════════</x:String>
+    <x:String x:Key="BorderOrnate">✦ ═══════════ ✦ ═══════════ ✦</x:String>
+    <x:String x:Key="DividerSimple">───────────────────────────</x:String>
+    <x:String x:Key="DividerFloral">❧ ─────── ❧ ─────── ❧</x:String>
+    
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!--                     GRADIENT BRUSHES FOR THEMES                      -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    
+    <LinearGradientBrush x:Key="ParchmentGradientBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFF8E7" Offset="0.0" />
+        <GradientStop Color="#F5E6C8" Offset="0.5" />
+        <GradientStop Color="#EED9B6" Offset="1.0" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="SanctuaryGradientBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#0D1117" Offset="0.0" />
+        <GradientStop Color="#161B22" Offset="0.5" />
+        <GradientStop Color="#1C2128" Offset="1.0" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="GoldenScrollGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FFD700" Offset="0.0" />
+        <GradientStop Color="#DAA520" Offset="0.5" />
+        <GradientStop Color="#B8860B" Offset="1.0" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="SunsetPrayerGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FF7E5F" Offset="0.0" />
+        <GradientStop Color="#FEB47B" Offset="0.5" />
+        <GradientStop Color="#FFD194" Offset="1.0" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="MorningGraceGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#89CFF0" Offset="0.0" />
+        <GradientStop Color="#A7D8FF" Offset="0.5" />
+        <GradientStop Color="#B8E0FF" Offset="1.0" />
+    </LinearGradientBrush>
+    
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!--                     TYPOGRAPHY FOR SCRIPTURE                         -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Verse Reference Style -->
+    <Style x:Key="VerseReferenceStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontAttributes" Value="Italic"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource ParchmentSecondary}, Dark={StaticResource SanctuarySecondary}}"/>
+    </Style>
+    
+    <!-- Chapter Heading Style -->
+    <Style x:Key="ChapterHeadingStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource ParchmentPrimary}, Dark={StaticResource SanctuaryAccent}}"/>
+        <Setter Property="Margin" Value="0,20,0,15"/>
+    </Style>
+    
+    <!-- Verse Text Style -->
+    <Style x:Key="VerseTextStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="LineHeight" Value="1.6"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource ParchmentText}, Dark={StaticResource SanctuaryText}}"/>
+    </Style>
+    
+    <!-- Verse Number Style -->
+    <Style x:Key="VerseNumberStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="VerticalOptions" Value="Start"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource ParchmentAccent}, Dark={StaticResource SanctuaryPrimary}}"/>
+    </Style>
+    
+    <!-- Book Title Style -->
+    <Style x:Key="BookTitleStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="32"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource ParchmentPrimary}, Dark={StaticResource SanctuaryAccent}}"/>
+        <Setter Property="Margin" Value="0,30,0,10"/>
+    </Style>
+    
+    <!-- Prayer Text Style -->
+    <Style x:Key="PrayerTextStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontAttributes" Value="Italic"/>
+        <Setter Property="LineHeight" Value="1.8"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource ParchmentText}, Dark={StaticResource SanctuaryText}}"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+    </Style>
+    
+</ResourceDictionary>

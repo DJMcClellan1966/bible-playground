@@ -31,6 +31,41 @@ public partial class PrayerViewModel : BaseViewModel
     [ObservableProperty]
     private bool isGenerating;
 
+    // Personalization options
+    [ObservableProperty]
+    private bool showAdvancedOptions;
+
+    [ObservableProperty]
+    private PrayerMood? selectedMood;
+
+    [ObservableProperty]
+    private PrayerRequestType selectedStyle = PrayerRequestType.General;
+
+    [ObservableProperty]
+    private PrayerLength selectedLength = PrayerLength.Medium;
+
+    [ObservableProperty]
+    private PrayerTradition selectedTradition = PrayerTradition.General;
+
+    [ObservableProperty]
+    private TimeOfDayContext? selectedTimeContext;
+
+    [ObservableProperty]
+    private string? prayingFor;
+
+    [ObservableProperty]
+    private string? lifeCircumstances;
+
+    [ObservableProperty]
+    private bool includeScripture = true;
+
+    // Option lists for pickers
+    public List<PrayerMood> AvailableMoods => Enum.GetValues<PrayerMood>().ToList();
+    public List<PrayerRequestType> AvailableStyles => Enum.GetValues<PrayerRequestType>().ToList();
+    public List<PrayerLength> AvailableLengths => Enum.GetValues<PrayerLength>().ToList();
+    public List<PrayerTradition> AvailableTraditions => Enum.GetValues<PrayerTradition>().ToList();
+    public List<TimeOfDayContext> AvailableTimeContexts => Enum.GetValues<TimeOfDayContext>().ToList();
+
     public PrayerViewModel(IAIService aiService, IPrayerRepository prayerRepository, IReflectionRepository reflectionRepository, IDialogService dialogService)
     {
         _aiService = aiService;
@@ -38,6 +73,16 @@ public partial class PrayerViewModel : BaseViewModel
         _reflectionRepository = reflectionRepository;
         _dialogService = dialogService;
         Title = "Prayer Generator";
+        
+        // Auto-detect time context
+        var hour = DateTime.Now.Hour;
+        SelectedTimeContext = hour switch
+        {
+            >= 5 and < 12 => TimeOfDayContext.Morning,
+            >= 12 and < 17 => TimeOfDayContext.Midday,
+            >= 17 and < 21 => TimeOfDayContext.Evening,
+            _ => TimeOfDayContext.Night
+        };
     }
 
     partial void OnSelectedPrayerChanged(Prayer? value)
@@ -73,6 +118,12 @@ public partial class PrayerViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private void ToggleAdvancedOptions()
+    {
+        ShowAdvancedOptions = !ShowAdvancedOptions;
+    }
+
+    [RelayCommand]
     private async Task GeneratePrayer()
     {
         if (string.IsNullOrWhiteSpace(PrayerRequest) || IsGenerating)
@@ -83,7 +134,31 @@ public partial class PrayerViewModel : BaseViewModel
             IsGenerating = true;
             GeneratedPrayer = "Generating prayer...";
 
-            var prayer = await _aiService.GeneratePrayerAsync(PrayerRequest);
+            string prayer;
+            
+            // Use personalized prayer if any advanced options are set
+            if (ShowAdvancedOptions || SelectedMood.HasValue || SelectedStyle != PrayerRequestType.General)
+            {
+                var options = new PrayerOptions
+                {
+                    Topic = PrayerRequest,
+                    Mood = SelectedMood,
+                    RequestType = SelectedStyle,
+                    Length = SelectedLength,
+                    Tradition = SelectedTradition,
+                    TimeContext = SelectedTimeContext,
+                    PrayingFor = PrayingFor,
+                    LifeCircumstances = LifeCircumstances,
+                    IncludeScripture = IncludeScripture
+                };
+                
+                prayer = await _aiService.GeneratePersonalizedPrayerAsync(options);
+            }
+            else
+            {
+                prayer = await _aiService.GeneratePrayerAsync(PrayerRequest);
+            }
+            
             GeneratedPrayer = prayer;
         }
         catch (Exception ex)

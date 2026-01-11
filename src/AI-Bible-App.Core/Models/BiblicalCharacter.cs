@@ -38,6 +38,11 @@ public class BiblicalCharacter
     /// Prayer style this character uses
     /// </summary>
     public PrayerStyle PrayerStyle { get; set; } = PrayerStyle.Traditional;
+    
+    /// <summary>
+    /// Whether this is a user-created custom character
+    /// </summary>
+    public bool IsCustom { get; set; } = false;
 }
 
 /// <summary>
@@ -98,5 +103,8 @@ public enum PrayerStyle
     Structured,
     Spontaneous,
     Contemplative,
-    Intercession
+    Intercession,
+    Conversational,
+    Prophetic,
+    Confessional
 }

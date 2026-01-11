@@ -47,7 +47,6 @@ public static class MauiProgram
 		// Core services
 		builder.Services.AddSingleton<INavigationService, NavigationService>();
 		builder.Services.AddSingleton<IDialogService, DialogService>();
-		builder.Services.AddSingleton<ICharacterRepository, InMemoryCharacterRepository>();
 		builder.Services.AddSingleton<IChatRepository, JsonChatRepository>();
 		builder.Services.AddSingleton<IPrayerRepository, JsonPrayerRepository>();
 		builder.Services.AddSingleton<IReflectionRepository, JsonReflectionRepository>();
@@ -61,6 +60,16 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IVerseBookmarkRepository, VerseBookmarkRepository>();
 		builder.Services.AddSingleton<IBibleVerseIndexService, BibleVerseIndexService>();
 		builder.Services.AddSingleton<ISecureConfigService, SecureConfigService>();
+		
+		// Custom character services
+		builder.Services.AddSingleton<ICustomCharacterRepository, CustomCharacterRepository>();
+		
+		// Character repository - depends on custom character repository for merged list
+		builder.Services.AddSingleton<ICharacterRepository>(sp =>
+		{
+			var customRepo = sp.GetRequiredService<ICustomCharacterRepository>();
+			return new InMemoryCharacterRepository(customRepo);
+		});
 		
 		// Offline AI services
 		builder.Services.AddSingleton<AI_Bible_App.Core.Services.IConnectivityService, ConnectivityService>();
@@ -178,6 +187,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<SystemDiagnosticsViewModel>();
 		builder.Services.AddTransient<DevotionalViewModel>();
 		builder.Services.AddTransient<BookmarksViewModel>();
+		builder.Services.AddTransient<CustomCharacterViewModel>();
 
 		// Register Pages
 		builder.Services.AddTransient<UserSelectionPage>();
@@ -196,6 +206,14 @@ public static class MauiProgram
 		builder.Services.AddTransient<SystemDiagnosticsPage>();
 		builder.Services.AddTransient<DevotionalPage>();
 		builder.Services.AddTransient<BookmarksPage>();
+		builder.Services.AddTransient<CustomCharacterPage>();
+		
+		// New UI Enhancement Pages and ViewModels
+		builder.Services.AddSingleton<IAccessibilityService, AccessibilityService>();
+		builder.Services.AddTransient<BibleReaderViewModel>();
+		builder.Services.AddTransient<HistoryDashboardViewModel>();
+		builder.Services.AddTransient<BibleReaderPage>();
+		builder.Services.AddTransient<HistoryDashboardPage>();
 
 		return builder.Build();
 	}

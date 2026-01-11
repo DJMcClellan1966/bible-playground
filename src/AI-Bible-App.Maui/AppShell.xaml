@@ -47,11 +47,32 @@
             Route="devotional" />
     </FlyoutItem>
     
+    <FlyoutItem Title="Bible Reader" Icon="{OnPlatform Default='📜'}">
+        <ShellContent
+            Title="Bible Reader"
+            ContentTemplate="{DataTemplate views:BibleReaderPage}"
+            Route="BibleReader" />
+    </FlyoutItem>
+    
+    <FlyoutItem Title="My Journey" Icon="{OnPlatform Default='📊'}">
+        <ShellContent
+            Title="My Journey"
+            ContentTemplate="{DataTemplate views:HistoryDashboardPage}"
+            Route="HistoryDashboard" />
+    </FlyoutItem>
+    
     <FlyoutItem Title="My Bookmarks" Icon="{OnPlatform Default='🔖'}">
         <ShellContent
             Title="My Bookmarks"
             ContentTemplate="{DataTemplate views:BookmarksPage}"
             Route="bookmarks" />
+    </FlyoutItem>
+    
+    <FlyoutItem Title="Custom Characters" Icon="{OnPlatform Default='✨'}">
+        <ShellContent
+            Title="Custom Characters"
+            ContentTemplate="{DataTemplate views:CustomCharacterPage}"
+            Route="customcharacters" />
     </FlyoutItem>
     
     <FlyoutItem Title="Settings" Icon="{OnPlatform Default='⚙️'}">

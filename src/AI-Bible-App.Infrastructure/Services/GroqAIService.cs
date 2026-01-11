@@ -146,6 +146,76 @@ IMPORTANT GUIDELINES:
         return result?.Choices?.FirstOrDefault()?.Message?.Content ?? "Prayer could not be generated";
     }
 
+    public async Task<string> GeneratePersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken = default)
+    {
+        if (!IsAvailable)
+            throw new InvalidOperationException("Groq API key not configured");
+
+        // Build personalized prompt
+        var promptParts = new List<string>();
+        
+        if (options.RequestType != PrayerRequestType.General)
+            promptParts.Add($"Write {options.RequestType.GetDescription()}.");
+        
+        promptParts.Add(options.Tradition.GetStyleHint());
+        
+        if (options.Mood.HasValue)
+            promptParts.Add($"The person praying is {options.Mood.Value.GetDescription()}.");
+        
+        if (options.TimeContext.HasValue)
+            promptParts.Add($"This prayer is {options.TimeContext.Value.GetTimeGreeting()}.");
+        
+        if (!string.IsNullOrEmpty(options.LifeCircumstances))
+            promptParts.Add($"Life context: {options.LifeCircumstances}");
+        
+        if (options.Intentions.Any())
+            promptParts.Add($"Include these intentions: {string.Join(", ", options.Intentions)}");
+        
+        if (!string.IsNullOrEmpty(options.PrayingFor))
+            promptParts.Add($"This prayer is for/about: {options.PrayingFor}");
+        
+        var wordCount = options.Length.GetWordCount();
+        promptParts.Add($"Keep the prayer approximately {wordCount} words.");
+
+        var messages = new List<GroqMessage>
+        {
+            new() 
+            { 
+                Role = "system", 
+                Content = $@"You are a compassionate prayer writer. Generate heartfelt, biblically-grounded prayers.
+
+{string.Join("\n", promptParts)}
+
+IMPORTANT GUIDELINES:
+- Write the prayer directly - start with addressing God and end with Amen
+- Use natural, sincere language that flows like a real conversation with God
+- Do NOT include parenthetical references or meta-commentary
+- The output should ONLY be the prayer text itself"
+            },
+            new() 
+            { 
+                Role = "user", 
+                Content = string.IsNullOrEmpty(options.Topic) 
+                    ? "Generate a personalized prayer." 
+                    : $"Generate a prayer about: {options.Topic}"
+            }
+        };
+
+        var request = new GroqRequest
+        {
+            Model = _modelName,
+            Messages = messages,
+            MaxTokens = wordCount * 2,
+            Temperature = 0.8
+        };
+
+        var response = await _httpClient.PostAsJsonAsync(BaseUrl, request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        
+        var result = await response.Content.ReadFromJsonAsync<GroqResponse>(cancellationToken: cancellationToken);
+        return result?.Choices?.FirstOrDefault()?.Message?.Content ?? "Prayer could not be generated";
+    }
+
     public async Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default)
     {
         if (!IsAvailable)

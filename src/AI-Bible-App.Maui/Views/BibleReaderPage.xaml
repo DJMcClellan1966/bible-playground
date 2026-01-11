@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             x:Class="AI_Bible_App.Maui.Views.BibleReaderPage"
+             x:DataType="vm:BibleReaderViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+    
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="15">
+        
+        <!-- Header with Back Button -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,5,0,15">
+            <Button Grid.Column="0"
+                    Text="◀ Back"
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Primary}"
+                    FontSize="14"
+                    HeightRequest="36"
+                    AutomationProperties.Name="Go back"/>
+            <Label Grid.Column="1"
+                   Text="📖 Bible Reader"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="{DynamicResource Primary}"
+                   AutomationProperties.IsInAccessibleTree="True"/>
+            <Button Grid.Column="2"
+                    Text="🔖"
+                    Command="{Binding ToggleBookmarksCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Gray600}"
+                    FontSize="20"
+                    HeightRequest="36"
+                    AutomationProperties.Name="View bookmarks"/>
+        </Grid>
+        
+        <!-- Search Bar -->
+        <Border Grid.Row="1" 
+                Padding="12,8"
+                Margin="0,0,0,10"
+                BackgroundColor="{DynamicResource CardBackground}"
+                StrokeThickness="1"
+                Stroke="{DynamicResource Gray300}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="25"/>
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Label Grid.Column="0"
+                       Text="🔍"
+                       FontSize="18"
+                       VerticalOptions="Center"
+                       Margin="0,0,10,0"/>
+                <Entry Grid.Column="1"
+                       Text="{Binding SearchQuery}"
+                       Placeholder="Search verses (e.g., 'love', 'John 3:16')"
+                       ReturnCommand="{Binding SearchCommand}"
+                       PlaceholderColor="{DynamicResource Gray500}"
+                       FontSize="14"
+                       AutomationProperties.Name="Search Bible"/>
+                <Button Grid.Column="2"
+                        Text="Search"
+                        Command="{Binding SearchCommand}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="White"
+                        FontSize="12"
+                        HeightRequest="32"
+                        CornerRadius="16"
+                        Padding="15,0"
+                        AutomationProperties.Name="Search"/>
+            </Grid>
+        </Border>
+        
+        <!-- Book/Chapter Picker -->
+        <Grid Grid.Row="2" ColumnDefinitions="2*,*,Auto" ColumnSpacing="10" Margin="0,0,0,10">
+            <Border Grid.Column="0"
+                    Padding="0"
+                    BackgroundColor="{DynamicResource CardBackground}"
+                    StrokeThickness="1"
+                    Stroke="{DynamicResource Gray300}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Picker ItemsSource="{Binding Books}"
+                        SelectedItem="{Binding SelectedBook}"
+                        Title="Select Book"
+                        FontSize="14"
+                        AutomationProperties.Name="Select Bible book"/>
+            </Border>
+            
+            <Border Grid.Column="1"
+                    Padding="0"
+                    BackgroundColor="{DynamicResource CardBackground}"
+                    StrokeThickness="1"
+                    Stroke="{DynamicResource Gray300}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Picker ItemsSource="{Binding Chapters}"
+                        SelectedItem="{Binding SelectedChapter}"
+                        Title="Chapter"
+                        FontSize="14"
+                        AutomationProperties.Name="Select chapter"/>
+            </Border>
+            
+            <Button Grid.Column="2"
+                    Text="Go"
+                    Command="{Binding LoadChapterCommand}"
+                    BackgroundColor="{DynamicResource Primary}"
+                    TextColor="White"
+                    FontSize="14"
+                    HeightRequest="40"
+                    WidthRequest="50"
+                    CornerRadius="8"
+                    AutomationProperties.Name="Go to chapter"/>
+        </Grid>
+        
+        <!-- Search Results / Verse Display -->
+        <Grid Grid.Row="3">
+            <!-- Search Results Panel (overlays when searching) -->
+            <Border x:Name="SearchResultsPanel"
+                    IsVisible="{Binding IsSearching}"
+                    BackgroundColor="{DynamicResource CardBackground}"
+                    Padding="15"
+                    ZIndex="10">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <Grid RowDefinitions="Auto,*">
+                    <HorizontalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,10">
+                        <Label Text="{Binding SearchResultCount, StringFormat='📜 {0} results found'}"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="{DynamicResource Primary}"/>
+                        <Button Text="✕ Close"
+                                Command="{Binding ClearSearchCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource Gray600}"
+                                FontSize="12"
+                                HeightRequest="30"/>
+                    </HorizontalStackLayout>
+                    
+                    <CollectionView Grid.Row="1"
+                                    ItemsSource="{Binding SearchResults}"
+                                    SelectionMode="Single"
+                                    SelectionChanged="OnSearchResultSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <SwipeView>
+                                    <SwipeView.RightItems>
+                                        <SwipeItems Mode="Execute">
+                                            <SwipeItem Text="🔖 Bookmark"
+                                                       BackgroundColor="{DynamicResource Primary}"
+                                                       Invoked="OnBookmarkSwipe"/>
+                                        </SwipeItems>
+                                    </SwipeView.RightItems>
+                                    <Border Padding="12"
+                                            Margin="0,5"
+                                            BackgroundColor="{DynamicResource Surface}"
+                                            Shadow="{Shadow Brush=Black, Offset='0,1', Radius=3, Opacity=0.2}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="10"/>
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="5">
+                                            <Label Text="{Binding Reference}"
+                                                   FontSize="14"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{DynamicResource Primary}"/>
+                                            <Label Text="{Binding Text}"
+                                                   FontSize="13"
+                                                   TextColor="{DynamicResource TextColor}"
+                                                   LineBreakMode="WordWrap"
+                                                   MaxLines="3"/>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </SwipeView>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </Border>
+            
+            <!-- Main Verse Reader -->
+            <ScrollView x:Name="VerseScrollView"
+                        IsVisible="{Binding IsSearching, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Padding="10" Spacing="0">
+                    <!-- Chapter Heading -->
+                    <Label Text="{Binding CurrentChapterHeading}"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="{DynamicResource Primary}"
+                           Margin="0,10,0,20"
+                           AutomationProperties.IsInAccessibleTree="True"/>
+                    
+                    <!-- Decorative Divider -->
+                    <Label Text="✦ ═══════════════ ✦"
+                           FontSize="12"
+                           TextColor="{DynamicResource Gray400}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,20"/>
+                    
+                    <!-- Verses -->
+                    <CollectionView ItemsSource="{Binding CurrentVerses}"
+                                    SelectionMode="Single"
+                                    SelectionChanged="OnVerseSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="30,*" Margin="0,8" Padding="5">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Verse}"
+                                           FontSize="11"
+                                           FontAttributes="Bold"
+                                           TextColor="{DynamicResource Primary}"
+                                           VerticalOptions="Start"
+                                           Margin="0,3,0,0"/>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Text}"
+                                           FontSize="16"
+                                           LineHeight="1.6"
+                                           TextColor="{DynamicResource TextColor}"
+                                           LineBreakMode="WordWrap"
+                                           AutomationProperties.IsInAccessibleTree="True"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    
+                    <!-- End Decorative -->
+                    <Label Text="❧ ─────── ❧"
+                           FontSize="12"
+                           TextColor="{DynamicResource Gray400}"
+                           HorizontalOptions="Center"
+                           Margin="0,20"/>
+                </VerticalStackLayout>
+            </ScrollView>
+            
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{DynamicResource Primary}"
+                               WidthRequest="40"
+                               HeightRequest="40"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+        </Grid>
+        
+        <!-- Navigation Footer -->
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto,*" Margin="0,10,0,0">
+            <Button Grid.Column="0"
+                    Text="◀ Previous"
+                    Command="{Binding PreviousChapterCommand}"
+                    BackgroundColor="{DynamicResource CardBackground}"
+                    TextColor="{DynamicResource Primary}"
+                    FontSize="14"
+                    HeightRequest="44"
+                    CornerRadius="10"
+                    AutomationProperties.Name="Previous chapter"/>
+            
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="5">
+                <Label Text="{Binding SelectedBook}"
+                       FontSize="12"
+                       TextColor="{DynamicResource Gray600}"
+                       HorizontalOptions="Center"/>
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="🔊"
+                            Command="{Binding ReadAloudCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource Primary}"
+                            FontSize="20"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            AutomationProperties.Name="Read chapter aloud"/>
+                    <Button Text="📋"
+                            Command="{Binding CopyChapterCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource Primary}"
+                            FontSize="20"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            AutomationProperties.Name="Copy chapter"/>
+                    <Button Text="💬"
+                            Command="{Binding DiscussWithCharacterCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource Primary}"
+                            FontSize="20"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            AutomationProperties.Name="Discuss with biblical character"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+            
+            <Button Grid.Column="2"
+                    Text="Next ▶"
+                    Command="{Binding NextChapterCommand}"
+                    BackgroundColor="{DynamicResource CardBackground}"
+                    TextColor="{DynamicResource Primary}"
+                    FontSize="14"
+                    HeightRequest="44"
+                    CornerRadius="10"
+                    AutomationProperties.Name="Next chapter"/>
+        </Grid>
+    </Grid>
+</ContentPage>

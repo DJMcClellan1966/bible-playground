@@ -319,6 +319,46 @@ public class HybridAIService : IAIService
         return await _cachedService.GeneratePrayerAsync(topic, cancellationToken);
     }
 
+    public async Task<string> GeneratePersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken = default)
+    {
+        var hasNetwork = _capabilityService.HasNetworkConnectivity();
+
+        // Try primary
+        try
+        {
+            return _recommendation.Primary switch
+            {
+                AIBackendType.LocalOllama => await _localService.GeneratePersonalizedPrayerAsync(options, cancellationToken),
+                AIBackendType.OnDevice when _onDeviceService != null => await _onDeviceService.GeneratePersonalizedPrayerAsync(options, cancellationToken),
+                AIBackendType.Cloud when hasNetwork && _cloudAvailable => await _cloudService.GeneratePersonalizedPrayerAsync(options, cancellationToken),
+                _ => await _cachedService.GeneratePersonalizedPrayerAsync(options, cancellationToken)
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Primary personalized prayer generation failed");
+        }
+
+        // Try fallback
+        try
+        {
+            return _recommendation.Fallback switch
+            {
+                AIBackendType.LocalOllama => await _localService.GeneratePersonalizedPrayerAsync(options, cancellationToken),
+                AIBackendType.OnDevice when _onDeviceService != null => await _onDeviceService.GeneratePersonalizedPrayerAsync(options, cancellationToken),
+                AIBackendType.Cloud when hasNetwork && _cloudAvailable => await _cloudService.GeneratePersonalizedPrayerAsync(options, cancellationToken),
+                _ => await _cachedService.GeneratePersonalizedPrayerAsync(options, cancellationToken)
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Fallback personalized prayer generation failed");
+        }
+
+        // Emergency - fall back to simple prayer
+        return await _cachedService.GeneratePrayerAsync(options.Topic, cancellationToken);
+    }
+
     public async Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default)
     {
         var hasNetwork = _capabilityService.HasNetworkConnectivity();
