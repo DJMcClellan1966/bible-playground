@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:AI_Bible_App.Maui.Controls"
+             x:Class="AI_Bible_App.Maui.Controls.EnhancedRoundtableView">
+    
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <!-- Roundtable Scene Background -->
+            <LinearGradientBrush x:Key="SceneBackgroundGradient" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#1a1f2e" Offset="0" />
+                <GradientStop Color="#2d3548" Offset="0.5" />
+                <GradientStop Color="#1a1f2e" Offset="1" />
+            </LinearGradientBrush>
+            
+            <!-- Golden glow for active speaker -->
+            <LinearGradientBrush x:Key="ActiveGlowGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFD700" Offset="0" />
+                <GradientStop Color="#FFA500" Offset="1" />
+            </LinearGradientBrush>
+            
+            <!-- Subtle table surface -->
+            <RadialGradientBrush x:Key="TableGradient" Center="0.5,0.5" Radius="0.5">
+                <GradientStop Color="#3d4557" Offset="0" />
+                <GradientStop Color="#2d3548" Offset="0.7" />
+                <GradientStop Color="#1a1f2e" Offset="1" />
+            </RadialGradientBrush>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    
+    <Grid>
+        <!-- Background Scene -->
+        <BoxView Background="{StaticResource SceneBackgroundGradient}" />
+        
+        <!-- Main Content -->
+        <Grid RowDefinitions="Auto,*,Auto" Padding="16">
+            
+            <!-- Header with Topic -->
+            <Border Grid.Row="0"
+                    BackgroundColor="#2d3548"
+                    StrokeShape="RoundRectangle 12"
+                    Stroke="#4a5568"
+                    StrokeThickness="1"
+                    Padding="16"
+                    Margin="0,0,0,16">
+                <Border.Shadow>
+                    <Shadow Brush="#000000"
+                            Offset="0,4"
+                            Radius="8"
+                            Opacity="0.3" />
+                </Border.Shadow>
+                
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="📖 Discussion Topic"
+                           FontSize="12"
+                           TextColor="#a0aec0"
+                           FontAttributes="Bold" />
+                    <Label x:Name="TopicLabel"
+                           Text="What does it mean to have faith?"
+                           FontSize="18"
+                           TextColor="#FFFFFF"
+                           FontAttributes="Bold"
+                           LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Participants Circle / Table View -->
+            <Grid Grid.Row="1">
+                <!-- Virtual Table -->
+                <Ellipse x:Name="TableShape"
+                         WidthRequest="320"
+                         HeightRequest="200"
+                         Fill="{StaticResource TableGradient}"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center">
+                    <Ellipse.Shadow>
+                        <Shadow Brush="#000000"
+                                Offset="0,8"
+                                Radius="16"
+                                Opacity="0.4" />
+                    </Ellipse.Shadow>
+                </Ellipse>
+                
+                <!-- Participants arranged around table -->
+                <Grid x:Name="ParticipantsGrid"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center"
+                      WidthRequest="400"
+                      HeightRequest="320">
+                    <!-- Participants will be added programmatically -->
+                </Grid>
+            </Grid>
+            
+            <!-- Current Speaker Panel -->
+            <Border Grid.Row="2"
+                    x:Name="SpeakerPanel"
+                    BackgroundColor="#2d3548"
+                    StrokeShape="RoundRectangle 16"
+                    Stroke="#4a5568"
+                    StrokeThickness="1"
+                    Padding="20"
+                    Margin="0,16,0,0"
+                    IsVisible="False">
+                <Border.Shadow>
+                    <Shadow Brush="#000000"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.3" />
+                </Border.Shadow>
+                
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                    <!-- Speaker Avatar -->
+                    <Grid Grid.Column="0" VerticalOptions="Start">
+                        <local:CharacterAvatar x:Name="SpeakerAvatar"
+                                               Size="60"
+                                               IsSpeaking="True" />
+                    </Grid>
+                    
+                    <!-- Speech Content -->
+                    <VerticalStackLayout Grid.Column="1" Spacing="8">
+                        <HorizontalStackLayout Spacing="8">
+                            <Label x:Name="SpeakerNameLabel"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="#FFFFFF" />
+                            <Border BackgroundColor="#4a5568"
+                                    StrokeShape="RoundRectangle 8"
+                                    Padding="8,4"
+                                    VerticalOptions="Center">
+                                <Label Text="Speaking..."
+                                       FontSize="10"
+                                       TextColor="#a0aec0" />
+                            </Border>
+                        </HorizontalStackLayout>
+                        
+                        <Label x:Name="SpeechLabel"
+                               FontSize="15"
+                               TextColor="#e2e8f0"
+                               LineBreakMode="WordWrap"
+                               LineHeight="1.4" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+        </Grid>
+        
+        <!-- Decorative Elements -->
+        <BoxView x:Name="TopGlow"
+                 HeightRequest="100"
+                 VerticalOptions="Start"
+                 Opacity="0.3">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#FFD700" Offset="0" />
+                    <GradientStop Color="Transparent" Offset="1" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+    </Grid>
+</ContentView>

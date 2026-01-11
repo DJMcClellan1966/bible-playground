@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             x:Class="AI_Bible_App.Maui.Views.SystemDiagnosticsPage"
+             x:DataType="vm:SystemDiagnosticsViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource PageBackgroundColor}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <!-- System Status Header -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#1A1A2E}"
+                   CornerRadius="16"
+                   Padding="20"
+                   HasShadow="True">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                    <Label Text="System Status"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#2C3E50, Dark=#E8E8E8}"/>
+                    <Label Text="{Binding SystemStatus}"
+                           Grid.Row="1"
+                           FontSize="16"
+                           TextColor="{AppThemeBinding Light=#34495E, Dark=#B8B8B8}"
+                           Margin="0,5,0,0"/>
+                    
+                    <VerticalStackLayout Grid.Column="1" Grid.RowSpan="2" VerticalOptions="Center">
+                        <BoxView WidthRequest="20" HeightRequest="20"
+                                 CornerRadius="10"
+                                 Color="{Binding IsHealthy, Converter={StaticResource BoolToColorConverter}}"
+                                 HorizontalOptions="Center"/>
+                        <Label Text="{Binding LastRefreshed, StringFormat='Updated: {0}'}"
+                               FontSize="10"
+                               TextColor="Gray"
+                               HorizontalOptions="Center"
+                               Margin="0,5,0,0"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </Frame>
+
+            <!-- Cache Statistics -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#16213E}"
+                   CornerRadius="16"
+                   Padding="20"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="📦 Cache Statistics"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#2C3E50, Dark=#E8E8E8}"/>
+                    
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10">
+                        <!-- Hit Rate -->
+                        <Frame BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B4332}"
+                               CornerRadius="12" Padding="15">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="{Binding CacheHitRate, StringFormat='{0:F1}%'}"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#2E7D32, Dark=#95D5B2}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Hit Rate"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#4CAF50, Dark=#74C69D}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Total Entries -->
+                        <Frame Grid.Column="1"
+                               BackgroundColor="{AppThemeBinding Light=#E3F2FD, Dark=#0D47A1}"
+                               CornerRadius="12" Padding="15">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="{Binding TotalCacheEntries}"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#1565C0, Dark=#90CAF9}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Entries"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#42A5F5, Dark=#64B5F6}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Similarity Hits -->
+                        <Frame Grid.Column="2"
+                               BackgroundColor="{AppThemeBinding Light=#FFF3E0, Dark=#E65100}"
+                               CornerRadius="12" Padding="15">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="{Binding SimilarityHits}"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#E65100, Dark=#FFB74D}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Similar Hits"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#FB8C00, Dark=#FFA726}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Hits -->
+                        <Frame Grid.Row="1" Margin="0,10,0,0"
+                               BackgroundColor="{AppThemeBinding Light=#F3E5F5, Dark=#6A1B9A}"
+                               CornerRadius="12" Padding="15">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="{Binding TotalHits}"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#7B1FA2, Dark=#CE93D8}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Total Hits"
+                                       FontSize="11"
+                                       TextColor="{AppThemeBinding Light=#9C27B0, Dark=#BA68C8}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Misses -->
+                        <Frame Grid.Row="1" Grid.Column="1" Margin="0,10,0,0"
+                               BackgroundColor="{AppThemeBinding Light=#FFEBEE, Dark=#B71C1C}"
+                               CornerRadius="12" Padding="15">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="{Binding TotalMisses}"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#C62828, Dark=#EF9A9A}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Misses"
+                                       FontSize="11"
+                                       TextColor="{AppThemeBinding Light=#E53935, Dark=#E57373}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Recent Operations -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#16213E}"
+                   CornerRadius="16"
+                   Padding="20"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="⚡ Recent Operations"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#2C3E50, Dark=#E8E8E8}"/>
+                    
+                    <CollectionView ItemsSource="{Binding RecentOperations}"
+                                    EmptyView="No operations recorded yet">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:OperationDisplay">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Padding="10" ColumnSpacing="15">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Name}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#2C3E50, Dark=#E8E8E8}"/>
+                                        <Label Text="{Binding Category}"
+                                               FontSize="11"
+                                               TextColor="Gray"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" 
+                                           Text="{Binding AvgDuration}"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light=#2196F3, Dark=#90CAF9}"
+                                           VerticalOptions="Center"/>
+                                    <Label Grid.Column="2"
+                                           Text="{Binding CallCount, StringFormat='{0} calls'}"
+                                           FontSize="11"
+                                           TextColor="Gray"
+                                           VerticalOptions="Center"/>
+                                    <Label Grid.Column="3"
+                                           Text="{Binding SuccessRate}"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light=#4CAF50, Dark=#81C784}"
+                                           VerticalOptions="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Optimization Suggestions -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#16213E}"
+                   CornerRadius="16"
+                   Padding="20"
+                   HasShadow="True"
+                   IsVisible="{Binding Suggestions.Count, Converter={StaticResource IntToBoolConverter}}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="💡 Optimization Suggestions"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#2C3E50, Dark=#E8E8E8}"/>
+                    
+                    <CollectionView ItemsSource="{Binding Suggestions}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SuggestionDisplay">
+                                <Frame Margin="0,5" Padding="15"
+                                       BackgroundColor="{AppThemeBinding Light=#FAFAFA, Dark=#0F3460}"
+                                       CornerRadius="10">
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*">
+                                        <BoxView WidthRequest="6" HeightRequest="6"
+                                                 CornerRadius="3"
+                                                 Color="{Binding PriorityColor}"
+                                                 VerticalOptions="Center"
+                                                 Margin="0,0,10,0"/>
+                                        <Label Grid.Column="1"
+                                               Text="{Binding Area}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light=#2C3E50, Dark=#E8E8E8}"/>
+                                        <Label Grid.Row="1" Grid.ColumnSpan="2"
+                                               Text="{Binding Issue}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#E74C3C, Dark=#FF6B6B}"
+                                               Margin="16,2,0,0"/>
+                                        <Label Grid.Row="2" Grid.ColumnSpan="2"
+                                               Text="{Binding Suggestion}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#27AE60, Dark=#69DB7C}"
+                                               Margin="16,2,0,0"/>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Button Text="🔄 Refresh"
+                        Command="{Binding RefreshDataCommand}"
+                        BackgroundColor="{AppThemeBinding Light=#3498DB, Dark=#2980B9}"
+                        TextColor="White"
+                        CornerRadius="12"
+                        HeightRequest="50"/>
+                
+                <Button Grid.Column="1"
+                        Text="🔥 Warmup"
+                        Command="{Binding WarmupSystemCommand}"
+                        BackgroundColor="{AppThemeBinding Light=#E67E22, Dark=#D35400}"
+                        TextColor="White"
+                        CornerRadius="12"
+                        HeightRequest="50"/>
+                
+                <Button Grid.Column="2"
+                        Text="🧪 Test"
+                        Command="{Binding TestEnhancementCommand}"
+                        BackgroundColor="{AppThemeBinding Light=#9B59B6, Dark=#8E44AD}"
+                        TextColor="White"
+                        CornerRadius="12"
+                        HeightRequest="50"/>
+            </Grid>
+            
+            <Button Text="🗑️ Clear Expired Cache"
+                    Command="{Binding ClearCacheCommand}"
+                    BackgroundColor="{AppThemeBinding Light=#E74C3C, Dark=#C0392B}"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="45"
+                    HorizontalOptions="Center"
+                    WidthRequest="200"/>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

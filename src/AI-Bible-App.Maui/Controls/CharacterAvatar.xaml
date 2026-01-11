@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AI_Bible_App.Maui.Controls.CharacterAvatar"
+             x:Name="thisControl">
+    
+    <Border x:Name="AvatarBorder"
+            StrokeThickness="3"
+            StrokeShape="RoundRectangle 100"
+            WidthRequest="{Binding Size, Source={x:Reference thisControl}}"
+            HeightRequest="{Binding Size, Source={x:Reference thisControl}}">
+        <Border.Stroke>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="{Binding BorderColorStart, Source={x:Reference thisControl}}" Offset="0.0" />
+                <GradientStop Color="{Binding BorderColorEnd, Source={x:Reference thisControl}}" Offset="1.0" />
+            </LinearGradientBrush>
+        </Border.Stroke>
+        
+        <Grid>
+            <!-- Gradient Background (fallback when no image) -->
+            <Border x:Name="GradientBackground"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 100"
+                    IsVisible="{Binding ShowGradient, Source={x:Reference thisControl}}">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="{Binding PrimaryColor, Source={x:Reference thisControl}}" Offset="0.0" />
+                        <GradientStop Color="{Binding SecondaryColor, Source={x:Reference thisControl}}" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                
+                <!-- Initials -->
+                <Label Text="{Binding Initials, Source={x:Reference thisControl}}"
+                       TextColor="White"
+                       FontSize="{Binding InitialsFontSize, Source={x:Reference thisControl}}"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                    <Label.Shadow>
+                        <Shadow Brush="Black" Offset="2,2" Radius="4" Opacity="0.5" />
+                    </Label.Shadow>
+                </Label>
+            </Border>
+            
+            <!-- Actual Image (when available) -->
+            <Border x:Name="ImageContainer"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 100"
+                    IsVisible="{Binding ShowImage, Source={x:Reference thisControl}}">
+                <Image x:Name="AvatarImage"
+                       Source="{Binding ImageSource, Source={x:Reference thisControl}}"
+                       Aspect="AspectFill" />
+            </Border>
+            
+            <!-- Glow Effect Overlay -->
+            <Border x:Name="GlowOverlay"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 100"
+                    Opacity="0"
+                    IsVisible="{Binding ShowGlow, Source={x:Reference thisControl}}">
+                <Border.Background>
+                    <RadialGradientBrush Center="0.5,0.5" Radius="0.5">
+                        <GradientStop Color="#40FFFFFF" Offset="0.7" />
+                        <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                    </RadialGradientBrush>
+                </Border.Background>
+            </Border>
+            
+            <!-- Speaking Indicator Ring -->
+            <Border x:Name="SpeakingRing"
+                    StrokeThickness="4"
+                    StrokeShape="RoundRectangle 100"
+                    BackgroundColor="Transparent"
+                    IsVisible="{Binding IsSpeaking, Source={x:Reference thisControl}}"
+                    Opacity="0">
+                <Border.Stroke>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#FFD700" Offset="0.0" />
+                        <GradientStop Color="#FFA500" Offset="0.5" />
+                        <GradientStop Color="#FFD700" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Stroke>
+            </Border>
+        </Grid>
+    </Border>
+</ContentView>

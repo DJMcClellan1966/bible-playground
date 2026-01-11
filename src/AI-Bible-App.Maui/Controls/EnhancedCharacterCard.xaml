@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:AI_Bible_App.Maui.Controls"
+             x:Class="AI_Bible_App.Maui.Controls.EnhancedCharacterCard"
+             x:Name="thisCard">
+    
+    <Border x:Name="CardBorder"
+            Padding="0"
+            StrokeThickness="2"
+            StrokeShape="RoundRectangle 20">
+        <Border.Stroke>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="{Binding BorderColorStart, Source={x:Reference thisCard}}" Offset="0.0" />
+                <GradientStop Color="{Binding BorderColorEnd, Source={x:Reference thisCard}}" Offset="1.0" />
+            </LinearGradientBrush>
+        </Border.Stroke>
+        <Border.Shadow>
+            <Shadow Brush="{Binding ShadowColor, Source={x:Reference thisCard}}" 
+                    Offset="0,4" Radius="16" Opacity="0.3" />
+        </Border.Shadow>
+        
+        <Grid RowDefinitions="Auto,*,Auto">
+            <!-- Header with Gradient Background -->
+            <Border Grid.Row="0"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 20,20,0,0"
+                    HeightRequest="100">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="{Binding PrimaryColor, Source={x:Reference thisCard}}" Offset="0.0" />
+                        <GradientStop Color="{Binding SecondaryColor, Source={x:Reference thisCard}}" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                
+                <!-- Decorative Pattern Overlay -->
+                <Grid>
+                    <BoxView Opacity="0.1">
+                        <BoxView.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="White" Offset="0.0" />
+                                <GradientStop Color="Transparent" Offset="0.3" />
+                                <GradientStop Color="White" Offset="0.5" />
+                                <GradientStop Color="Transparent" Offset="0.7" />
+                                <GradientStop Color="White" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </BoxView.Background>
+                    </BoxView>
+                    
+                    <!-- Role Badge -->
+                    <Border Padding="8,4"
+                            BackgroundColor="#40000000"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            HorizontalOptions="End"
+                            VerticalOptions="Start"
+                            Margin="12">
+                        <Label Text="{Binding RoleText, Source={x:Reference thisCard}}"
+                               TextColor="White"
+                               FontSize="11"
+                               FontAttributes="Bold" />
+                    </Border>
+                </Grid>
+            </Border>
+            
+            <!-- Avatar (overlapping header) -->
+            <controls:CharacterAvatar x:Name="Avatar"
+                                      Grid.Row="0"
+                                      Grid.RowSpan="2"
+                                      CharacterName="{Binding CharacterName, Source={x:Reference thisCard}}"
+                                      Size="80"
+                                      HorizontalOptions="Center"
+                                      VerticalOptions="End"
+                                      Margin="0,0,0,-40"
+                                      ZIndex="10">
+                <controls:CharacterAvatar.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="8" Opacity="0.4" />
+                </controls:CharacterAvatar.Shadow>
+            </controls:CharacterAvatar>
+            
+            <!-- Content Area -->
+            <VerticalStackLayout Grid.Row="1"
+                                 Padding="16,50,16,16"
+                                 Spacing="8"
+                                 BackgroundColor="#1A1A2E">
+                
+                <!-- Character Name -->
+                <Label Text="{Binding CharacterName, Source={x:Reference thisCard}}"
+                       TextColor="White"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center" />
+                
+                <!-- Title/Role -->
+                <Label Text="{Binding Title, Source={x:Reference thisCard}}"
+                       TextColor="#B0B0C0"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       FontAttributes="Italic" />
+                
+                <!-- Era Badge -->
+                <Border Padding="10,4"
+                        BackgroundColor="#252547"
+                        StrokeThickness="1"
+                        Stroke="#40FFFFFF"
+                        StrokeShape="RoundRectangle 12"
+                        HorizontalOptions="Center"
+                        Margin="0,4">
+                    <Label Text="{Binding Era, Source={x:Reference thisCard}}"
+                           TextColor="#FFD700"
+                           FontSize="11" />
+                </Border>
+                
+                <!-- Description -->
+                <Label Text="{Binding Description, Source={x:Reference thisCard}}"
+                       TextColor="#808090"
+                       FontSize="12"
+                       LineHeight="1.3"
+                       MaxLines="3"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,8,0,0" />
+            </VerticalStackLayout>
+            
+            <!-- Footer Actions -->
+            <Border Grid.Row="2"
+                    BackgroundColor="#16213E"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 0,0,20,20"
+                    Padding="12">
+                <Grid ColumnDefinitions="*,Auto,*">
+                    <!-- Stats/Info -->
+                    <HorizontalStackLayout Grid.Column="0"
+                                           Spacing="4"
+                                           HorizontalOptions="Start"
+                                           VerticalOptions="Center">
+                        <Label Text="📖" FontSize="14" />
+                        <Label Text="{Binding BooksCount, Source={x:Reference thisCard}}"
+                               TextColor="#B0B0C0"
+                               FontSize="12"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    
+                    <!-- Chat Button -->
+                    <Button Grid.Column="1"
+                            Text="Chat"
+                            FontSize="13"
+                            FontAttributes="Bold"
+                            TextColor="#1A1A2E"
+                            BackgroundColor="#FFD700"
+                            CornerRadius="16"
+                            Padding="20,8"
+                            Clicked="OnChatClicked">
+                        <Button.Shadow>
+                            <Shadow Brush="#FFD700" Offset="0,2" Radius="6" Opacity="0.4" />
+                        </Button.Shadow>
+                    </Button>
+                    
+                    <!-- Selection Indicator -->
+                    <Border Grid.Column="2"
+                            x:Name="SelectionIndicator"
+                            BackgroundColor="#4CAF50"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            WidthRequest="24"
+                            HeightRequest="24"
+                            HorizontalOptions="End"
+                            VerticalOptions="Center"
+                            IsVisible="{Binding IsSelected, Source={x:Reference thisCard}}"
+                            Opacity="0">
+                        <Label Text="✓"
+                               TextColor="White"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</ContentView>

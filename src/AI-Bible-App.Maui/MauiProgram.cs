@@ -5,6 +5,7 @@ using AI_Bible_App.Core.Models;
 using AI_Bible_App.Infrastructure.Repositories;
 using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
+using AI_Bible_App.Maui.Services.Core;
 using AI_Bible_App.Maui.ViewModels;
 using AI_Bible_App.Maui.Views;
 using CommunityToolkit.Maui;
@@ -84,8 +85,39 @@ public static class MauiProgram
 		// Character Intelligence Service - evolving character personalities
 		builder.Services.AddSingleton<CharacterIntelligenceService>();
 		
+		// Cross-Character Learning Service - enables characters to learn from roundtable discussions
+		builder.Services.AddSingleton<ICrossCharacterLearningService, CrossCharacterLearningService>();
+		
+		// ═══════════════════════════════════════════════════════════════════════════════
+		// CORE OPTIMIZATION SERVICES - High-performance, interconnected systems
+		// ═══════════════════════════════════════════════════════════════════════════════
+		
+		// Intelligent caching with semantic similarity matching
+		builder.Services.AddSingleton<IIntelligentCacheService, IntelligentCacheService>();
+		
+		// Character mood system - dynamic emotional states for authentic interactions
+		builder.Services.AddSingleton<ICharacterMoodService, CharacterMoodService>();
+		
+		// Scripture context engine - intelligent Bible verse finder
+		builder.Services.AddSingleton<IScriptureContextEngine, ScriptureContextEngine>();
+		
+		// Performance monitoring - real-time metrics and health checks
+		builder.Services.AddSingleton<IPerformanceMonitor, PerformanceMonitor>();
+		
+		// Conversation flow predictor - anticipates user questions
+		builder.Services.AddSingleton<IConversationFlowPredictor, ConversationFlowPredictor>();
+		
+		// Core services orchestrator - coordinates all systems for optimal performance
+		builder.Services.AddSingleton<ICoreServicesOrchestrator, CoreServicesOrchestrator>();
+		
+		// Chat enhancement service - integrates core systems for chat interactions
+		builder.Services.AddSingleton<IChatEnhancementService, ChatEnhancementService>();
+		
 		// Multi-Character Chat Service
 		builder.Services.AddSingleton<IMultiCharacterChatService, MultiCharacterChatService>();
+		
+		// Image Generation Service - AI-generated character portraits and scenes
+		builder.Services.AddSingleton<IImageGenerationService, ImageGenerationService>();
 		
 		// Device capability detection for tiered AI
 		builder.Services.AddSingleton<IDeviceCapabilityService>(sp =>
@@ -129,6 +161,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<WisdomCouncilViewModel>();
 		builder.Services.AddTransient<PrayerChainViewModel>();
 		builder.Services.AddTransient<RoundtableChatViewModel>();
+		builder.Services.AddTransient<CharacterEvolutionViewModel>();
+		builder.Services.AddTransient<SystemDiagnosticsViewModel>();
 
 		// Register Pages
 		builder.Services.AddTransient<UserSelectionPage>();
@@ -143,6 +177,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<WisdomCouncilPage>();
 		builder.Services.AddTransient<PrayerChainPage>();
 		builder.Services.AddTransient<RoundtableChatPage>();
+		builder.Services.AddTransient<CharacterEvolutionPage>();
+		builder.Services.AddTransient<SystemDiagnosticsPage>();
 
 		return builder.Build();
 	}

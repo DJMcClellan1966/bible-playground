@@ -35,6 +35,20 @@
             Route="reflections" />
     </FlyoutItem>
     
+    <FlyoutItem Title="Character Growth" Icon="{OnPlatform Default='🌱'}">
+        <ShellContent
+            Title="Character Growth"
+            ContentTemplate="{DataTemplate views:CharacterEvolutionPage}"
+            Route="evolution" />
+    </FlyoutItem>
+    
+    <FlyoutItem Title="System Diagnostics" Icon="{OnPlatform Default='📊'}">
+        <ShellContent
+            Title="System Diagnostics"
+            ContentTemplate="{DataTemplate views:SystemDiagnosticsPage}"
+            Route="diagnostics" />
+    </FlyoutItem>
+    
     <FlyoutItem Title="Settings" Icon="{OnPlatform Default='⚙️'}">
         <ShellContent
             Title="Settings"

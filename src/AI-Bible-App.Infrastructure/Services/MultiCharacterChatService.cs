@@ -626,11 +626,20 @@ Keep response to 2-3 focused paragraphs.";
     /// </summary>
     private bool ResponseAddressesQuestion(string response, string question)
     {
-        // Extract key terms from question
+        if (string.IsNullOrWhiteSpace(question) || string.IsNullOrWhiteSpace(response))
+            return true; // Can't validate empty
+            
+        // Extract key terms from question (more aggressive filtering)
+        var stopWords = new HashSet<string> { 
+            "what", "how", "why", "when", "where", "does", "the", "this", "that", 
+            "about", "with", "your", "you", "tell", "can", "could", "would", "should",
+            "think", "believe", "mean", "explain", "describe"
+        };
+        
         var questionTerms = question.ToLower()
             .Split(new[] { ' ', '.', ',', '!', '?', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Where(w => w.Length > 3)
-            .Where(w => !new[] { "what", "how", "why", "when", "where", "does", "the", "this", "that", "about", "with" }.Contains(w))
+            .Where(w => !stopWords.Contains(w))
             .ToHashSet();
         
         var responseTerms = response.ToLower()
@@ -638,73 +647,129 @@ Keep response to 2-3 focused paragraphs.";
             .Where(w => w.Length > 3)
             .ToHashSet();
         
-        // At least 20% of question key terms should appear in response
+        // Need at least 25% of question key terms (was 20%)
         var overlap = questionTerms.Intersect(responseTerms).Count();
         var relevance = questionTerms.Count > 0 ? (double)overlap / questionTerms.Count : 1;
         
-        return relevance >= 0.2 || response.Length > 200; // Long responses get a pass
+        // Also check if response contains the question's core subject
+        var coreTerms = questionTerms.Where(t => t.Length > 5).Take(3).ToList();
+        var containsCoreTerm = coreTerms.Count == 0 || coreTerms.Any(t => response.ToLower().Contains(t));
+        
+        return (relevance >= 0.25 && containsCoreTerm) || (relevance >= 0.4);
     }
 
     private string BuildDiscussionPrompt(BiblicalCharacter speaker, List<BiblicalCharacter> allParticipants, 
         List<ChatMessage> history, string responseType, bool seekConsensus)
     {
         // Find the LATEST user question (not just the original topic)
-        var latestUserMessage = history.LastOrDefault(m => m.Role == "user");
+        var latestUserMessageIndex = history.FindLastIndex(m => m.Role == "user");
+        var latestUserMessage = latestUserMessageIndex >= 0 ? history[latestUserMessageIndex] : null;
         var currentQuestionText = latestUserMessage?.Content ?? _currentQuestion;
         
-        // Get what THIS character has already said (to prevent repetition)
-        var speakerPreviousStatements = history
+        // CRITICAL: Only get statements made AFTER the latest user question
+        // This prevents confusion when a new question is asked
+        var messagesForCurrentQuestion = latestUserMessageIndex >= 0 
+            ? history.Skip(latestUserMessageIndex + 1).ToList()
+            : history.Where(m => m.Role == "assistant").ToList();
+        
+        // Get what THIS character has already said FOR THIS QUESTION ONLY
+        var speakerPreviousStatements = messagesForCurrentQuestion
             .Where(m => m.CharacterId == speaker.Id)
             .Select(m => m.Content)
             .ToList();
         
         var speakerPreviousTurns = speakerPreviousStatements.Count;
-        var totalTurns = history.Count(m => m.Role == "assistant");
+        var totalTurns = messagesForCurrentQuestion.Count(m => m.Role == "assistant");
         
-        // Get what OTHER characters said (this is critical - the model needs to see this!)
-        var otherResponses = history
+        // Get what OTHER characters said FOR THIS QUESTION ONLY (most recent)
+        var otherRecentResponses = messagesForCurrentQuestion
             .Where(m => m.Role == "assistant" && m.CharacterId != speaker.Id)
-            .TakeLast(4)
+            .TakeLast(3)
             .Select(m => {
                 var name = allParticipants.FirstOrDefault(c => c.Id == m.CharacterId)?.Name ?? "Someone";
                 return $"{name}: \"{m.Content}\"";
             })
             .ToList();
         
-        var conversationSoFar = otherResponses.Any()
-            ? "WHAT OTHERS SAID:\n" + string.Join("\n\n", otherResponses)
+        var conversationSoFar = otherRecentResponses.Any()
+            ? "RECENT STATEMENTS FROM OTHERS:\n" + string.Join("\n\n", otherRecentResponses)
             : "";
         
-        // What this character already said (to avoid)
+        // Strong anti-repetition: Show key phrases already used
+        var alreadySaidPhrases = speakerPreviousStatements
+            .SelectMany(s => ExtractKeyPhrases(s))
+            .Distinct()
+            .Take(10)
+            .ToList();
+        
         var alreadySaid = speakerPreviousStatements.Any()
-            ? "YOU ALREADY SAID (DO NOT REPEAT):\n" + string.Join("\n", speakerPreviousStatements.Select(s => 
-                $"• \"{s.Substring(0, Math.Min(100, s.Length))}...\""))
+            ? $"⚠️ YOU ALREADY SAID THESE THINGS (DO NOT REPEAT OR PARAPHRASE):\n" + 
+              string.Join("\n", speakerPreviousStatements.Select((s, i) => 
+                $"Turn {i+1}: \"{TruncateText(s, 150)}\"")) +
+              (alreadySaidPhrases.Any() ? $"\n\n❌ BANNED PHRASES (do not use): {string.Join(", ", alreadySaidPhrases)}" : "")
             : "";
+
+        // Determine what kind of continuation this is
+        var isContinuation = speakerPreviousTurns > 0;
+        var continuationDirective = "";
+        
+        if (isContinuation)
+        {
+            var lastSpeakerName = allParticipants
+                .FirstOrDefault(c => c.Id == history.LastOrDefault(m => m.Role == "assistant")?.CharacterId)?.Name;
+            
+            continuationDirective = $@"
+🔄 THIS IS A CONTINUATION - You have spoken {speakerPreviousTurns} time(s) before.
+
+CRITICAL: You MUST say something COMPLETELY NEW. Options:
+1. RESPOND directly to {lastSpeakerName ?? "the last speaker"}'s most recent point
+2. CHALLENGE something specific another character said  
+3. Add a NEW biblical example you haven't mentioned
+4. Share a DIFFERENT aspect of your experience
+5. Ask a probing question to another character
+
+DO NOT: Summarize, repeat yourself, or restate your previous points.";
+        }
 
         // Simple, clear prompt structure
         return $@"You are {speaker.Name}, {speaker.Title}.
 
-QUESTION FROM THE USER: ""{currentQuestionText}""
+QUESTION: ""{currentQuestionText}""
 
 {conversationSoFar}
 
 {alreadySaid}
 
-YOUR TASK: Answer the question ""{currentQuestionText}"" from YOUR unique perspective as {speaker.Name}.
+{continuationDirective}
 
-{(speakerPreviousTurns == 0 
-    ? "This is your FIRST response. Share your view boldly." 
-    : otherResponses.Any() 
-        ? $"Engage with what others said. Agree or disagree with {allParticipants.Where(c => c.Id != speaker.Id).FirstOrDefault()?.Name ?? "them"} specifically."
-        : "Add a NEW insight you haven't shared yet.")}
+YOUR TASK: {(isContinuation ? "ADD SOMETHING NEW to the discussion" : "Share your initial perspective")}.
 
 RULES:
-- Answer about ""{currentQuestionText}"" - nothing else
-- Do NOT repeat anything you already said above
-- Keep it to 2-3 sentences
-- Speak as {speaker.Name} with your unique biblical experience
+1. Keep it to 2-3 sentences MAXIMUM
+2. Be SPECIFIC - reference your actual biblical experiences  
+3. {(isContinuation ? "MUST say something you haven't said before" : "Share your unique perspective")}
+4. {(otherRecentResponses.Any() ? "ENGAGE with what others said - agree, disagree, or build on it" : "Open with your perspective")}
 
 {speaker.Name}'s response:";
+    }
+    
+    private IEnumerable<string> ExtractKeyPhrases(string text)
+    {
+        // Extract significant 3-4 word phrases to track for anti-repetition
+        var words = text.Split(new[] { ' ', ',', '.', '!', '?' }, StringSplitOptions.RemoveEmptyEntries)
+            .Where(w => w.Length > 3)
+            .ToArray();
+        
+        for (int i = 0; i < words.Length - 2; i++)
+        {
+            yield return $"{words[i]} {words[i+1]} {words[i+2]}".ToLower();
+        }
+    }
+    
+    private string TruncateText(string text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+        return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
     }
 
     private (BiblicalCharacter? Speaker, string ResponseType) DetermineNextSpeaker(
@@ -830,22 +895,29 @@ RULES:
     private async Task<ChatMessage> GetCharacterDiscussionResponseAsync(
         BiblicalCharacter character, string prompt, CancellationToken cancellationToken)
     {
-        const int maxRetries = 2;
+        const int maxRetries = 3;
         string? bestResponse = null;
         
-        // Get previous statements for similarity checking
-        var previousStatements = _discussionHistory?
+        // CRITICAL FIX: Only get previous statements for the CURRENT question
+        // Find where the current question starts in history
+        var latestUserMessageIndex = _discussionHistory?.FindLastIndex(m => m.Role == "user") ?? -1;
+        var messagesForCurrentQuestion = latestUserMessageIndex >= 0 && _discussionHistory != null
+            ? _discussionHistory.Skip(latestUserMessageIndex + 1).ToList()
+            : _discussionHistory?.Where(m => m.Role == "assistant").ToList() ?? new List<ChatMessage>();
+        
+        // Only check against statements made for THIS question
+        var previousStatementsForThisQuestion = messagesForCurrentQuestion
             .Where(m => m.CharacterId == character.Id)
             .Select(m => m.Content)
-            .ToList() ?? new List<string>();
+            .ToList();
         
         for (int attempt = 0; attempt <= maxRetries; attempt++)
         {
             try
             {
-                // Add retry indicator to prompt if this is a retry
+                // Add stronger retry indicator if this is a retry
                 var currentPrompt = attempt > 0 
-                    ? prompt + $"\n\n⚠️ RETRY #{attempt}: Your previous response was too similar to what you already said. Be COMPLETELY DIFFERENT this time. Say something NEW."
+                    ? prompt + $"\n\n🚨 CRITICAL RETRY #{attempt}: Your response was REJECTED. You MUST say something COMPLETELY DIFFERENT. Do NOT repeat any previous ideas. Give a FRESH perspective on the question: \"{_currentQuestion}\""
                     : prompt;
                 
                 // CRITICAL: Pass EMPTY history because the prompt already contains all context.
@@ -857,16 +929,18 @@ RULES:
                     currentPrompt,
                     cancellationToken);
                 
-                // Validate: Check if response is too similar to previous ones
-                if (IsResponseTooSimilar(response, previousStatements))
+                // Validate: Check if response is too similar to what was said FOR THIS QUESTION
+                if (IsResponseTooSimilar(response, previousStatementsForThisQuestion))
                 {
+                    System.Diagnostics.Debug.WriteLine($"[MultiChat] {character.Name} response too similar, attempt {attempt}");
                     bestResponse ??= response; // Keep as fallback
                     if (attempt < maxRetries) continue; // Try again
                 }
                 
-                // Validate: Check if response addresses the current question
+                // Validate: Check if response addresses the CURRENT question (stricter check)
                 if (!string.IsNullOrEmpty(_currentQuestion) && !ResponseAddressesQuestion(response, _currentQuestion))
                 {
+                    System.Diagnostics.Debug.WriteLine($"[MultiChat] {character.Name} response doesn't address question, attempt {attempt}");
                     bestResponse ??= response; // Keep as fallback
                     if (attempt < maxRetries) continue; // Try again
                 }

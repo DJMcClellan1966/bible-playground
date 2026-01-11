@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             xmlns:models="clr-namespace:AI_Bible_App.Core.Models;assembly=AI-Bible-App.Core"
+             x:Class="AI_Bible_App.Maui.Views.CharacterEvolutionPage"
+             x:DataType="vm:CharacterEvolutionViewModel"
+             Title="🌱 Character Growth"
+             BackgroundColor="{StaticResource PageBackgroundColor}">
+
+    <Grid RowDefinitions="Auto,*" Padding="20">
+        
+        <!-- Header Section -->
+        <VerticalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,20">
+            <Label Text="🌱 Character Evolution"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Primary}"/>
+            
+            <Label Text="See how characters learn and grow from roundtable discussions"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Gray500}"/>
+            
+            <!-- Character Picker -->
+            <Frame BackgroundColor="{StaticResource Surface}"
+                   BorderColor="{StaticResource Gray200}"
+                   CornerRadius="10"
+                   Padding="15"
+                   Margin="0,10">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Select a Character"
+                           FontSize="14"
+                           FontAttributes="Bold"/>
+                    <Picker ItemsSource="{Binding Characters}"
+                            SelectedItem="{Binding SelectedCharacter}"
+                            ItemDisplayBinding="{Binding Name}"
+                            HorizontalOptions="FillAndExpand"/>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+        
+        <!-- Content Section -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="15">
+                
+                <!-- Loading Indicator -->
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="{StaticResource Primary}"
+                                   HorizontalOptions="Center"/>
+                
+                <!-- No Evolution Message -->
+                <Frame IsVisible="{Binding HasEvolution, Converter={StaticResource InvertedBoolConverter}}"
+                       BackgroundColor="{StaticResource Surface}"
+                       BorderColor="{StaticResource Gray200}"
+                       CornerRadius="10"
+                       Padding="20">
+                    <VerticalStackLayout Spacing="15" HorizontalOptions="Center">
+                        <Label Text="🌱" 
+                               FontSize="48" 
+                               HorizontalOptions="Center"/>
+                        <Label Text="{Binding EvolutionDescription}"
+                               FontSize="16"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource Gray600}"/>
+                        <Label Text="Start a roundtable discussion to see characters grow!"
+                               FontSize="14"
+                               FontAttributes="Italic"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource Gray400}"/>
+                    </VerticalStackLayout>
+                </Frame>
+                
+                <!-- Evolution Data -->
+                <VerticalStackLayout IsVisible="{Binding HasEvolution}" Spacing="15">
+                    
+                    <!-- Stats Cards -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                        
+                        <!-- Roundtables Card -->
+                        <Frame Grid.Row="0" Grid.Column="0"
+                               BackgroundColor="{StaticResource Primary}"
+                               CornerRadius="10"
+                               Padding="15">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="🎯" FontSize="24" HorizontalOptions="Center"/>
+                                <Label Text="{Binding EvolutionSummary.TotalRoundtables}"
+                                       FontSize="28"
+                                       FontAttributes="Bold"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Discussions"
+                                       FontSize="12"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Insights Card -->
+                        <Frame Grid.Row="0" Grid.Column="1"
+                               BackgroundColor="{StaticResource Secondary}"
+                               CornerRadius="10"
+                               Padding="15">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="💡" FontSize="24" HorizontalOptions="Center"/>
+                                <Label Text="{Binding EvolutionSummary.TotalInsightsGained}"
+                                       FontSize="28"
+                                       FontAttributes="Bold"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Insights"
+                                       FontSize="12"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Teachings Card -->
+                        <Frame Grid.Row="1" Grid.Column="0"
+                               BackgroundColor="#6366F1"
+                               CornerRadius="10"
+                               Padding="15">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="📚" FontSize="24" HorizontalOptions="Center"/>
+                                <Label Text="{Binding EvolutionSummary.TotalTeachingsLearned}"
+                                       FontSize="28"
+                                       FontAttributes="Bold"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Teachings"
+                                       FontSize="12"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Wisdom Card -->
+                        <Frame Grid.Row="1" Grid.Column="1"
+                               BackgroundColor="#F59E0B"
+                               CornerRadius="10"
+                               Padding="15">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="✨" FontSize="24" HorizontalOptions="Center"/>
+                                <Label Text="{Binding EvolutionSummary.SynthesizedWisdomCount}"
+                                       FontSize="28"
+                                       FontAttributes="Bold"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Wisdom"
+                                       FontSize="12"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </Grid>
+                    
+                    <!-- Top Influencers Section -->
+                    <Frame BackgroundColor="{StaticResource Surface}"
+                           BorderColor="{StaticResource Gray200}"
+                           CornerRadius="10"
+                           Padding="15"
+                           IsVisible="{Binding EvolutionSummary.TopInfluencers.Count, Converter={StaticResource IntToBoolConverter}}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="🤝 Characters Who Influenced Growth"
+                                   FontSize="16"
+                                   FontAttributes="Bold"/>
+                            
+                            <CollectionView ItemsSource="{Binding EvolutionSummary.TopInfluencers}"
+                                            SelectionMode="None">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Null}">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="5">
+                                            <Label Grid.Column="0"
+                                                   Text="👤"
+                                                   FontSize="18"
+                                                   VerticalOptions="Center"/>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding CharacterName}"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"
+                                                   Margin="10,0"/>
+                                            <Label Grid.Column="2"
+                                                   Text="{Binding TeachingsLearned, StringFormat='{0} teachings'}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource Gray500}"
+                                                   VerticalOptions="Center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Recent Growth Events -->
+                    <Frame BackgroundColor="{StaticResource Surface}"
+                           BorderColor="{StaticResource Gray200}"
+                           CornerRadius="10"
+                           Padding="15"
+                           IsVisible="{Binding EvolutionSummary.RecentGrowthEvents.Count, Converter={StaticResource IntToBoolConverter}}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="📈 Recent Growth Events"
+                                   FontSize="16"
+                                   FontAttributes="Bold"/>
+                            
+                            <CollectionView ItemsSource="{Binding EvolutionSummary.RecentGrowthEvents}"
+                                            SelectionMode="None">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:GrowthEvent">
+                                        <Frame BackgroundColor="{StaticResource PageBackgroundColor}"
+                                               CornerRadius="8"
+                                               Padding="10"
+                                               Margin="0,5">
+                                            <VerticalStackLayout Spacing="5">
+                                                <Label Text="{Binding Description}"
+                                                       FontSize="14"/>
+                                                <Label Text="{Binding OccurredAt, StringFormat='{0:MMM dd, yyyy}'}"
+                                                       FontSize="11"
+                                                       TextColor="{StaticResource Gray400}"/>
+                                            </VerticalStackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Full Description -->
+                    <Frame BackgroundColor="{StaticResource Surface}"
+                           BorderColor="{StaticResource Gray200}"
+                           CornerRadius="10"
+                           Padding="15">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="📝 Evolution Details"
+                                   FontSize="16"
+                                   FontAttributes="Bold"/>
+                            <Label Text="{Binding EvolutionDescription}"
+                                   FontSize="14"
+                                   TextColor="{StaticResource Gray600}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
+                
+                <!-- Refresh Button -->
+                <Button Text="🔄 Refresh"
+                        Command="{Binding RefreshEvolutionCommand}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        Margin="0,10"/>
+                
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

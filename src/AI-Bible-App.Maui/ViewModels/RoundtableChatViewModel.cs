@@ -12,6 +12,7 @@ public partial class RoundtableChatViewModel : BaseViewModel
     private readonly IMultiCharacterChatService _multiCharacterChatService;
     private readonly ICharacterRepository _characterRepository;
     private readonly IChatRepository _chatRepository;
+    private readonly ICrossCharacterLearningService _learningService;
 
     [ObservableProperty]
     private string _sessionId = string.Empty;
@@ -49,6 +50,9 @@ public partial class RoundtableChatViewModel : BaseViewModel
 
     [ObservableProperty]
     private string? _discussionOutcome;
+    
+    [ObservableProperty]
+    private bool _isLearningEnabled = true; // Enable character evolution by default
 
     // Computed properties for UI
     public bool HasMessages => Messages?.Count > 0;
@@ -56,15 +60,18 @@ public partial class RoundtableChatViewModel : BaseViewModel
 
     private ChatSession? _session;
     private CancellationTokenSource? _discussionCancellation;
+    private string _currentTopic = string.Empty;
 
     public RoundtableChatViewModel(
         IMultiCharacterChatService multiCharacterChatService,
         ICharacterRepository characterRepository,
-        IChatRepository chatRepository)
+        IChatRepository chatRepository,
+        ICrossCharacterLearningService learningService)
     {
         _multiCharacterChatService = multiCharacterChatService;
         _characterRepository = characterRepository;
         _chatRepository = chatRepository;
+        _learningService = learningService;
         
         Title = "Roundtable Discussion";
     }
@@ -156,9 +163,19 @@ public partial class RoundtableChatViewModel : BaseViewModel
             }
             else if (!IsDiscussionActive)
             {
-                // Start new discussion
+                // Start new discussion with FRESH history
+                // CRITICAL: Clear UI messages AND session messages for fresh start
                 IsDiscussionActive = true;
                 DiscussionOutcome = null;
+                
+                // Clear ALL old messages for fresh discussion
+                Messages.Clear();
+                if (_session != null)
+                {
+                    _session.Messages.Clear();
+                }
+                OnPropertyChanged(nameof(HasMessages));
+                OnPropertyChanged(nameof(HasNoMessages));
 
                 var settings = new DiscussionSettings
                 {
@@ -171,7 +188,7 @@ public partial class RoundtableChatViewModel : BaseViewModel
                 await ProcessDiscussionUpdatesAsync(
                     _multiCharacterChatService.StartDynamicDiscussionAsync(
                         Characters.ToList(),
-                        Messages.ToList(),
+                        new List<ChatMessage>(), // FRESH start - no old history
                         userMessage,
                         settings));
             }
@@ -266,6 +283,12 @@ public partial class RoundtableChatViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            
+            // Track the topic for learning
+            if (string.IsNullOrEmpty(_currentTopic))
+            {
+                _currentTopic = userMessage;
+            }
 
             // Get roundtable responses from all characters
             var responses = await _multiCharacterChatService.GetRoundtableResponsesAsync(
@@ -296,6 +319,26 @@ public partial class RoundtableChatViewModel : BaseViewModel
             {
                 _session.Messages.AddRange(responses);
                 await _chatRepository.SaveSessionAsync(_session);
+            }
+            
+            // Process learning if enabled - characters learn from each other
+            if (IsLearningEnabled && responses.Count > 1)
+            {
+                try
+                {
+                    await _learningService.ProcessRoundtableDiscussionAsync(
+                        _currentTopic,
+                        Characters.ToList(),
+                        Messages.ToList());
+                    
+                    StatusMessage = "✨ Characters are learning from this discussion...";
+                    await Task.Delay(2000);
+                    StatusMessage = "";
+                }
+                catch
+                {
+                    // Learning is a background feature, don't interrupt the user
+                }
             }
         }
         catch (Exception ex)
