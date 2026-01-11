@@ -29,7 +29,7 @@ public class VerseSearchResult
 public class BibleVerseIndexService : IBibleVerseIndexService
 {
     private readonly ConcurrentDictionary<string, string> _verseIndex = new();
-    private readonly ConcurrentDictionary<string, HashSet<string>> _wordIndex = new();
+    private readonly ConcurrentDictionary<string, ConcurrentBag<string>> _wordIndex = new();
     private readonly ILogger<BibleVerseIndexService>? _logger;
     private bool _isInitialized;
     private int _totalVersesIndexed;
@@ -155,14 +155,12 @@ public class BibleVerseIndexService : IBibleVerseIndexService
         var normalizedRef = NormalizeReference(reference);
         _verseIndex[normalizedRef] = text;
 
-        // Index words for faster searching
+        // Index words for faster searching (thread-safe)
         var words = NormalizeAndSplit(text);
         foreach (var word in words)
         {
-            if (!_wordIndex.ContainsKey(word))
-                _wordIndex[word] = new HashSet<string>();
-            
-            _wordIndex[word].Add(normalizedRef);
+            var bag = _wordIndex.GetOrAdd(word, _ => new ConcurrentBag<string>());
+            bag.Add(normalizedRef);
         }
     }
 }
