@@ -144,13 +144,11 @@ public partial class CharacterSelectionPage : ContentPage
                         new Point(0, 0),
                         new Point(1, 1)
                     );
-                    CardsViewButton.Shadow = new Shadow { Brush = Color.FromArgb("#60667EEA"), Offset = new Point(0, 4), Radius = 12, Opacity = 0.4f };
                     if (CardsViewButton.Content is Label cardsLabel)
                         cardsLabel.TextColor = Colors.White;
                     
                     // Update List button to inactive state
                     ListViewButton.Background = new SolidColorBrush(Colors.Transparent);
-                    ListViewButton.Shadow = new Shadow { Brush = Colors.Transparent, Offset = new Point(0, 0), Radius = 0, Opacity = 0 };
                     if (ListViewButton.Content is Label listLabel)
                         listLabel.TextColor = Color.FromArgb("#6C757D");
                     
@@ -197,13 +195,11 @@ public partial class CharacterSelectionPage : ContentPage
                         new Point(0, 0),
                         new Point(1, 1)
                     );
-                    ListViewButton.Shadow = new Shadow { Brush = Color.FromArgb("#60667EEA"), Offset = new Point(0, 4), Radius = 12, Opacity = 0.4f };
                     if (ListViewButton.Content is Label listLabel)
                         listLabel.TextColor = Colors.White;
                     
                     // Update Cards button to inactive state
                     CardsViewButton.Background = new SolidColorBrush(Colors.Transparent);
-                    CardsViewButton.Shadow = new Shadow { Brush = Colors.Transparent, Offset = new Point(0, 0), Radius = 0, Opacity = 0 };
                     if (CardsViewButton.Content is Label cardsLabel)
                         cardsLabel.TextColor = Color.FromArgb("#6C757D");
                     
