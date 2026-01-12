@@ -134,7 +134,7 @@ public partial class CharacterSelectionPage : ContentPage
                     CarouselContainer.IsVisible = true;
                     ListContainer.IsVisible = false;
                     
-                    // Update button styles for new Border-based buttons
+                    // Update Cards button to active state
                     CardsViewButton.Background = new LinearGradientBrush(
                         new GradientStopCollection
                         {
@@ -145,21 +145,14 @@ public partial class CharacterSelectionPage : ContentPage
                         new Point(1, 1)
                     );
                     CardsViewButton.Shadow = new Shadow { Brush = Color.FromArgb("#60667EEA"), Offset = new Point(0, 4), Radius = 12, Opacity = 0.4f };
+                    if (CardsViewButton.Content is Label cardsLabel)
+                        cardsLabel.TextColor = Colors.White;
                     
+                    // Update List button to inactive state
                     ListViewButton.Background = new SolidColorBrush(Colors.Transparent);
                     ListViewButton.Shadow = new Shadow { Brush = Colors.Transparent, Offset = new Point(0, 0), Radius = 0, Opacity = 0 };
-                    
-                    // Update label colors
-                    if (CardsViewButton.Content is VerticalStackLayout cardsStack && cardsStack.Children.Count > 1)
-                    {
-                        if (cardsStack.Children[1] is Label cardsLabel)
-                            cardsLabel.TextColor = Colors.White;
-                    }
-                    if (ListViewButton.Content is VerticalStackLayout listStack && listStack.Children.Count > 1)
-                    {
-                        if (listStack.Children[1] is Label listLabel)
-                            listLabel.TextColor = Color.FromArgb("#6C757D");
-                    }
+                    if (ListViewButton.Content is Label listLabel)
+                        listLabel.TextColor = Color.FromArgb("#6C757D");
                     
                     System.Diagnostics.Debug.WriteLine("[DEBUG] Cards view switch completed");
                 }
@@ -194,7 +187,7 @@ public partial class CharacterSelectionPage : ContentPage
                     CarouselContainer.IsVisible = false;
                     ListContainer.IsVisible = true;
                     
-                    // Update button styles for new Border-based buttons
+                    // Update List button to active state
                     ListViewButton.Background = new LinearGradientBrush(
                         new GradientStopCollection
                         {
@@ -205,21 +198,14 @@ public partial class CharacterSelectionPage : ContentPage
                         new Point(1, 1)
                     );
                     ListViewButton.Shadow = new Shadow { Brush = Color.FromArgb("#60667EEA"), Offset = new Point(0, 4), Radius = 12, Opacity = 0.4f };
+                    if (ListViewButton.Content is Label listLabel)
+                        listLabel.TextColor = Colors.White;
                     
+                    // Update Cards button to inactive state
                     CardsViewButton.Background = new SolidColorBrush(Colors.Transparent);
                     CardsViewButton.Shadow = new Shadow { Brush = Colors.Transparent, Offset = new Point(0, 0), Radius = 0, Opacity = 0 };
-                    
-                    // Update label colors
-                    if (ListViewButton.Content is VerticalStackLayout listStack && listStack.Children.Count > 1)
-                    {
-                        if (listStack.Children[1] is Label listLabel)
-                            listLabel.TextColor = Colors.White;
-                    }
-                    if (CardsViewButton.Content is VerticalStackLayout cardsStack && cardsStack.Children.Count > 1)
-                    {
-                        if (cardsStack.Children[1] is Label cardsLabel)
-                            cardsLabel.TextColor = Color.FromArgb("#6C757D");
-                    }
+                    if (CardsViewButton.Content is Label cardsLabel)
+                        cardsLabel.TextColor = Color.FromArgb("#6C757D");
                     
                     System.Diagnostics.Debug.WriteLine("[DEBUG] List view switch completed");
                 }
