@@ -28,6 +28,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
     private readonly ICharacterVoiceService _voiceService;
     private readonly CharacterIntelligenceService? _intelligenceService;
     private readonly PersonalizedPromptService? _personalizedPromptService;
+    private readonly IUserQuestionCollector? _questionCollector;
     private readonly bool _enableContextualReferences;
     private ChatSession? _currentSession;
     private CancellationTokenSource? _speechCancellationTokenSource;
@@ -72,7 +73,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
     [ObservableProperty]
     private bool isActionInProgress;
 
-    public ChatViewModel(IAIService aiService, IChatRepository chatRepository, IBibleLookupService bibleLookupService, IReflectionRepository reflectionRepository, IPrayerRepository prayerRepository, IDialogService dialogService, IContentModerationService moderationService, IUserService userService, ICharacterVoiceService voiceService, IConfiguration configuration, CharacterIntelligenceService? intelligenceService = null, PersonalizedPromptService? personalizedPromptService = null)
+    public ChatViewModel(IAIService aiService, IChatRepository chatRepository, IBibleLookupService bibleLookupService, IReflectionRepository reflectionRepository, IPrayerRepository prayerRepository, IDialogService dialogService, IContentModerationService moderationService, IUserService userService, ICharacterVoiceService voiceService, IConfiguration configuration, CharacterIntelligenceService? intelligenceService = null, PersonalizedPromptService? personalizedPromptService = null, IUserQuestionCollector? questionCollector = null)
     {
         _aiService = aiService;
         _chatRepository = chatRepository;
@@ -85,6 +86,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
         _voiceService = voiceService;
         _intelligenceService = intelligenceService;
         _personalizedPromptService = personalizedPromptService;
+        _questionCollector = questionCollector;
         _enableContextualReferences = configuration["Features:ContextualReferences"]?.ToLower() == "true";
     }
 
@@ -273,7 +275,14 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
             Messages.Add(chatMessage);
             _currentSession?.Messages.Add(chatMessage);
             System.Diagnostics.Debug.WriteLine($"[DEBUG] Added user message: {userMsg}");
+            Collect user question for training data (with consent check)
+            if (_questionCollector != null && _userService.CurrentUser != null)
+            {
+                var userConsented = _userService.CurrentUser.Settings?.ShareDataForImprovement ?? false;
+                await _questionCollector.SaveUserQuestionAsync(userMsg, Character.Id, userConsented);
+            }
             
+            // 
             // Request scroll to bottom after user message
             ScrollToBottomRequested?.Invoke(this, EventArgs.Empty);
 

@@ -121,7 +121,121 @@ public class SyntheticDataGenerator : ISyntheticDataGenerator
         // Financial Stress
         "I'm drowning in debt and don't see a way out. Where do I even start?",
         "I work hard but barely make ends meet. How do you trust God with finances?",
-        "I feel guilty for not being able to provide better for my family. What should I do?"
+        "I feel guilty for not being able to provide better for my family. What should I do?",
+        
+        // More Fear & Anxiety
+        "I have panic attacks and feel like I'm losing control. What can I do?",
+        "The news makes me terrified for the future. How do you stay grounded?",
+        "I'm afraid of disappointing God. Will He give up on me?",
+        "My health issues are causing constant fear. How do I find peace?",
+        
+        // More Betrayal & Relationship Issues
+        "My spouse had an affair. Can this marriage be saved?",
+        "I was abused by someone I trusted. How do I heal from this?",
+        "My church leadership let me down. Can I trust spiritual leaders again?",
+        "I feel used by people who only come to me when they need something. What should I do?",
+        
+        // Identity & Self-Worth
+        "I don't know who I am anymore. How do I rediscover myself?",
+        "Everyone expects me to be someone I'm not. How do I be authentic?",
+        "I compare myself to others constantly. How do I find my identity in God?",
+        "My whole identity was wrapped up in something I lost. Who am I now?",
+        
+        // Spiritual Dryness
+        "I used to feel close to God but now feel nothing. What happened?",
+        "Prayer feels like talking to the ceiling. Is God even there?",
+        "I'm going through the motions but my heart isn't in it. How do I reignite my faith?",
+        "I've lost my passion for God. Can it be restored?",
+        
+        // Suffering & Injustice
+        "Why do evil people prosper while I struggle despite trying to do right?",
+        "I see so much suffering in the world. How can a good God allow this?",
+        "I'm exhausted from fighting. How do you keep going when everything is against you?",
+        "Nothing I do seems to make a difference. Is there any point in trying?",
+        
+        // Parenting Specific
+        "My teenager is making terrible choices. How do I guide without pushing them away?",
+        "I lost my temper with my kids again. Am I damaging them?",
+        "I feel like I'm failing as a parent. How did you parent when you made mistakes too?",
+        "My child has special needs and I'm overwhelmed. Where do I find strength?",
+        
+        // Ministry & Calling
+        "I felt called to ministry but the doors keep closing. Did I mishear God?",
+        "I'm burned out from serving. Is it okay to step back?",
+        "I gave up everything to follow God's call and now I'm struggling. Was it worth it?",
+        "I see others with less commitment getting more opportunities. Why?",
+        
+        // Sexual Sin & Purity
+        "I'm struggling with pornography and hate myself for it. How do I break free?",
+        "My past sexual choices haunt me. Can God really make me clean?",
+        "I'm in a relationship that's crossing physical boundaries. How do I have the strength to stop?",
+        "Same-sex attraction conflicts with my faith. What do I do?",
+        
+        // Mental Health
+        "I think I'm depressed but I'm afraid to admit it. What if people think I lack faith?",
+        "I have dark thoughts sometimes. Does this mean I'm not saved?",
+        "Medication helps my mental illness but I feel guilty for needing it. Should I trust God instead?",
+        "I don't want to burden anyone with my struggles. How do I ask for help?",
+        
+        // Contentment & Materialism
+        "I can't stop wanting more stuff. How do you find contentment?",
+        "Social media makes me feel poor even though I have enough. How do I combat this?",
+        "I know I should be grateful but I'm not. What's wrong with me?",
+        "Everyone around me is upgrading their lives and I feel left behind. How do you cope?",
+        
+        // Conflict & Confrontation
+        "Someone wronged me and everyone wants me to stay quiet. Should I speak up?",
+        "I need to have a difficult conversation but I'm terrified of conflict. How do you approach these?",
+        "I was right but apologizing would keep the peace. Do I compromise truth for harmony?",
+        "I'm in constant conflict with someone close to me. When is it time to walk away?",
+        
+        // Aging & Mortality
+        "I'm getting older and feeling useless. Does life have purpose after retirement?",
+        "I'm afraid of dying. How do you face mortality with faith?",
+        "My body is failing and I feel like a burden. How do I maintain dignity?",
+        "Time is running out for my dreams. Is it too late?",
+        
+        // Evangelism & Witnessing
+        "I want to share my faith but don't know what to say. How did you talk about God?",
+        "Everyone I witness to rejects me. Am I doing something wrong?",
+        "I'm afraid of being judged for my faith at work. How do you be bold?",
+        "My lifestyle doesn't always match my beliefs. Am I a hypocrite trying to witness?",
+        
+        // Church & Community
+        "I can't find a church that feels like home. Should I keep searching?",
+        "Church people hurt me deeply. How do I not lose faith because of them?",
+        "I disagree with my church on important issues. Should I stay or go?",
+        "I'm lonely at church even surrounded by people. How do I find real community?",
+        
+        // Crisis & Emergency
+        "Something terrible just happened. Where is God right now?",
+        "I have to make a life-or-death decision today. How do I know what to do?",
+        "My world is falling apart and I can't breathe. How do you survive crisis?",
+        "I'm in danger. What should I pray for?",
+        
+        // Addiction & Compulsions
+        "I've tried to quit so many times and keep failing. Is there hope for me?",
+        "My addiction is destroying my family but I can't stop. What do I do?",
+        "I'm hiding my struggle from everyone. How do I ask for help without losing everything?",
+        "I feel like my addiction defines me. Can I ever be free?",
+        
+        // Justice & Advocacy
+        "I see injustice but speaking up could cost me. What's the right thing to do?",
+        "How do you fight for justice without becoming bitter and angry?",
+        "I'm exhausted from advocating for the oppressed. How do you sustain this work?",
+        "Is it okay to be angry about injustice or should I just pray about it?",
+        
+        // Discernment & Deception
+        "I think I'm being lied to but can't prove it. How do you discern truth?",
+        "A spiritual leader I respected turned out to be false. How do I trust again?",
+        "I made a major decision based on what I thought was God's leading, but it was wrong. How do I hear Him?",
+        "There's so much conflicting teaching. How do you know what's true?",
+        
+        // Hope & Perseverance  
+        "I'm tired of fighting. How do you keep hoping when hope keeps disappointing?",
+        "Everything I've worked for is crumbling. How do you rebuild?",
+        "I've been faithful for years with no results. When do I see fruit?",
+        "I feel like giving up. What kept you going during your darkest time?"
     };
 
     public SyntheticDataGenerator(IAIService aiService, ICharacterRepository characterRepository)

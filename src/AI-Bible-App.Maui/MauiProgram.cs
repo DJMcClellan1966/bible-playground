@@ -99,6 +99,12 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IUserService, UserService>();
 		builder.Services.AddSingleton<IContentModerationService, ContentModerationService>();
 		
+		// Training data collection services
+		builder.Services.AddSingleton<ITrainingDataRepository, TrainingDataRepository>();
+		builder.Services.AddSingleton<ISyntheticDataGenerator, SyntheticDataGenerator>();
+		builder.Services.AddSingleton<IUserQuestionCollector, UserQuestionCollector>();
+		builder.Services.AddSingleton<IMultiCharacterTrainingGenerator, MultiCharacterTrainingGenerator>();
+		
 		// Character Intelligence Service - evolving character personalities
 		builder.Services.AddSingleton<CharacterIntelligenceService>();
 		

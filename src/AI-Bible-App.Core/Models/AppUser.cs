@@ -98,4 +98,9 @@ public class UserSettings
     /// Font size multiplier: "Small" (0.85), "Medium" (1.0), "Large" (1.2), "ExtraLarge" (1.4)
     /// </summary>
     public string FontSizePreference { get; set; } = "Medium";
+    
+    /// <summary>
+    /// Whether user consents to share anonymized questions for model improvement (default: false)
+    /// </summary>
+    public bool ShareDataForImprovement { get; set; } = false;
 }
