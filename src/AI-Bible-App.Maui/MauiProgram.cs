@@ -105,6 +105,11 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IUserQuestionCollector, UserQuestionCollector>();
 		builder.Services.AddSingleton<IMultiCharacterTrainingGenerator, MultiCharacterTrainingGenerator>();
 		
+		// Autonomous learning services
+		builder.Services.AddSingleton<IModelFineTuningService, AutomatedFineTuningService>();
+		builder.Services.AddSingleton<IModelEvaluationService, ModelEvaluationService>();
+		builder.Services.AddSingleton<IAutonomousLearningService, AutonomousLearningService>();
+		
 		// Character Intelligence Service - evolving character personalities
 		builder.Services.AddSingleton<CharacterIntelligenceService>();
 		
@@ -193,6 +198,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<SettingsViewModel>();
 		builder.Services.AddTransient<OfflineModelsViewModel>();
 		builder.Services.AddTransient<MultiCharacterSelectionViewModel>();
+		builder.Services.AddTransient<AdminViewModel>();
 		builder.Services.AddTransient<WisdomCouncilViewModel>();
 		builder.Services.AddTransient<PrayerChainViewModel>();
 		builder.Services.AddTransient<RoundtableChatViewModel>();
@@ -222,6 +228,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<BookmarksPage>();
 		builder.Services.AddTransient<CustomCharacterPage>();
 		builder.Services.AddTransient<ReadingPlanPage>();
+		builder.Services.AddTransient<AdminPage>();
 		
 		// New UI Enhancement Pages and ViewModels
 		builder.Services.AddSingleton<IAccessibilityService, AccessibilityService>();

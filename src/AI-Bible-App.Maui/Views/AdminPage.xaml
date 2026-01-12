@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             x:Class="AI_Bible_App.Maui.Views.AdminPage"
+             x:DataType="vm:AdminViewModel"
+             Title="Autonomous Learning Admin"
+             BackgroundColor="{StaticResource PageBackgroundColor}">
+    
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <!-- Header -->
+            <Label Text="🤖 Autonomous Learning System"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,20"/>
+            
+            <!-- Current Status Card -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="{StaticResource BorderColor}"
+                    BackgroundColor="{StaticResource CardBackgroundColor}"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📊 Current Status" 
+                           FontSize="20" 
+                           FontAttributes="Bold"/>
+                    
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Model Version:" FontAttributes="Bold"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Statistics.CurrentModelVersion}"/>
+                        
+                        <Label Grid.Row="1" Grid.Column="0" Text="Learning Cycles:" FontAttributes="Bold"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Statistics.TotalLearningCycles}"/>
+                        
+                        <Label Grid.Row="2" Grid.Column="0" Text="Successful Deployments:" FontAttributes="Bold"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Statistics.SuccessfulDeployments}"/>
+                        
+                        <Label Grid.Row="3" Grid.Column="0" Text="Avg Improvement:" FontAttributes="Bold"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Statistics.AverageImprovementPerCycle, StringFormat='{0:+P1}'}"/>
+                        
+                        <Label Grid.Row="4" Grid.Column="0" Text="Last Cycle:" FontAttributes="Bold"/>
+                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding Statistics.LastLearningCycle, StringFormat='{0:g}'}"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Training Data Card -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="{StaticResource BorderColor}"
+                    BackgroundColor="{StaticResource CardBackgroundColor}"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="💾 Training Data" 
+                           FontSize="20" 
+                           FontAttributes="Bold"/>
+                    
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Available Conversations: " FontAttributes="Bold"/>
+                                <Span Text="{Binding AvailableConversations}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Total Training Conversations Used: " FontAttributes="Bold"/>
+                                <Span Text="{Binding Statistics.TotalConversationsUsedForTraining}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    
+                    <Button Text="🔄 Refresh Statistics"
+                            Command="{Binding RefreshStatisticsCommand}"
+                            HorizontalOptions="Start"/>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Learning Cycle Control -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="{StaticResource BorderColor}"
+                    BackgroundColor="{StaticResource CardBackgroundColor}"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="🚀 Execute Learning Cycle" 
+                           FontSize="20" 
+                           FontAttributes="Bold"/>
+                    
+                    <Label Text="This will:"
+                           FontSize="14"/>
+                    <Label Text="1️⃣ Collect high-quality conversations"
+                           FontSize="12" Margin="20,0,0,0"/>
+                    <Label Text="2️⃣ Fine-tune the model with LoRA"
+                           FontSize="12" Margin="20,0,0,0"/>
+                    <Label Text="3️⃣ Evaluate against baseline"
+                           FontSize="12" Margin="20,0,0,0"/>
+                    <Label Text="4️⃣ Deploy if improved by 3%+"
+                           FontSize="12" Margin="20,0,0,0"/>
+                    
+                    <Label Text="⚠️ This process takes 1-4 hours"
+                           FontSize="12"
+                           TextColor="Orange"
+                           Margin="0,8,0,0"/>
+                    
+                    <Button Text="▶️ Start Learning Cycle"
+                            Command="{Binding StartLearningCycleCommand}"
+                            IsEnabled="{Binding CanStartCycle}"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            Margin="0,12,0,0"/>
+                    
+                    <ProgressBar Progress="{Binding CycleProgress}"
+                                IsVisible="{Binding IsExecutingCycle}"
+                                Margin="0,8,0,0"/>
+                    
+                    <Label Text="{Binding LastCycleMessage}"
+                           IsVisible="{Binding LastCycleMessage, Converter={StaticResource IsNotNullConverter}}"
+                           FontSize="12"
+                           Margin="0,8,0,0"/>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Version History -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="{StaticResource BorderColor}"
+                    BackgroundColor="{StaticResource CardBackgroundColor}"
+                    Padding="16"
+                    IsVisible="{Binding Statistics.VersionHistory.Count, Converter={StaticResource IsGreaterThanZeroConverter}}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📜 Version History" 
+                           FontSize="20" 
+                           FontAttributes="Bold"/>
+                    
+                    <CollectionView ItemsSource="{Binding Statistics.VersionHistory}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border StrokeShape="RoundRectangle 8"
+                                        Stroke="{StaticResource BorderColor}"
+                                        Padding="12"
+                                        Margin="0,4">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                        <Label Grid.Column="0" 
+                                               Text="{Binding Version}"
+                                               FontAttributes="Bold"/>
+                                        <Label Grid.Column="1" 
+                                               Text="{Binding DeployedAt, StringFormat='{0:g}'}"
+                                               FontSize="12"
+                                               VerticalOptions="Center"/>
+                                        <Label Grid.Column="2" 
+                                               Text="{Binding ImprovementScore, StringFormat='+{0:P1}'}"
+                                               TextColor="Green"
+                                               FontAttributes="Bold"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Info Card -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="{StaticResource BorderColor}"
+                    BackgroundColor="#F0F8FF"
+                    Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="ℹ️ How Autonomous Learning Works"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    
+                    <Label FontSize="12">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="The system learns from real user conversations. High-quality interactions (rated 4+) are used to fine-tune the model using LoRA (Low-Rank Adaptation) for efficiency. The new model is evaluated against the current one, and only deployed if it shows meaningful improvement (3%+).&#x0a;&#x0a;"/>
+                                <Span Text="This creates a feedback loop: better responses → happier users → better training data → even better responses." FontAttributes="Italic"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
