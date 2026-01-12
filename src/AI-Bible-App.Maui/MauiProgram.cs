@@ -113,6 +113,9 @@ public static class MauiProgram
 		// Knowledge base for historical context and language insights
 		builder.Services.AddSingleton<IKnowledgeBaseService, KnowledgeBaseService>();
 		
+		// Device capability detection and adaptive configuration
+		builder.Services.AddSingleton<IDeviceCapabilityService, DeviceCapabilityService>();
+		
 		// Character Intelligence Service - evolving character personalities
 		builder.Services.AddSingleton<CharacterIntelligenceService>();
 		

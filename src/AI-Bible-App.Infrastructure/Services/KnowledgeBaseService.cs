@@ -11,16 +11,21 @@ namespace AI_Bible_App.Infrastructure.Services;
 public class KnowledgeBaseService : IKnowledgeBaseService
 {
     private readonly ILogger<KnowledgeBaseService> _logger;
+    private readonly IDeviceCapabilityService? _deviceService;
     private readonly string _dataDirectory;
     
     private List<HistoricalContext> _historicalContexts = new();
     private List<LanguageInsight> _languageInsights = new();
     private List<ThematicConnection> _thematicConnections = new();
     private bool _initialized = false;
+    private ModelConfiguration? _currentConfig;
     
-    public KnowledgeBaseService(ILogger<KnowledgeBaseService> logger)
+    public KnowledgeBaseService(
+        ILogger<KnowledgeBaseService> logger,
+        IDeviceCapabilityService? deviceService = null)
     {
         _logger = logger;
+        _deviceService = deviceService;
         _dataDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "AIBibleApp",
@@ -37,6 +42,13 @@ public class KnowledgeBaseService : IKnowledgeBaseService
         try
         {
             _logger.LogInformation("Initializing knowledge base");
+            
+            // Get device configuration for pagination limits
+            if (_deviceService != null)
+            {
+                _currentConfig = await _deviceService.GetRecommendedConfigurationAsync();
+                _logger.LogInformation("Using configuration: {Config}", _currentConfig.DisplayName);
+            }
             
             // Load historical contexts
             var historicalPath = Path.Combine(_dataDirectory, "historical_context.json");
@@ -97,6 +109,12 @@ public class KnowledgeBaseService : IKnowledgeBaseService
     {
         await InitializeAsync();
         
+        // Apply device-specific limits
+        if (_currentConfig != null && _currentConfig.UseKnowledgeBasePagination)
+        {
+            maxResults = Math.Min(maxResults, _currentConfig.MaxHistoricalContexts);
+        }
+        
         // Find contexts relevant to this character
         var characterContexts = _historicalContexts
             .Where(c => c.RelatedCharacters.Contains(characterId) || c.RelatedCharacters.Count == 0)
@@ -128,6 +146,12 @@ public class KnowledgeBaseService : IKnowledgeBaseService
     {
         await InitializeAsync();
         
+        // Apply device-specific limits
+        if (_currentConfig != null && _currentConfig.UseKnowledgeBasePagination)
+        {
+            maxResults = Math.Min(maxResults, _currentConfig.MaxLanguageInsights);
+        }
+        
         // Find insights that match words in the passage
         var passageWords = passage.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
         
@@ -140,7 +164,13 @@ public class KnowledgeBaseService : IKnowledgeBaseService
     }
     
     public async Task<List<ThematicConnection>> FindThematicConnectionsAsync(
-        string passage,
+        strApply device-specific limits
+        if (_currentConfig != null && _currentConfig.UseKnowledgeBasePagination)
+        {
+            maxResults = Math.Min(maxResults, _currentConfig.MaxThematicConnections);
+        }
+        
+        // ing passage,
         string theme,
         int maxResults = 3)
     {
