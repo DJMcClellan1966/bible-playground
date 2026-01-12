@@ -88,7 +88,7 @@ public partial class App : Application
 						try
 						{
 							// Load Bible verses from bundled data
-							var bibleFiles = new[] { "web.json", "kjv.json", "asv.json" };
+							var bibleFiles = new[] { "web.json", "kjv.json", "asv.json", "youngs.json" };
 							foreach (var fileName in bibleFiles)
 							{
 								try

@@ -209,7 +209,7 @@ The following major features are **already implemented** and working:
 |-------------|--------|
 | ASV (American Standard 1901) | 🔲 Add |
 | Darby Translation | 🔲 Add |
-| Young's Literal Translation | 🔲 Add |
+| Young's Literal Translation | ✅ Added (31,102 verses) |
 
 **Commentaries/References:**
 | Source | Status |
