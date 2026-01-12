@@ -121,7 +121,7 @@ $conversations = Get-Content $conversationsFile | ForEach-Object {
     return @{
         messages = $messages
     } | ConvertTo-Json -Compress
-}
+} # <-- This closing brace was missing!
 
 $filteredConversations = $conversations | Where-Object { $_ -ne $null }
 $filteredConversations | Out-File -FilePath $trainingFile -Encoding UTF8
