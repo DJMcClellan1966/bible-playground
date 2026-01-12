@@ -132,13 +132,11 @@ public partial class CharacterSelectionViewModel : BaseViewModel
             System.Diagnostics.Debug.WriteLine($"[DEBUG] Creating navigation parameters");
             var navParams = new Dictionary<string, object> { { "character", character } };
             
-            // TEMPORARILY DISABLED: Skip existing session check to isolate crash
-            // Will re-enable after confirming basic navigation works
-            /*
             // Check if there's an existing session for this character
             ChatSession? existingSession = null;
             try
             {
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Checking for existing session");
                 existingSession = await _chatRepository.GetLatestSessionForCharacterAsync(character.Id);
             }
             catch (Exception ex)
@@ -171,7 +169,6 @@ public partial class CharacterSelectionViewModel : BaseViewModel
                 }
                 // "Continue Chat" will use the existing session automatically
             }
-            */
             
             System.Diagnostics.Debug.WriteLine($"[DEBUG] About to navigate to chat page...");
             await _navigationService.NavigateToAsync("chat", navParams);

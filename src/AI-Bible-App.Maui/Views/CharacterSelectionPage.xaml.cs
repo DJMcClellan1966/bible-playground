@@ -32,22 +32,19 @@ public partial class CharacterSelectionPage : ContentPage
         {
             System.Diagnostics.Debug.WriteLine($"[DEBUG] OnCharacterSelected fired");
             
-            var collectionView = sender as CollectionView;
             var character = e.CurrentSelection.FirstOrDefault() as BiblicalCharacter;
             
             System.Diagnostics.Debug.WriteLine($"[DEBUG] Character: {character?.Name ?? "null"}");
             
-            // Clear selection immediately to allow re-selection
-            if (collectionView != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Clearing selection");
-                collectionView.SelectedItem = null;
-            }
+            // DO NOT clear selection here - causes WinUI3 crash
+            // Will clear after command execution completes
             
-            // Execute command on main thread with a slight delay to ensure selection is cleared
             if (character != null)
             {
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] Dispatching command for {character.Name}");
+                
+                // Capture sender for later selection clearing
+                var collectionView = sender as CollectionView;
                 
                 Dispatcher.Dispatch(async () =>
                 {
@@ -59,6 +56,13 @@ public partial class CharacterSelectionPage : ContentPage
                         {
                             System.Diagnostics.Debug.WriteLine($"[DEBUG] Executing command");
                             await _viewModel.SelectCharacterCommand.ExecuteAsync(character);
+                            
+                            // Clear selection AFTER command completes
+                            if (collectionView != null)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"[DEBUG] Clearing selection after command");
+                                collectionView.SelectedItem = null;
+                            }
                         }
                         else
                         {
@@ -117,34 +121,84 @@ public partial class CharacterSelectionPage : ContentPage
     {
         if (_isCarouselView) return;
         
-        _isCarouselView = true;
-        CarouselContainer.IsVisible = true;
-        ListContainer.IsVisible = false;
-        
-        // Update button styles
-        CardsViewButton.BackgroundColor = (Color)Application.Current!.Resources["Primary"];
-        CardsViewButton.TextColor = Colors.White;
-        ListViewButton.BackgroundColor = (Color)Application.Current!.Resources["Gray300"];
-        ListViewButton.TextColor = (Color)Application.Current!.Resources["Gray800"];
-        
-        HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("[DEBUG] Switching to cards view");
+            
+            _isCarouselView = true;
+            
+            Dispatcher.Dispatch(() =>
+            {
+                try
+                {
+                    CarouselContainer.IsVisible = true;
+                    ListContainer.IsVisible = false;
+                    
+                    // Update button styles
+                    if (Application.Current?.Resources != null)
+                    {
+                        CardsViewButton.BackgroundColor = (Color)Application.Current.Resources["Primary"];
+                        CardsViewButton.TextColor = Colors.White;
+                        ListViewButton.BackgroundColor = (Color)Application.Current.Resources["Gray300"];
+                        ListViewButton.TextColor = (Color)Application.Current.Resources["Gray800"];
+                    }
+                    
+                    System.Diagnostics.Debug.WriteLine("[DEBUG] Cards view switch completed");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[ERROR] Cards view switch inner failed: {ex}");
+                }
+            });
+            
+            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ERROR] OnCardsViewClicked failed: {ex}");
+        }
     }
     
     private void OnListViewClicked(object sender, EventArgs e)
     {
         if (!_isCarouselView) return;
         
-        _isCarouselView = false;
-        CarouselContainer.IsVisible = false;
-        ListContainer.IsVisible = true;
-        
-        // Update button styles
-        ListViewButton.BackgroundColor = (Color)Application.Current!.Resources["Primary"];
-        ListViewButton.TextColor = Colors.White;
-        CardsViewButton.BackgroundColor = (Color)Application.Current!.Resources["Gray300"];
-        CardsViewButton.TextColor = (Color)Application.Current!.Resources["Gray800"];
-        
-        HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("[DEBUG] Switching to list view");
+            
+            _isCarouselView = false;
+            
+            Dispatcher.Dispatch(() =>
+            {
+                try
+                {
+                    CarouselContainer.IsVisible = false;
+                    ListContainer.IsVisible = true;
+                    
+                    // Update button styles
+                    if (Application.Current?.Resources != null)
+                    {
+                        ListViewButton.BackgroundColor = (Color)Application.Current.Resources["Primary"];
+                        ListViewButton.TextColor = Colors.White;
+                        CardsViewButton.BackgroundColor = (Color)Application.Current.Resources["Gray300"];
+                        CardsViewButton.TextColor = (Color)Application.Current.Resources["Gray800"];
+                    }
+                    
+                    System.Diagnostics.Debug.WriteLine("[DEBUG] List view switch completed");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[ERROR] List view switch inner failed: {ex}");
+                }
+            });
+            
+            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ERROR] OnListViewClicked failed: {ex}");
+        }
     }
     
     private async void OnSwipeChatInvoked(object sender, EventArgs e)
