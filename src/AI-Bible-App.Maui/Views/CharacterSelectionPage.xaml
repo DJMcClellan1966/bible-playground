@@ -7,82 +7,79 @@
              x:DataType="vm:CharacterSelectionViewModel"
              Title="{Binding Title}">
     <ContentPage.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#F8F9FA" Offset="0.0" />
-            <GradientStop Color="#E9ECEF" Offset="1.0" />
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="{StaticResource HallowDarkPurple}" Offset="0.0" />
+            <GradientStop Color="{StaticResource HallowDeepBlue}" Offset="0.5" />
+            <GradientStop Color="{StaticResource HallowMidPurple}" Offset="1.0" />
         </LinearGradientBrush>
     </ContentPage.Background>
     
     <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="{StaticResource PageMargin}">
         
-        <!-- Modern Header -->
-        <Border Grid.Row="0" Margin="0,15,0,20" Padding="20,25" BackgroundColor="White"
-                StrokeThickness="1" Stroke="#E0E0E0">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="25"/>
-            </Border.StrokeShape>
+        <!-- Modern Header with Hallow Theme -->
+        <Border Grid.Row="0" Margin="0,15,0,20" Padding="20,25"
+                Style="{StaticResource HallowCard}">
             <VerticalStackLayout Spacing="8">
                 <Label Text="Voices of Scripture"
-                       FontSize="32"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"
-                       TextColor="#2C3E50"
+                       Style="{StaticResource HallowHeaderText}"
                        AutomationProperties.IsInAccessibleTree="True"
                        SemanticProperties.HeadingLevel="Level1"
                        SemanticProperties.Description="Main page heading - Voices of Scripture app"/>
                 <BoxView HeightRequest="3" WidthRequest="60" CornerRadius="1.5"
                          HorizontalOptions="Center" Margin="0,5,0,8">
                     <BoxView.Background>
-                        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                            <GradientStop Color="#667EEA" Offset="0.0" />
-                            <GradientStop Color="#764BA2" Offset="1.0" />
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
+                            <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
                         </LinearGradientBrush>
                     </BoxView.Background>
                 </BoxView>
                 <Label Text="Connect with Biblical Figures Through AI"
-                       FontSize="15"
+                       Style="{StaticResource HallowSubtitleText}"
                        HorizontalOptions="Center"
-                       TextColor="#7F8C8D"
                        FontAttributes="Italic"
                        AutomationProperties.IsInAccessibleTree="True"
                        SemanticProperties.Hint="Use arrow keys or swipe to browse biblical characters"/>
             </VerticalStackLayout>
         </Border>
 
-        <!-- Modern View Toggle -->
+        <!-- Modern View Toggle with Hallow Theme -->
         <Border Grid.Row="1" HorizontalOptions="Center" Margin="0,0,0,15"
-                BackgroundColor="#F8F9FA" Padding="4" StrokeThickness="1" Stroke="#E0E0E0">
+                BackgroundColor="{StaticResource HallowCardBackground}" 
+                Padding="4" 
+                StrokeThickness="0">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="25"/>
             </Border.StrokeShape>
             <HorizontalStackLayout Spacing="6">
                 <Border x:Name="CardsViewButton" Padding="18,10" 
                         StrokeThickness="0">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#667EEA" Offset="0.0" />
-                            <GradientStop Color="#764BA2" Offset="1.0" />
-                        </LinearGradientBrush>
-                    </Border.Background>
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="22"/>
                     </Border.StrokeShape>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
+                            <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.Background>
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnCardsViewClicked"/>
                     </Border.GestureRecognizers>
-                    <Label Text="Cards" TextColor="White" FontSize="15"
+                    <Label Text="Cards" TextColor="{StaticResource HallowTextPrimary}" FontSize="15"
                            FontAttributes="Bold" VerticalOptions="Center"
                            SemanticProperties.Description="Card view"/>
                 </Border>
                 <Border x:Name="ListViewButton" Padding="18,10" 
-                        BackgroundColor="Transparent" StrokeThickness="0">
+                        BackgroundColor="Transparent" 
+                        StrokeThickness="0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="22"/>
                     </Border.StrokeShape>
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnListViewClicked"/>
                     </Border.GestureRecognizers>
-                    <Label Text="List" TextColor="#6C757D" FontSize="15"
+                    <Label Text="List" TextColor="{StaticResource HallowTextMuted}" FontSize="15"
                            FontAttributes="Bold" VerticalOptions="Center"
                            SemanticProperties.Description="List view"/>
                 </Border>
@@ -117,11 +114,12 @@
                                 <!-- Modern Avatar with Gradient -->
                                 <Border WidthRequest="100" HeightRequest="100"
                                         Padding="0" HorizontalOptions="Center"
-                                        StrokeThickness="4" Stroke="White">
+                                        StrokeThickness="4" 
+                                        Stroke="{StaticResource HallowAccentPurple}">
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#667EEA" Offset="0.0" />
-                                            <GradientStop Color="#764BA2" Offset="1.0" />
+                                            <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
+                                            <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
                                         </LinearGradientBrush>
                                     </Border.Background>
                                     <Border.StrokeShape>
@@ -130,36 +128,30 @@
                                     <Label Text="{Binding Name, StringFormat='{0:substring(0,1)}'}"
                                            FontSize="45"
                                            FontAttributes="Bold"
-                                           TextColor="White"
+                                           TextColor="{StaticResource HallowTextPrimary}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center"/>
                                 </Border>
                                 
                                 <!-- Character Name -->
                                 <Label Text="{Binding Name, Converter={StaticResource ShortNameConverter}}"
-                                       FontSize="26"
-                                       FontAttributes="Bold"
-                                       TextColor="#2C3E50"
+                                       Style="{StaticResource HallowTitleText}"
                                        HorizontalOptions="Center"
                                        HorizontalTextAlignment="Center"/>
                                 
                                 <!-- Title/Role Badge -->
-                                <Border BackgroundColor="#F8F9FA" Padding="12,6"
-                                        HorizontalOptions="Center" StrokeThickness="0">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="15"/>
-                                    </Border.StrokeShape>
+                                <Border Style="{StaticResource HallowBadge}"
+                                        HorizontalOptions="Center">
                                     <Label Text="{Binding Title}"
                                            FontSize="13"
                                            FontAttributes="Bold"
-                                           TextColor="#667EEA"
+                                           TextColor="{StaticResource HallowTextPrimary}"
                                            HorizontalOptions="Center"/>
                                 </Border>
                                 
                                 <!-- Description -->
                                 <Label Text="{Binding Description}"
-                                       FontSize="14"
-                                       TextColor="#7F8C8D"
+                                       Style="{StaticResource HallowBodyText}"
                                        HorizontalOptions="Center"
                                        HorizontalTextAlignment="Center"
                                        LineBreakMode="WordWrap"
@@ -168,22 +160,10 @@
                                        Margin="10,5,10,0"/>
                                 
                                 <!-- Start Chat CTA -->
-                                <Border Padding="20,12" Margin="0,15,0,0"
-                                        HorizontalOptions="Center" StrokeThickness="0">
-                                    <Border.Background>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                            <GradientStop Color="#667EEA" Offset="0.0" />
-                                            <GradientStop Color="#764BA2" Offset="1.0" />
-                                        </LinearGradientBrush>
-                                    </Border.Background>
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="25"/>
-                                    </Border.StrokeShape>
-                                    <Label Text="Start Conversation →"
-                                           FontSize="15"
-                                           FontAttributes="Bold"
-                                           TextColor="White"/>
-                                </Border>
+                                <Button Text="Start Conversation →"
+                                        Style="{StaticResource HallowPrimaryButton}"
+                                        Margin="0,15,0,0"
+                                        WidthRequest="220" />
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>
@@ -196,8 +176,8 @@
                                    Spacing="10"
                                    Margin="0,0,0,20">
                 <IndicatorView x:Name="CharacterIndicator"
-                               IndicatorColor="#CED4DA"
-                               SelectedIndicatorColor="#667EEA"
+                               IndicatorColor="{StaticResource HallowDivider}"
+                               SelectedIndicatorColor="{StaticResource HallowAccentPurple}"
                                IndicatorSize="8"
                                HorizontalOptions="Center"/>
             </HorizontalStackLayout>

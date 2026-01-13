@@ -5,7 +5,24 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:AI_Bible_App.Maui.Views"
     Title="Voices of Scripture"
-    FlyoutBehavior="Flyout">
+    FlyoutBehavior="Flyout"
+    FlyoutBackgroundColor="{StaticResource HallowBackground}"
+    Shell.ForegroundColor="{StaticResource HallowTextPrimary}"
+    Shell.BackgroundColor="{StaticResource HallowBackground}"
+    Shell.TabBarBackgroundColor="{StaticResource HallowCardBackground}"
+    Shell.TabBarForegroundColor="{StaticResource HallowTextSecondary}"
+    Shell.TabBarTitleColor="{StaticResource HallowTextPrimary}"
+    Shell.TabBarUnselectedColor="{StaticResource HallowTextMuted}">
+
+    <Shell.Resources>
+        <Style x:Key="BaseStyle" TargetType="Element">
+            <Setter Property="Shell.BackgroundColor" Value="{StaticResource HallowBackground}" />
+            <Setter Property="Shell.ForegroundColor" Value="{StaticResource HallowTextPrimary}" />
+            <Setter Property="Shell.TitleColor" Value="{StaticResource HallowTextPrimary}" />
+        </Style>
+        <Style TargetType="TabBar" BasedOn="{StaticResource BaseStyle}" />
+        <Style TargetType="FlyoutItem" BasedOn="{StaticResource BaseStyle}" />
+    </Shell.Resources>
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <!-- PRODUCTION-READY FEATURES                                           -->

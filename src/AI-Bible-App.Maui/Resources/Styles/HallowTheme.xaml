@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Hallow-Inspired Color Palette -->
+    <!-- Deep Purple/Blue Gradient Background -->
+    <Color x:Key="HallowDarkPurple">#1A0B2E</Color>
+    <Color x:Key="HallowMidPurple">#2B1B3D</Color>
+    <Color x:Key="HallowDeepBlue">#0F1C3F</Color>
+    <Color x:Key="HallowAccentPurple">#6B46C1</Color>
+    <Color x:Key="HallowLightPurple">#9D7CC8</Color>
+    <Color x:Key="HallowGold">#D4AF37</Color>
+    <Color x:Key="HallowRose">#E8A0BF</Color>
+    
+    <!-- UI Colors -->
+    <Color x:Key="HallowBackground">#0D0A1A</Color>
+    <Color x:Key="HallowCardBackground">#1E1833</Color>
+    <Color x:Key="HallowCardHover">#2A2143</Color>
+    <Color x:Key="HallowTextPrimary">#F8F6FF</Color>
+    <Color x:Key="HallowTextSecondary">#B8B0D0</Color>
+    <Color x:Key="HallowTextMuted">#7A7590</Color>
+    <Color x:Key="HallowDivider">#2E2642</Color>
+    
+    <!-- Accent Colors -->
+    <Color x:Key="HallowSuccess">#4ECDC4</Color>
+    <Color x:Key="HallowWarning">#FFD93D</Color>
+    <Color x:Key="HallowDanger">#FF6B9D</Color>
+    <Color x:Key="HallowInfo">#A78BFA</Color>
+
+    <!-- Gradient Brushes -->
+    <LinearGradientBrush x:Key="HallowBackgroundGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource HallowDarkPurple}" Offset="0.0" />
+        <GradientStop Color="{StaticResource HallowDeepBlue}" Offset="0.5" />
+        <GradientStop Color="{StaticResource HallowMidPurple}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HallowCardGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{StaticResource HallowCardBackground}" Offset="0.0" />
+        <GradientStop Color="{StaticResource HallowCardHover}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HallowAccentGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
+        <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HallowGoldGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="{StaticResource HallowGold}" Offset="0.0" />
+        <GradientStop Color="{StaticResource HallowLightPurple}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <!-- Shadows -->
+    <Shadow x:Key="HallowCardShadow" 
+            Brush="#40000000"
+            Offset="0,8"
+            Radius="24"
+            Opacity="0.6" />
+
+    <Shadow x:Key="HallowButtonShadow" 
+            Brush="#60000000"
+            Offset="0,4"
+            Radius="12"
+            Opacity="0.5" />
+
+    <!-- Card Style -->
+    <Style x:Key="HallowCard" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource HallowCardBackground}" />
+        <Setter Property="BorderColor" Value="Transparent" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="Padding" Value="20" />
+        <Setter Property="HasShadow" Value="True" />
+        <Setter Property="Shadow" Value="{StaticResource HallowCardShadow}" />
+    </Style>
+
+    <!-- Button Styles -->
+    <Style x:Key="HallowPrimaryButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource HallowAccentGradient}" />
+        <Setter Property="TextColor" Value="{StaticResource HallowTextPrimary}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CornerRadius" Value="25" />
+        <Setter Property="HeightRequest" Value="50" />
+        <Setter Property="Shadow" Value="{StaticResource HallowButtonShadow}" />
+    </Style>
+
+    <Style x:Key="HallowSecondaryButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BorderColor" Value="{StaticResource HallowAccentPurple}" />
+        <Setter Property="BorderWidth" Value="2" />
+        <Setter Property="TextColor" Value="{StaticResource HallowTextPrimary}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CornerRadius" Value="25" />
+        <Setter Property="HeightRequest" Value="50" />
+    </Style>
+
+    <Style x:Key="HallowGhostButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource HallowTextSecondary}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HeightRequest" Value="40" />
+    </Style>
+
+    <!-- Text Styles -->
+    <Style x:Key="HallowHeaderText" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource HallowTextPrimary}" />
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+    </Style>
+
+    <Style x:Key="HallowTitleText" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource HallowTextPrimary}" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontAttributes" Value="Bold" />
+    </Style>
+
+    <Style x:Key="HallowSubtitleText" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource HallowTextSecondary}" />
+        <Setter Property="FontSize" Value="16" />
+    </Style>
+
+    <Style x:Key="HallowBodyText" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource HallowTextPrimary}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="LineHeight" Value="1.5" />
+    </Style>
+
+    <Style x:Key="HallowCaptionText" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource HallowTextMuted}" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <Style x:Key="HallowAccentText" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource HallowLightPurple}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontAttributes" Value="Bold" />
+    </Style>
+
+    <!-- Entry/Input Style -->
+    <Style x:Key="HallowEntry" TargetType="Entry">
+        <Setter Property="BackgroundColor" Value="{StaticResource HallowCardBackground}" />
+        <Setter Property="TextColor" Value="{StaticResource HallowTextPrimary}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource HallowTextMuted}" />
+        <Setter Property="HeightRequest" Value="50" />
+        <Setter Property="Margin" Value="0,8" />
+    </Style>
+
+    <Style x:Key="HallowEditor" TargetType="Editor">
+        <Setter Property="BackgroundColor" Value="{StaticResource HallowCardBackground}" />
+        <Setter Property="TextColor" Value="{StaticResource HallowTextPrimary}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource HallowTextMuted}" />
+        <Setter Property="MinimumHeightRequest" Value="100" />
+        <Setter Property="Margin" Value="0,8" />
+    </Style>
+
+    <!-- Divider -->
+    <Style x:Key="HallowDividerStyle" TargetType="BoxView">
+        <Setter Property="Color" Value="{StaticResource HallowDivider}" />
+        <Setter Property="HeightRequest" Value="1" />
+        <Setter Property="Margin" Value="0,16" />
+    </Style>
+
+    <!-- Badge Style -->
+    <Style x:Key="HallowBadge" TargetType="Frame">
+        <Setter Property="Background" Value="{StaticResource HallowGoldGradient}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="HasShadow" Value="False" />
+    </Style>
+
+    <!-- Character Avatar Style -->
+    <Style x:Key="HallowAvatar" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource HallowCardBackground}" />
+        <Setter Property="BorderColor" Value="{StaticResource HallowAccentPurple}" />
+        <Setter Property="CornerRadius" Value="40" />
+        <Setter Property="HeightRequest" Value="80" />
+        <Setter Property="WidthRequest" Value="80" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HasShadow" Value="True" />
+        <Setter Property="Shadow" Value="{StaticResource HallowCardShadow}" />
+    </Style>
+
+    <!-- Progress Bar Style -->
+    <Style x:Key="HallowProgressBar" TargetType="ProgressBar">
+        <Setter Property="ProgressColor" Value="{StaticResource HallowAccentPurple}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource HallowDivider}" />
+        <Setter Property="HeightRequest" Value="8" />
+    </Style>
+
+</ResourceDictionary>
