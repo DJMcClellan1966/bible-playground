@@ -48,6 +48,11 @@ public class BiblicalCharacter
     /// Whether this character is enabled for roundtable discussions
     /// </summary>
     public bool RoundtableEnabled { get; set; } = false;
+
+    /// <summary>
+    /// Whether this character should act as a contrarian (devil's advocate) when enabled for the session
+    /// </summary>
+    public bool IsContrarian { get; set; } = false;
 }
 
 /// <summary>

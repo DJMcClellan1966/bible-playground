@@ -57,6 +57,11 @@ public class ChatSession
     /// Preview of the last message in this chat session
     /// </summary>
     public string LastMessagePreview { get; set; } = string.Empty;
+
+    // Devil's Advocate session settings
+    public bool DevilsAdvocateEnabled { get; set; } = false;
+    public string AdvocateTone { get; set; } = "soft"; // soft, firm, strong
+    public List<string> ContrarianCharacterIds { get; set; } = new();
 }
 
 /// <summary>

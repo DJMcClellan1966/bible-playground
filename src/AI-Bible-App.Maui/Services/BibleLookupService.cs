@@ -206,13 +206,25 @@ public class BibleLookupService : IBibleLookupService
     {
         if (_cachedVerses == null)
         {
-            _cachedVerses = await _versesLoader.Value;
-            
+            try
+            {
+                _cachedVerses = await _versesLoader.Value;
+            }
+            catch
+            {
+                _cachedVerses = new List<BibleVerse>();
+            }
             // Build book index for fast lookups
-            _versesByBook = _cachedVerses
-                .GroupBy(v => v.Book.ToLowerInvariant())
-                .ToDictionary(g => g.Key, g => g.ToList());
-                
+            if (_cachedVerses != null && _cachedVerses.Any())
+            {
+                _versesByBook = _cachedVerses
+                    .GroupBy(v => v.Book.ToLowerInvariant())
+                    .ToDictionary(g => g.Key, g => g.ToList());
+            }
+            else
+            {
+                _versesByBook = new Dictionary<string, List<BibleVerse>>();
+            }
             System.Diagnostics.Debug.WriteLine($"[DEBUG] Built index for {_versesByBook.Count} books");
         }
     }

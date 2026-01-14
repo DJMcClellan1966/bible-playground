@@ -14,6 +14,7 @@ public partial class BookmarksViewModel : BaseViewModel
     private readonly IVerseBookmarkRepository _bookmarkRepository;
     private readonly IDialogService _dialogService;
     private readonly IUserService _userService;
+    private readonly IBibleLookupService _bibleLookupService;
 
     [ObservableProperty]
     private ObservableCollection<VerseBookmark> bookmarks = new();
@@ -55,11 +56,13 @@ public partial class BookmarksViewModel : BaseViewModel
     public BookmarksViewModel(
         IVerseBookmarkRepository bookmarkRepository, 
         IDialogService dialogService, 
-        IUserService userService)
+        IUserService userService,
+        IBibleLookupService bibleLookupService)
     {
         _bookmarkRepository = bookmarkRepository;
         _dialogService = dialogService;
         _userService = userService;
+        _bibleLookupService = bibleLookupService;
         Title = "My Bookmarks";
     }
 
@@ -261,11 +264,29 @@ public partial class BookmarksViewModel : BaseViewModel
                 return;
             }
 
+
+            // Try to parse the reference (e.g., "John 3:16")
+            string verseText = "Verse text not found";
+            try
+            {
+                var match = System.Text.RegularExpressions.Regex.Match(reference.Trim(), @"^(?<book>[1-3]?\s?[A-Za-z ]+)\s+(?<chapter>\d+):(?<verse>\d+)");
+                if (match.Success)
+                {
+                    var book = match.Groups["book"].Value.Trim();
+                    var chapter = int.Parse(match.Groups["chapter"].Value);
+                    var verse = int.Parse(match.Groups["verse"].Value);
+                    var result = await _bibleLookupService.LookupPassageAsync(book, chapter, verse);
+                    if (result.Found && !string.IsNullOrWhiteSpace(result.Text))
+                        verseText = result.Text;
+                }
+            }
+            catch { /* fallback to default */ }
+
             var bookmark = new VerseBookmark
             {
                 UserId = userId,
                 VerseReference = reference,
-                VerseText = "Verse text will be loaded...", // TODO: Integrate with Bible lookup
+                VerseText = verseText,
                 Category = "Other",
                 CreatedAt = DateTime.UtcNow
             };

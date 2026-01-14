@@ -55,6 +55,8 @@ public class MultiCharacterChatService : IMultiCharacterChatService
         List<BiblicalCharacter> characters,
         List<ChatMessage> conversationHistory,
         string userMessage,
+        bool enableDevilsAdvocate = false,
+        string advocateTone = "soft",
         CancellationToken cancellationToken = default)
     {
         var responses = new List<ChatMessage>();
@@ -72,14 +74,35 @@ public class MultiCharacterChatService : IMultiCharacterChatService
         // Get response from each character in turn
         var updatedHistory = new List<ChatMessage>(conversationHistory) { userMsg };
         
+        // If devil's advocate is enabled but no character is explicitly marked, choose the first available
+        string? forcedDevilId = null;
+        if (enableDevilsAdvocate && !characters.Any(c => c.IsContrarian))
+        {
+            forcedDevilId = characters.FirstOrDefault()?.Id;
+        }
+
         foreach (var character in characters)
         {
             try
             {
+                // Build a prompt; if this character is acting as devil's advocate, add instruction
+                var prompt = userMessage;
+                var isAdvocate = enableDevilsAdvocate && (character.IsContrarian || character.Id == forcedDevilId);
+                if (isAdvocate)
+                {
+                    // Use character's system prompt as base and instruct contrarian stance
+                    var briefProfile = !string.IsNullOrEmpty(character.SystemPrompt)
+                        ? character.SystemPrompt
+                        : character.Description;
+                    prompt = $"[Devil's Advocate - Tone: {advocateTone}] Using the voice and background: {briefProfile}. " +
+                             "Take a reasoned opposing view to the user's point. Raise 2 objections and ask 2 probing questions. Stay in-character and avoid inflammatory language. " +
+                             $"Topic: {userMessage}";
+                }
+
                 var response = await _aiService.GetChatResponseAsync(
                     character,
                     updatedHistory,
-                    userMessage,
+                    prompt,
                     cancellationToken);
 
                 var assistantMsg = new ChatMessage

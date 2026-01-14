@@ -5,6 +5,7 @@
              xmlns:models="clr-namespace:AI_Bible_App.Core.Models;assembly=AI-Bible-App.Core"
              xmlns:controls="clr-namespace:AI_Bible_App.Maui.Controls"
              x:Class="AI_Bible_App.Maui.Views.RoundtableChatPage"
+             x:Name="Root"
              x:DataType="vm:RoundtableChatViewModel"
              Title="🎯 Roundtable Discussion"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
@@ -64,20 +65,26 @@
                                ItemsLayout="HorizontalList">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:BiblicalCharacter">
-                            <Border WidthRequest="36"
-                                    HeightRequest="36"
-                                    Margin="2"
-                                    BackgroundColor="{DynamicResource Primary}">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="18"/>
-                                </Border.StrokeShape>
-                                <Label Text="{Binding Name, Converter={StaticResource FirstLetterConverter}}"
-                                       FontSize="16"
-                                       FontAttributes="Bold"
-                                       TextColor="White"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"/>
-                            </Border>
+                            <Grid Margin="2" WidthRequest="120" HeightRequest="36">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="36" />
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" BackgroundColor="{DynamicResource Primary}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="18"/>
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Name, Converter={StaticResource FirstLetterConverter}}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="White"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"/>
+                                </Border>
+                                <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center" FontSize="12" TextColor="{DynamicResource Gray700}"/>
+                                <CheckBox Grid.Column="2" IsChecked="{Binding IsContrarian}" CheckedChanged="OnContrarianCheckedChanged" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>

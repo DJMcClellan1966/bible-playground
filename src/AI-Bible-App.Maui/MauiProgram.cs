@@ -187,6 +187,14 @@ public static class MauiProgram
 		
 		// Multi-Character Chat Service
 		builder.Services.AddSingleton<IMultiCharacterChatService, MultiCharacterChatService>();
+
+		// Unconscious processing (best-effort background summarization / context prep)
+		builder.Services.AddSingleton<AI_Bible_App.Core.Interfaces.ILongTermMemoryService, AI_Bible_App.Infrastructure.Services.InMemoryLongTermMemoryService>();
+		builder.Services.AddSingleton<AI_Bible_App.Core.Interfaces.IUnconsciousService, AI_Bible_App.Infrastructure.Services.InMemoryUnconsciousService>(sp =>
+		{
+			var longTerm = sp.GetService<AI_Bible_App.Core.Interfaces.ILongTermMemoryService>();
+			return new AI_Bible_App.Infrastructure.Services.InMemoryUnconsciousService(longTerm);
+		});
 		
 		// Image Generation Service - AI-generated character portraits and scenes
 		builder.Services.AddSingleton<IImageGenerationService, ImageGenerationService>();

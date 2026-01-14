@@ -14,6 +14,8 @@ public interface IMultiCharacterChatService
         List<BiblicalCharacter> characters,
         List<ChatMessage> conversationHistory,
         string userMessage,
+        bool enableDevilsAdvocate = false,
+        string advocateTone = "soft",
         CancellationToken cancellationToken = default);
 
     /// <summary>

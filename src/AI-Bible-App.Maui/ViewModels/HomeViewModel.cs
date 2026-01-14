@@ -13,6 +13,7 @@ namespace AI_Bible_App.Maui.ViewModels;
 /// </summary>
 public partial class HomeViewModel : BaseViewModel
 {
+    public static event Action? ChatCreated;
     private readonly ICharacterRepository _characterRepository;
     private readonly IChatRepository _chatRepository;
     private readonly IPrayerRepository _prayerRepository;
@@ -52,6 +53,9 @@ public partial class HomeViewModel : BaseViewModel
         
         Title = "Home";
         UpdateGreeting();
+
+        // Subscribe to chat creation event for auto-refresh
+        ChatCreated += async () => await RefreshRecentChatsAsync();
     }
 
     private void UpdateGreeting()
@@ -94,6 +98,8 @@ public partial class HomeViewModel : BaseViewModel
             RecentChats = new ObservableCollection<ChatSession>(
                 userChats.OrderByDescending(c => c.StartedAt).Take(5));
 
+            // ...existing code...
+
             // Load recent prayers (last 6)
             var allPrayers = await _prayerRepository.GetAllPrayersAsync();
             var userPrayers = allPrayers.Where(p => p.UserId == userId || string.IsNullOrEmpty(p.UserId));
@@ -114,6 +120,17 @@ public partial class HomeViewModel : BaseViewModel
     private async Task NewChat()
     {
         await Shell.Current.GoToAsync("//characters");
+        // Fire event to auto-refresh recent chats
+        ChatCreated?.Invoke();
+    }
+
+    public async Task RefreshRecentChatsAsync()
+    {
+        var userId = _userService.CurrentUser?.Id ?? "default";
+        var allChats = await _chatRepository.GetAllSessionsAsync();
+        var userChats = allChats.Where(c => c.UserId == userId || string.IsNullOrEmpty(c.UserId));
+        RecentChats = new ObservableCollection<ChatSession>(
+            userChats.OrderByDescending(c => c.StartedAt).Take(5));
     }
 
     [RelayCommand]

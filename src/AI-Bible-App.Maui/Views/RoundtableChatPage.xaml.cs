@@ -29,6 +29,14 @@ public partial class RoundtableChatPage : ContentPage
         }
     }
 
+    private void OnContrarianCheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        if (sender is CheckBox cb && cb.BindingContext is AI_Bible_App.Core.Models.BiblicalCharacter character)
+        {
+            _viewModel?.ToggleContrarianCommand.Execute(character);
+        }
+    }
+
     private async void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action == NotifyCollectionChangedAction.Add)
