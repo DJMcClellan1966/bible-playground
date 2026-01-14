@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             x:Class="AI_Bible_App.Maui.Views.HallowLoginPage"
+             x:DataType="viewmodels:HallowLoginViewModel"
+             Title="Welcome"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    
+    <!-- Hallow-inspired dark gradient background -->
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#1A0A2E" Offset="0.0"/>
+                <GradientStop Color="#2D1B4E" Offset="0.5"/>
+                <GradientStop Color="#1A0A2E" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        
+        <!-- Subtle cross pattern overlay -->
+        <BoxView Color="#FFFFFF" Opacity="0.02" />
+        
+        <ScrollView>
+            <Grid RowDefinitions="Auto,*,Auto" Padding="32,60,32,40">
+                
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- HEADER - Logo and Welcome Text                               -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <VerticalStackLayout Grid.Row="0" Spacing="16" Padding="0,0,0,40">
+                    
+                    <!-- Animated glow effect behind icon -->
+                    <Border WidthRequest="100" HeightRequest="100"
+                            StrokeShape="RoundRectangle 50"
+                            StrokeThickness="0"
+                            HorizontalOptions="Center">
+                        <Border.Background>
+                            <RadialGradientBrush>
+                                <GradientStop Color="#8B5CF6" Offset="0.0"/>
+                                <GradientStop Color="Transparent" Offset="1.0"/>
+                            </RadialGradientBrush>
+                        </Border.Background>
+                        <Label Text="✝️" 
+                               FontSize="48" 
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <!-- App Name -->
+                    <Label Text="Voices of Scripture" 
+                           FontSize="32" 
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="White"/>
+                    
+                    <!-- Tagline -->
+                    <Label Text="Walk with biblical figures through&#x0a;AI-powered conversations" 
+                           FontSize="16" 
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           TextColor="#A78BFA"
+                           LineHeight="1.4"/>
+                </VerticalStackLayout>
+                
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- SIGN IN BUTTONS                                              -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <VerticalStackLayout Grid.Row="1" Spacing="16" VerticalOptions="Center">
+                    
+                    <!-- Continue with Google -->
+                    <Button Text="Continue with Google"
+                            Command="{Binding SignInWithGoogleCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="White"
+                            TextColor="#1F2937"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            HeightRequest="56"
+                            CornerRadius="28"
+                            Padding="24,0">
+                        <Button.ImageSource>
+                            <FontImageSource Glyph="G" 
+                                             FontFamily="Arial" 
+                                             Color="#4285F4"
+                                             Size="20"/>
+                        </Button.ImageSource>
+                    </Button>
+                    
+                    <!-- Continue with Apple (iOS/Mac only indicator) -->
+                    <Button Text="Continue with Apple"
+                            Command="{Binding SignInWithAppleCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="White"
+                            TextColor="#1F2937"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            HeightRequest="56"
+                            CornerRadius="28"
+                            Padding="24,0">
+                        <Button.ImageSource>
+                            <FontImageSource Glyph="" 
+                                             FontFamily="Arial" 
+                                             Color="#000000"
+                                             Size="20"/>
+                        </Button.ImageSource>
+                    </Button>
+                    
+                    <!-- Divider -->
+                    <Grid ColumnDefinitions="*,Auto,*" Padding="0,8">
+                        <BoxView Grid.Column="0" HeightRequest="1" 
+                                 Color="#4C1D95" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Text="or" 
+                               TextColor="#7C3AED" 
+                               FontSize="14"
+                               Margin="16,0"/>
+                        <BoxView Grid.Column="2" HeightRequest="1" 
+                                 Color="#4C1D95" VerticalOptions="Center"/>
+                    </Grid>
+                    
+                    <!-- Continue with Email -->
+                    <Button Text="Continue with Email"
+                            Command="{Binding ShowEmailSignInCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="#7C3AED"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            HeightRequest="56"
+                            CornerRadius="28"/>
+                    
+                    <!-- Skip / Continue as Guest -->
+                    <Button Text="Continue as Guest"
+                            Command="{Binding ContinueAsGuestCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="Transparent"
+                            TextColor="#A78BFA"
+                            FontSize="14"
+                            HeightRequest="44"
+                            Margin="0,8,0,0"/>
+                    
+                    <!-- Loading indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       Color="#A78BFA"
+                                       HeightRequest="30"
+                                       HorizontalOptions="Center"/>
+                    
+                    <!-- Error message -->
+                    <Label Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding HasError}"
+                           TextColor="#F87171"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+                
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- FOOTER - Terms and Privacy                                   -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <VerticalStackLayout Grid.Row="2" Spacing="8" Padding="0,20,0,0">
+                    <Label HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           FontSize="12"
+                           TextColor="#6B7280">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="By continuing, you agree to our "/>
+                                <Span Text="Terms of Service" 
+                                      TextColor="#A78BFA"
+                                      TextDecorations="Underline">
+                                    <Span.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding OpenTermsCommand}"/>
+                                    </Span.GestureRecognizers>
+                                </Span>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           FontSize="12"
+                           TextColor="#6B7280">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="and "/>
+                                <Span Text="Privacy Policy" 
+                                      TextColor="#A78BFA"
+                                      TextDecorations="Underline">
+                                    <Span.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding OpenPrivacyCommand}"/>
+                                    </Span.GestureRecognizers>
+                                </Span>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+                
+            </Grid>
+        </ScrollView>
+    </Grid>
+</ContentPage>

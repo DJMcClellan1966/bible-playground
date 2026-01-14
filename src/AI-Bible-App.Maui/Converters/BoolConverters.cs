@@ -6,15 +6,22 @@ public class BoolToColorConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not bool boolValue || parameter is not string colors)
+        if (value is not bool boolValue)
             return Colors.Gray;
-
-        var colorStrings = colors.Split(',');
-        if (colorStrings.Length != 2)
-            return Colors.Gray;
-
-        var colorStr = boolValue ? colorStrings[0] : colorStrings[1];
-        return Color.FromArgb(colorStr.Trim());
+        
+        // If parameter provided, use it for custom colors
+        if (parameter is string colors)
+        {
+            var colorStrings = colors.Split(',');
+            if (colorStrings.Length == 2)
+            {
+                var colorStr = boolValue ? colorStrings[0] : colorStrings[1];
+                return Color.FromArgb(colorStr.Trim());
+            }
+        }
+        
+        // Default: purple for active, transparent for inactive (Hallow style)
+        return boolValue ? Color.FromArgb("#7C3AED") : Colors.Transparent;
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

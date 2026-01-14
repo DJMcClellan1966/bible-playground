@@ -164,6 +164,12 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
     }
 
     [RelayCommand]
+    private async Task GoBack()
+    {
+        await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
     private async Task ToggleSpeechToText()
     {
         if (IsListening)

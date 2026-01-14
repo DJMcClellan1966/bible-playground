@@ -16,12 +16,34 @@
     <!-- These are stable, tested, and ready for users                       -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     
-    <!-- Hidden login/user selection page (not in flyout) -->
+    <!-- Hallow-style Login Page (first screen users see) -->
     <ShellContent
         Title="Welcome"
+        ContentTemplate="{DataTemplate views:HallowLoginPage}"
+        Route="login"
+        FlyoutItemIsVisible="False" />
+    
+    <!-- Email Sign In Page (hidden from flyout) -->
+    <ShellContent
+        Title="Sign In"
+        ContentTemplate="{DataTemplate views:EmailSignInPage}"
+        Route="emailsignin"
+        FlyoutItemIsVisible="False" />
+    
+    <!-- Legacy user selection page (hidden) -->
+    <ShellContent
+        Title="Users"
         ContentTemplate="{DataTemplate views:UserSelectionPage}"
         Route="userselection"
         FlyoutItemIsVisible="False" />
+    
+    <!-- Notion-style Home Page -->
+    <FlyoutItem Title="Home" Icon="{OnPlatform Default='🏠'}">
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate views:NotionHomePage}"
+            Route="home" />
+    </FlyoutItem>
     
     <FlyoutItem Title="Characters" Icon="{OnPlatform Default='👤'}">
         <ShellContent

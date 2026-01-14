@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             x:Class="AI_Bible_App.Maui.Views.EmailSignInPage"
+             x:DataType="viewmodels:EmailSignInViewModel"
+             Title="Sign In"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+    
+    <!-- Hallow-inspired dark gradient background -->
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#1A0A2E" Offset="0.0"/>
+                <GradientStop Color="#2D1B4E" Offset="0.5"/>
+                <GradientStop Color="#1A0A2E" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        
+        <ScrollView>
+            <Grid RowDefinitions="Auto,*,Auto" Padding="32,40,32,40">
+                
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- HEADER - Back button and title                               -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,32">
+                    <Button Grid.Column="0" 
+                            Text="←"
+                            FontSize="24"
+                            Command="{Binding GoBackCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
+                            WidthRequest="44"
+                            HeightRequest="44"/>
+                    
+                    <Label Grid.Column="1" 
+                           Text="{Binding PageTitle}"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Grid>
+                
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- FORM CONTENT                                                 -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <VerticalStackLayout Grid.Row="1" Spacing="20" VerticalOptions="Start">
+                    
+                    <!-- Mode Toggle (Sign In / Sign Up) -->
+                    <Border StrokeShape="RoundRectangle 25"
+                            StrokeThickness="0"
+                            BackgroundColor="#2D1B4E"
+                            Padding="4"
+                            HeightRequest="50"
+                            HorizontalOptions="Center">
+                        <Grid ColumnDefinitions="*,*" WidthRequest="280">
+                            <Button Grid.Column="0"
+                                    Text="Sign In"
+                                    Command="{Binding SetSignInModeCommand}"
+                                    BackgroundColor="{Binding IsSignInMode, Converter={StaticResource BoolToColorConverter}}"
+                                    TextColor="White"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    CornerRadius="21"
+                                    HeightRequest="42"/>
+                            <Button Grid.Column="1"
+                                    Text="Sign Up"
+                                    Command="{Binding SetSignUpModeCommand}"
+                                    BackgroundColor="{Binding IsSignUpMode, Converter={StaticResource BoolToColorConverter}}"
+                                    TextColor="White"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    CornerRadius="21"
+                                    HeightRequest="42"/>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Name field (Sign Up only) -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding IsSignUpMode}">
+                        <Label Text="Full Name" TextColor="#A78BFA" FontSize="14"/>
+                        <Border StrokeShape="RoundRectangle 12"
+                                StrokeThickness="1"
+                                Stroke="#4C1D95"
+                                BackgroundColor="#1A0A2E"
+                                Padding="16,4"
+                                HeightRequest="56">
+                            <Entry Text="{Binding DisplayName}"
+                                   Placeholder="Enter your name"
+                                   PlaceholderColor="#6B7280"
+                                   TextColor="White"
+                                   FontSize="16"
+                                   Keyboard="Text"
+                                   ReturnType="Next"/>
+                        </Border>
+                    </VerticalStackLayout>
+                    
+                    <!-- Email field -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Email" TextColor="#A78BFA" FontSize="14"/>
+                        <Border StrokeShape="RoundRectangle 12"
+                                StrokeThickness="1"
+                                Stroke="#4C1D95"
+                                BackgroundColor="#1A0A2E"
+                                Padding="16,4"
+                                HeightRequest="56">
+                            <Entry Text="{Binding Email}"
+                                   Placeholder="your@email.com"
+                                   PlaceholderColor="#6B7280"
+                                   TextColor="White"
+                                   FontSize="16"
+                                   Keyboard="Email"
+                                   ReturnType="Next"/>
+                        </Border>
+                    </VerticalStackLayout>
+                    
+                    <!-- Password field -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Password" TextColor="#A78BFA" FontSize="14"/>
+                        <Border StrokeShape="RoundRectangle 12"
+                                StrokeThickness="1"
+                                Stroke="#4C1D95"
+                                BackgroundColor="#1A0A2E"
+                                Padding="16,4"
+                                HeightRequest="56">
+                            <Entry Text="{Binding Password}"
+                                   Placeholder="••••••••"
+                                   PlaceholderColor="#6B7280"
+                                   TextColor="White"
+                                   FontSize="16"
+                                   IsPassword="True"
+                                   ReturnType="Done"
+                                   ReturnCommand="{Binding SubmitCommand}"/>
+                        </Border>
+                    </VerticalStackLayout>
+                    
+                    <!-- Confirm Password (Sign Up only) -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding IsSignUpMode}">
+                        <Label Text="Confirm Password" TextColor="#A78BFA" FontSize="14"/>
+                        <Border StrokeShape="RoundRectangle 12"
+                                StrokeThickness="1"
+                                Stroke="#4C1D95"
+                                BackgroundColor="#1A0A2E"
+                                Padding="16,4"
+                                HeightRequest="56">
+                            <Entry Text="{Binding ConfirmPassword}"
+                                   Placeholder="••••••••"
+                                   PlaceholderColor="#6B7280"
+                                   TextColor="White"
+                                   FontSize="16"
+                                   IsPassword="True"
+                                   ReturnType="Done"
+                                   ReturnCommand="{Binding SubmitCommand}"/>
+                        </Border>
+                    </VerticalStackLayout>
+                    
+                    <!-- Forgot Password (Sign In only) -->
+                    <Button Text="Forgot password?"
+                            Command="{Binding ForgotPasswordCommand}"
+                            IsVisible="{Binding IsSignInMode}"
+                            BackgroundColor="Transparent"
+                            TextColor="#A78BFA"
+                            FontSize="14"
+                            HorizontalOptions="End"
+                            Padding="0"
+                            Margin="0,-8,0,0"/>
+                    
+                    <!-- Error message -->
+                    <Label Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding HasError}"
+                           TextColor="#F87171"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                    
+                    <!-- Submit button -->
+                    <Button Text="{Binding SubmitButtonText}"
+                            Command="{Binding SubmitCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            HeightRequest="56"
+                            CornerRadius="28"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            Margin="0,8,0,0">
+                        <Button.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#8B5CF6" Offset="0.0"/>
+                                <GradientStop Color="#A855F7" Offset="0.5"/>
+                                <GradientStop Color="#7C3AED" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    
+                    <!-- Loading indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       Color="#A78BFA"
+                                       HeightRequest="30"
+                                       HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+                
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- FOOTER                                                       -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <VerticalStackLayout Grid.Row="2" Spacing="16" Padding="0,20,0,0">
+                    
+                    <!-- Divider -->
+                    <Grid ColumnDefinitions="*,Auto,*">
+                        <BoxView Grid.Column="0" HeightRequest="1" 
+                                 Color="#4C1D95" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Text="or continue with" 
+                               TextColor="#7C3AED" 
+                               FontSize="12"
+                               Margin="16,0"/>
+                        <BoxView Grid.Column="2" HeightRequest="1" 
+                                 Color="#4C1D95" VerticalOptions="Center"/>
+                    </Grid>
+                    
+                    <!-- Social buttons -->
+                    <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                        <Button Command="{Binding SignInWithGoogleCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                BackgroundColor="#2D1B4E"
+                                TextColor="White"
+                                Text="G"
+                                FontSize="20"
+                                FontAttributes="Bold"
+                                WidthRequest="56"
+                                HeightRequest="56"
+                                CornerRadius="28"/>
+                        
+                        <Button Command="{Binding SignInWithAppleCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                BackgroundColor="#2D1B4E"
+                                TextColor="White"
+                                Text=""
+                                FontSize="20"
+                                WidthRequest="56"
+                                HeightRequest="56"
+                                CornerRadius="28"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+                
+            </Grid>
+        </ScrollView>
+    </Grid>
+</ContentPage>

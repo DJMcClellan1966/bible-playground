@@ -42,6 +42,21 @@ public class ChatSession
     /// Story ID if this is an interactive story session
     /// </summary>
     public string? StoryId { get; set; }
+    
+    /// <summary>
+    /// Character emoji for display (cached from character data)
+    /// </summary>
+    public string CharacterEmoji { get; set; } = "👤";
+    
+    /// <summary>
+    /// Character name for display (cached from character data)
+    /// </summary>
+    public string CharacterName { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Preview of the last message in this chat session
+    /// </summary>
+    public string LastMessagePreview { get; set; } = string.Empty;
 }
 
 /// <summary>

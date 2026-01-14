@@ -130,11 +130,12 @@ public partial class App : Application
 					_fontScaleService.ApplyScale(_userService.CurrentUser.Settings.FontSizePreference);
 				}
 				
-				if (!autoLoggedIn)
+				if (autoLoggedIn && _userService.CurrentUser != null)
 				{
-					// No user found, show user selection page
-					await Shell.Current.GoToAsync("//userselection");
+					// User found, go to home page
+					await Shell.Current.GoToAsync("//home");
 				}
+				// If not auto-logged in, stay on the Hallow login page (already the default first page)
 			}
 			catch (Exception ex)
 			{

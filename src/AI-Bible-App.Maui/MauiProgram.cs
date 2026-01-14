@@ -97,6 +97,7 @@ public static class MauiProgram
 		// User management and content moderation
 		builder.Services.AddSingleton<IUserRepository, JsonUserRepository>();
 		builder.Services.AddSingleton<IUserService, UserService>();
+		builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
 		builder.Services.AddSingleton<IContentModerationService, ContentModerationService>();
 		
 		// Training data collection services
@@ -196,6 +197,8 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IAIService>(sp => sp.GetRequiredService<HybridAIServiceSimple>());
 
 		// Register ViewModels
+		builder.Services.AddTransient<HallowLoginViewModel>();
+		builder.Services.AddTransient<EmailSignInViewModel>();
 		builder.Services.AddTransient<UserSelectionViewModel>();
 		builder.Services.AddTransient<CharacterSelectionViewModel>();
 		builder.Services.AddTransient<ChatViewModel>();
@@ -218,6 +221,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<SubscriptionViewModel>();
 
 		// Register Pages
+		builder.Services.AddTransient<HallowLoginPage>();
+		builder.Services.AddTransient<EmailSignInPage>();
 		builder.Services.AddTransient<UserSelectionPage>();
 		builder.Services.AddTransient<CharacterSelectionPage>();
 		builder.Services.AddTransient<ChatPage>();
@@ -245,6 +250,11 @@ public static class MauiProgram
 		builder.Services.AddTransient<HistoryDashboardViewModel>();
 		builder.Services.AddTransient<BibleReaderPage>();
 		builder.Services.AddTransient<HistoryDashboardPage>();
+		
+		// Modern UI Pages (ChatGPT/Claude/Notion-inspired)
+		builder.Services.AddTransient<HomeViewModel>();
+		builder.Services.AddTransient<NotionHomePage>();
+		builder.Services.AddTransient<ModernChatPage>();
 
 		return builder.Build();
 	}

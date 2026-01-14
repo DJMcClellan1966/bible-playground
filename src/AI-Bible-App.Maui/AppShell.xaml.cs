@@ -17,7 +17,10 @@ public partial class AppShell : Shell
 		_keyboardService?.RegisterDefaultShortcuts();
 
 		// Core production routes
+		Routing.RegisterRoute("login", typeof(HallowLoginPage));
+		Routing.RegisterRoute("emailsignin", typeof(EmailSignInPage));
 		Routing.RegisterRoute("chat", typeof(ChatPage));
+		Routing.RegisterRoute("modernchat", typeof(ModernChatPage));
 		Routing.RegisterRoute("prayer", typeof(PrayerPage));
 		Routing.RegisterRoute("devotional", typeof(DevotionalPage));
 		Routing.RegisterRoute("bookmarks", typeof(BookmarksPage));

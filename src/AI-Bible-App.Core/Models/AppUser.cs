@@ -41,6 +41,26 @@ public class AppUser
     /// Email address for subscription/billing (optional for free tier)
     /// </summary>
     public string Email { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Authentication provider used to sign in (Email, Google, Apple)
+    /// </summary>
+    public string AuthProvider { get; set; } = "Anonymous";
+    
+    /// <summary>
+    /// External provider user ID (for Google/Apple sign-in)
+    /// </summary>
+    public string? ExternalAuthId { get; set; }
+    
+    /// <summary>
+    /// Hashed password (for email authentication only)
+    /// </summary>
+    public string? PasswordHash { get; set; }
+    
+    /// <summary>
+    /// Profile photo URL (from Google/Apple or uploaded)
+    /// </summary>
+    public string? ProfilePhotoUrl { get; set; }
 }
 
 /// <summary>

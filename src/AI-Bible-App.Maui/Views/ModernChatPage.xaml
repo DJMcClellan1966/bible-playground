@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AI_Bible_App.Maui.ViewModels"
+             xmlns:models="clr-namespace:AI_Bible_App.Core.Models;assembly=AI-Bible-App.Core"
+             xmlns:controls="clr-namespace:AI_Bible_App.Maui.Controls"
+             x:Class="AI_Bible_App.Maui.Views.ModernChatPage"
+             x:DataType="vm:ChatViewModel"
+             x:Name="ThisPage"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False">
+    
+    <!-- ChatGPT/Claude-inspired dark theme background -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="{StaticResource HallowDarkPurple}" Offset="0.0" />
+            <GradientStop Color="{StaticResource HallowBackground}" Offset="0.3" />
+            <GradientStop Color="{StaticResource HallowBackground}" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+    
+    <Grid RowDefinitions="Auto,*,Auto">
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- HEADER - Character Info Bar (Claude-style minimal header)           -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" 
+                BackgroundColor="{StaticResource HallowCardBackground}"
+                Padding="16,12"
+                StrokeThickness="0,0,0,1"
+                Stroke="{StaticResource HallowDivider}">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Back Button -->
+                <Button Grid.Column="0"
+                        Text="←"
+                        FontSize="22"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource HallowTextPrimary}"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        Command="{Binding GoBackCommand}"/>
+                
+                <!-- Character Info -->
+                <HorizontalStackLayout Grid.Column="1" 
+                                       HorizontalOptions="Center"
+                                       Spacing="12">
+                    <!-- Character Avatar -->
+                    <Border WidthRequest="40" HeightRequest="40"
+                            StrokeThickness="2"
+                            Stroke="{StaticResource HallowAccentPurple}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="20"/>
+                        </Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
+                                <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Label Text="{Binding Character.Emoji}"
+                               FontSize="20"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Border>
+                    
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                        <Label Text="{Binding Character.Name}"
+                               TextColor="{StaticResource HallowTextPrimary}"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Label Text="{Binding Character.Title}"
+                               TextColor="{StaticResource HallowTextMuted}"
+                               FontSize="12"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+                
+                <!-- Menu Button -->
+                <Button Grid.Column="2"
+                        Text="⋮"
+                        FontSize="22"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource HallowTextPrimary}"
+                        WidthRequest="44"
+                        HeightRequest="44"/>
+            </Grid>
+        </Border>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- CHAT MESSAGES - ChatGPT/Claude style conversation                   -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <ScrollView Grid.Row="1" x:Name="ChatScrollView">
+            <VerticalStackLayout Padding="0,20" Spacing="0">
+                <CollectionView ItemsSource="{Binding Messages}"
+                               Margin="0">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ChatMessage">
+                            <!-- Message Row - Full width like ChatGPT -->
+                            <Border Padding="20,16"
+                                    BackgroundColor="{Binding Role, Converter={StaticResource RoleToBackgroundConverter}}"
+                                    StrokeThickness="0">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" MaximumWidthRequest="900" HorizontalOptions="Center">
+                                    <!-- Avatar Column -->
+                                    <Border Grid.Column="0" 
+                                            WidthRequest="36" HeightRequest="36"
+                                            VerticalOptions="Start"
+                                            StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8"/>
+                                        </Border.StrokeShape>
+                                        <Border.Background>
+                                            <SolidColorBrush Color="{Binding Role, Converter={StaticResource RoleToAvatarColorConverter}}"/>
+                                        </Border.Background>
+                                        <Label Text="{Binding Role, Converter={StaticResource RoleToAvatarConverter}}"
+                                               FontSize="18"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                    </Border>
+                                    
+                                    <!-- Message Content Column -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="12">
+                                        <!-- Sender Name -->
+                                        <Label Text="{Binding Role, Converter={StaticResource RoleToNameConverter}}"
+                                               TextColor="{StaticResource HallowTextPrimary}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"/>
+                                        
+                                        <!-- Message Text -->
+                                        <controls:BibleLinkLabel LinkedText="{Binding Content}"
+                                               TextColor="{StaticResource HallowTextSecondary}"
+                                               FontSize="15"
+                                               LineBreakMode="WordWrap"
+                                               LineHeight="1.5"/>
+                                        
+                                        <!-- ═══════════════════════════════════════════════════════ -->
+                                        <!-- PERPLEXITY-STYLE SCRIPTURE SOURCES                     -->
+                                        <!-- Shows grounded scripture citations                     -->
+                                        <!-- ═══════════════════════════════════════════════════════ -->
+                                        <Border IsVisible="{Binding HasContextualReferences}"
+                                                Margin="0,8,0,0"
+                                                Padding="16"
+                                                BackgroundColor="{StaticResource HallowCardBackground}"
+                                                StrokeThickness="1"
+                                                Stroke="{StaticResource HallowAccentPurple}">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="12"/>
+                                            </Border.StrokeShape>
+                                            <VerticalStackLayout Spacing="12">
+                                                <!-- Sources Header -->
+                                                <HorizontalStackLayout Spacing="8">
+                                                    <Label Text="📖" FontSize="16"/>
+                                                    <Label Text="Scripture Sources"
+                                                           TextColor="{StaticResource HallowTextPrimary}"
+                                                           FontSize="13"
+                                                           FontAttributes="Bold"/>
+                                                    <Border Padding="6,2"
+                                                            BackgroundColor="{StaticResource HallowAccentPurple}"
+                                                            StrokeThickness="0">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="8"/>
+                                                        </Border.StrokeShape>
+                                                        <Label Text="Grounded"
+                                                               TextColor="{StaticResource HallowTextPrimary}"
+                                                               FontSize="10"
+                                                               FontAttributes="Bold"/>
+                                                    </Border>
+                                                </HorizontalStackLayout>
+                                                
+                                                <!-- Source Cards (Perplexity-style) -->
+                                                <FlexLayout BindableLayout.ItemsSource="{Binding ContextualReferences}"
+                                                           Wrap="Wrap"
+                                                           JustifyContent="Start"
+                                                           AlignItems="Start">
+                                                    <BindableLayout.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:ContextualReference">
+                                                            <Border Margin="0,0,8,8"
+                                                                    Padding="12,10"
+                                                                    BackgroundColor="{StaticResource HallowCardHover}"
+                                                                    StrokeThickness="0">
+                                                                <Border.StrokeShape>
+                                                                    <RoundRectangle CornerRadius="10"/>
+                                                                </Border.StrokeShape>
+                                                                <VerticalStackLayout Spacing="4" MaximumWidthRequest="280">
+                                                                    <!-- Reference Badge -->
+                                                                    <HorizontalStackLayout Spacing="6">
+                                                                        <Label Text="📜" FontSize="12"/>
+                                                                        <controls:BibleLinkLabel LinkedText="{Binding Reference}"
+                                                                                   FontSize="13"
+                                                                                   FontAttributes="Bold"
+                                                                                   TextColor="{StaticResource HallowAccentPurple}"/>
+                                                                    </HorizontalStackLayout>
+                                                                    <!-- Summary -->
+                                                                    <Label Text="{Binding Summary}"
+                                                                           TextColor="{StaticResource HallowTextSecondary}"
+                                                                           FontSize="12"
+                                                                           LineBreakMode="WordWrap"
+                                                                           MaxLines="2"/>
+                                                                </VerticalStackLayout>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </BindableLayout.ItemTemplate>
+                                                </FlexLayout>
+                                            </VerticalStackLayout>
+                                        </Border>
+                                        
+                                        <!-- Message Actions (Copy, Regenerate, etc) -->
+                                        <HorizontalStackLayout Spacing="8" 
+                                                               IsVisible="{Binding Role, Converter={StaticResource StringEqualConverter}, ConverterParameter='assistant'}"
+                                                               Opacity="0.7">
+                                            <Button Text="📋" FontSize="14" 
+                                                    BackgroundColor="Transparent"
+                                                    TextColor="{StaticResource HallowTextMuted}"
+                                                    WidthRequest="32" HeightRequest="32"
+                                                    ToolTipProperties.Text="Copy"/>
+                                            <Button Text="🔄" FontSize="14"
+                                                    BackgroundColor="Transparent"
+                                                    TextColor="{StaticResource HallowTextMuted}"
+                                                    WidthRequest="32" HeightRequest="32"
+                                                    ToolTipProperties.Text="Regenerate"/>
+                                            <Button Text="👍" FontSize="14"
+                                                    BackgroundColor="Transparent"
+                                                    TextColor="{StaticResource HallowTextMuted}"
+                                                    WidthRequest="32" HeightRequest="32"
+                                                    Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
+                                                    CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='1'}"/>
+                                            <Button Text="👎" FontSize="14"
+                                                    BackgroundColor="Transparent"
+                                                    TextColor="{StaticResource HallowTextMuted}"
+                                                    WidthRequest="32" HeightRequest="32"
+                                                    Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
+                                                    CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='-1'}"/>
+                                            <Button Text="🔊" FontSize="14"
+                                                    BackgroundColor="Transparent"
+                                                    TextColor="{StaticResource HallowTextMuted}"
+                                                    WidthRequest="32" HeightRequest="32"
+                                                    Command="{Binding Path=BindingContext.ToggleVoiceCommand, Source={x:Reference ThisPage}}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTipProperties.Text="Read aloud"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                
+                <!-- Typing Indicator (Claude-style) -->
+                <Border IsVisible="{Binding IsAiTyping}"
+                        Padding="20,16"
+                        BackgroundColor="{StaticResource HallowCardBackground}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" MaximumWidthRequest="900" HorizontalOptions="Center">
+                        <Border Grid.Column="0" 
+                                WidthRequest="36" HeightRequest="36"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8"/>
+                            </Border.StrokeShape>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
+                                    <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Label Text="{Binding Character.Emoji}"
+                                   FontSize="18"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                        </Border>
+                        <HorizontalStackLayout Grid.Column="1" Spacing="12" VerticalOptions="Center">
+                            <ActivityIndicator IsRunning="True"
+                                             WidthRequest="20"
+                                             HeightRequest="20"
+                                             Color="{StaticResource HallowAccentPurple}"/>
+                            <Label Text="{Binding Character.Name, StringFormat='{0} is thinking...'}"
+                                   TextColor="{StaticResource HallowTextMuted}"
+                                   FontSize="14"
+                                   FontAttributes="Italic"/>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- INPUT AREA - ChatGPT-style bottom input                             -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="2"
+                BackgroundColor="{StaticResource HallowCardBackground}"
+                Padding="16,12,16,20"
+                StrokeThickness="0,1,0,0"
+                Stroke="{StaticResource HallowDivider}">
+            <Grid MaximumWidthRequest="900" HorizontalOptions="Center">
+                <Border Padding="12,8"
+                        BackgroundColor="{StaticResource HallowBackground}"
+                        StrokeThickness="1"
+                        Stroke="{StaticResource HallowDivider}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24"/>
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Entry Grid.Column="0"
+                               x:Name="MessageEntry"
+                               Text="{Binding UserMessage}"
+                               Placeholder="Message..."
+                               PlaceholderColor="{StaticResource HallowTextMuted}"
+                               TextColor="{StaticResource HallowTextPrimary}"
+                               FontSize="15"
+                               ReturnCommand="{Binding SendMessageCommand}"
+                               IsEnabled="{Binding IsAiTyping, Converter={StaticResource InvertedBoolConverter}}"
+                               BackgroundColor="Transparent"
+                               MaxLength="2000"/>
+                        
+                        <!-- Send/Stop Button -->
+                        <Grid Grid.Column="1" WidthRequest="44" HeightRequest="44">
+                            <!-- Send Button -->
+                            <Border IsVisible="{Binding IsAiTyping, Converter={StaticResource InvertedBoolConverter}}"
+                                    WidthRequest="40" HeightRequest="40"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="20"/>
+                                </Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
+                                        <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SendMessageCommand}"/>
+                                </Border.GestureRecognizers>
+                                <Label Text="↑"
+                                       TextColor="{StaticResource HallowTextPrimary}"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Border>
+                            
+                            <!-- Stop Button -->
+                            <Border IsVisible="{Binding IsAiTyping}"
+                                    WidthRequest="40" HeightRequest="40"
+                                    BackgroundColor="{StaticResource HallowDanger}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="20"/>
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CancelResponseCommand}"/>
+                                </Border.GestureRecognizers>
+                                <Label Text="⏹"
+                                       TextColor="{StaticResource HallowTextPrimary}"
+                                       FontSize="18"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+        
+    </Grid>
+</ContentPage>
