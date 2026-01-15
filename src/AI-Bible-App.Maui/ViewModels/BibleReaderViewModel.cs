@@ -15,6 +15,7 @@ public class BibleVerseSearchResult
     public string Reference { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
     public double Relevance { get; set; }
+    public bool IsPlaceholder { get; set; }
 }
 
 public partial class BibleReaderViewModel : BaseViewModel
@@ -138,6 +139,10 @@ public partial class BibleReaderViewModel : BaseViewModel
         {
             IsBusy = true;
             _usageMetrics?.TrackFeatureUsed("BibleReader");
+            if (!string.IsNullOrEmpty(SearchQuery))
+            {
+                ClearSearch();
+            }
             
             // Initialize verse index if needed
             if (!_verseIndexService.IsInitialized)
@@ -292,6 +297,17 @@ public partial class BibleReaderViewModel : BaseViewModel
             }
             
             SearchResultCount = SearchResults.Count;
+            if (SearchResultCount == 0)
+            {
+                SearchResults.Add(new BibleVerseSearchResult
+                {
+                    Reference = "No results",
+                    Text = "Try a different term or a verse reference like John 3:16.",
+                    Relevance = 0,
+                    IsPlaceholder = true
+                });
+                SearchResultCount = 0;
+            }
         }
         catch (Exception ex)
         {
@@ -311,6 +327,22 @@ public partial class BibleReaderViewModel : BaseViewModel
         SearchQuery = string.Empty;
         SearchResults.Clear();
         SearchResultCount = 0;
+    }
+
+    [RelayCommand]
+    private void ClearSearchInput()
+    {
+        SearchQuery = string.Empty;
+    }
+
+    partial void OnSearchQueryChanged(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            IsSearching = false;
+            SearchResults.Clear();
+            SearchResultCount = 0;
+        }
     }
 
     private static string? DetectBookFromQuery(string query)
@@ -432,6 +464,8 @@ public partial class BibleReaderViewModel : BaseViewModel
     private async Task CopySearchResult(BibleVerseSearchResult result)
     {
         if (result == null) return;
+        if (result.IsPlaceholder || string.Equals(result.Reference, "No results", StringComparison.OrdinalIgnoreCase))
+            return;
 
         await Clipboard.Default.SetTextAsync($"{result.Reference}\n{result.Text}");
         await _dialogService.ShowAlertAsync("Copied", "Verse copied to clipboard.");
@@ -441,6 +475,8 @@ public partial class BibleReaderViewModel : BaseViewModel
     private async Task DiscussReference(string reference)
     {
         if (string.IsNullOrWhiteSpace(reference)) return;
+        if (string.Equals(reference, "No results", StringComparison.OrdinalIgnoreCase))
+            return;
 
         await Shell.Current.GoToAsync($"///CharacterSelection?discussVerse={Uri.EscapeDataString(reference)}");
     }

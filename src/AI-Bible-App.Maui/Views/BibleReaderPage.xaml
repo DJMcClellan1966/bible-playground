@@ -55,7 +55,7 @@
                BackgroundColor="{StaticResource HallowCardBackground}"
                BorderColor="Transparent"
                CornerRadius="25">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Label Grid.Column="0"
                        Text="🔍"
                        FontSize="18"
@@ -67,6 +67,7 @@
                        PlaceholderColor="{StaticResource HallowTextMuted}"
                        TextColor="{StaticResource HallowTextPrimary}"
                        ReturnCommand="{Binding SearchCommand}"
+                       ReturnType="Search"
                        FontSize="14"/>
                 <Button Grid.Column="2"
                         Text="Search"
@@ -76,7 +77,19 @@
                         FontSize="12"
                         HeightRequest="36"
                         CornerRadius="18"
-                        Padding="15,0"/>
+                        Padding="15,0"
+                        IsEnabled="{Binding SearchQuery, Converter={StaticResource StringNotEmptyConverter}}"/>
+                <Button Grid.Column="3"
+                        Text="Clear"
+                        Command="{Binding ClearSearchInputCommand}"
+                        BackgroundColor="{StaticResource HallowCardHover}"
+                        TextColor="{StaticResource HallowTextPrimary}"
+                        FontSize="12"
+                        HeightRequest="36"
+                        CornerRadius="18"
+                        Padding="15,0"
+                        IsEnabled="{Binding SearchQuery, Converter={StaticResource StringNotEmptyConverter}}"
+                        IsVisible="{Binding SearchQuery, Converter={StaticResource StringNotEmptyConverter}}"/>
             </Grid>
         </Frame>
         
@@ -123,6 +136,23 @@
                 </Button.Background>
             </Button>
         </Grid>
+
+        <Frame Grid.Row="2"
+               Margin="0,55,0,0"
+               Padding="10,6"
+               BackgroundColor="{StaticResource HallowCardHover}"
+               BorderColor="Transparent"
+               CornerRadius="12"
+               HorizontalOptions="Start">
+            <HorizontalStackLayout Spacing="6">
+                <Label Text="ℹ️"
+                       FontSize="12"
+                       TextColor="{StaticResource HallowTextMuted}"/>
+                <Label Text="Tap a verse to copy, bookmark, or discuss."
+                       FontSize="11"
+                       TextColor="{StaticResource HallowTextMuted}"/>
+            </HorizontalStackLayout>
+        </Frame>
         
         <!-- Search Results / Verse Display -->
         <Grid Grid.Row="3">
@@ -135,11 +165,19 @@
                    Padding="15"
                    ZIndex="10">
                 <Grid RowDefinitions="Auto,*">
-                    <HorizontalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,10">
+                    <HorizontalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,10" HorizontalOptions="FillAndExpand">
                         <Label Text="{Binding SearchResultCount, StringFormat='📜 {0} results found'}"
                                FontSize="14"
                                FontAttributes="Bold"
-                               TextColor="{StaticResource HallowAccentPurple}"/>
+                               TextColor="{StaticResource HallowAccentPurple}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label"
+                                             Binding="{Binding SearchResultCount}"
+                                             Value="0">
+                                    <Setter Property="Text" Value="📜 No results found"/>
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
                         <Button Text="✕ Close"
                                 Command="{Binding ClearSearchCommand}"
                                 BackgroundColor="Transparent"
@@ -152,9 +190,21 @@
                                     ItemsSource="{Binding SearchResults}"
                                     SelectionMode="Single"
                                     SelectionChanged="OnSearchResultSelected">
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout Spacing="6" Padding="10" HorizontalOptions="Center">
+                                <Label Text="No results yet"
+                                       FontSize="13"
+                                       TextColor="{StaticResource HallowTextMuted}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Try a verse reference like John 3:16"
+                                       FontSize="11"
+                                       TextColor="{StaticResource HallowTextMuted}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <SwipeView>
+                            <DataTemplate x:DataType="vm:BibleVerseSearchResult">
+                                <SwipeView IsEnabled="{Binding IsPlaceholder, Converter={StaticResource InvertedBoolConverter}}">
                                     <SwipeView.RightItems>
                                         <SwipeItems Mode="Execute">
                                             <SwipeItem Text="📋 Copy"
@@ -180,11 +230,27 @@
                                                    FontSize="14"
                                                    FontAttributes="Bold"
                                                    TextColor="{StaticResource HallowAccentPurple}"/>
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding IsPlaceholder}"
+                                                             Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource HallowTextMuted}"/>
+                                                    <Setter Property="FontAttributes" Value="Italic"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
                                             <Label Text="{Binding Text}"
                                                    FontSize="13"
                                                    TextColor="{StaticResource HallowTextPrimary}"
                                                    LineBreakMode="WordWrap"
                                                    MaxLines="3"/>
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding IsPlaceholder}"
+                                                             Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource HallowTextMuted}"/>
+                                                    <Setter Property="FontAttributes" Value="Italic"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
                                         </VerticalStackLayout>
                                     </Frame>
                                 </SwipeView>

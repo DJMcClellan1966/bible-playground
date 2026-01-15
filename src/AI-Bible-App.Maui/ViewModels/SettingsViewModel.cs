@@ -1287,6 +1287,7 @@ public partial class SettingsViewModel : BaseViewModel
     {
         return key switch
         {
+            "Home" => "Home",
             "Chat" => "Chat",
             "PrayerGenerator" => "Prayer",
             "BibleReader" => "Bible Reader",

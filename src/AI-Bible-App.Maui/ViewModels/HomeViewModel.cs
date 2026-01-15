@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,6 +20,7 @@ public partial class HomeViewModel : BaseViewModel
     private readonly IPrayerRepository _prayerRepository;
     private readonly IUserService _userService;
     private readonly INavigationService _navigationService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private string greeting = "Good morning";
@@ -43,13 +45,15 @@ public partial class HomeViewModel : BaseViewModel
         IChatRepository chatRepository,
         IPrayerRepository prayerRepository,
         IUserService userService,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _characterRepository = characterRepository;
         _chatRepository = chatRepository;
         _prayerRepository = prayerRepository;
         _userService = userService;
         _navigationService = navigationService;
+        _usageMetrics = usageMetrics;
         
         Title = "Home";
         UpdateGreeting();
@@ -84,6 +88,7 @@ public partial class HomeViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            _usageMetrics?.TrackFeatureUsed("Home");
             UpdateGreeting();
 
             // Load featured characters (first 8)

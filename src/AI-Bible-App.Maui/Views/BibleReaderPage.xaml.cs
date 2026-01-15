@@ -24,6 +24,9 @@ public partial class BibleReaderPage : ContentPage
     {
         if (e.CurrentSelection.FirstOrDefault() is BibleVerseSearchResult result)
         {
+            if (result.IsPlaceholder || string.Equals(result.Reference, "No results", StringComparison.OrdinalIgnoreCase))
+                return;
+
             // Clear selection
             if (sender is CollectionView cv)
                 cv.SelectedItem = null;
@@ -60,6 +63,9 @@ public partial class BibleReaderPage : ContentPage
     {
         if (sender is SwipeItem swipeItem && swipeItem.BindingContext is BibleVerseSearchResult result)
         {
+            if (result.IsPlaceholder || string.Equals(result.Reference, "No results", StringComparison.OrdinalIgnoreCase))
+                return;
+
             HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
             
             if (_viewModel.BookmarkVerseCommand.CanExecute(result.Reference))

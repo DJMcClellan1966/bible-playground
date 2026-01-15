@@ -116,6 +116,39 @@
                     </VerticalStackLayout>
                 </Border>
             </Grid>
+
+            <HorizontalStackLayout Spacing="12">
+                <Border Padding="10,6"
+                        BackgroundColor="{StaticResource HallowCardHover}"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14"/>
+                    </Border.StrokeShape>
+                    <Label Text="New Chat"
+                           TextColor="{StaticResource HallowTextMuted}"
+                           FontSize="11"/>
+                </Border>
+                <Border Padding="10,6"
+                        BackgroundColor="{StaticResource HallowCardHover}"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14"/>
+                    </Border.StrokeShape>
+                    <Label Text="Prayer"
+                           TextColor="{StaticResource HallowTextMuted}"
+                           FontSize="11"/>
+                </Border>
+                <Border Padding="10,6"
+                        BackgroundColor="{StaticResource HallowCardHover}"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14"/>
+                    </Border.StrokeShape>
+                    <Label Text="Bible"
+                           TextColor="{StaticResource HallowTextMuted}"
+                           FontSize="11"/>
+                </Border>
+            </HorizontalStackLayout>
             
             <!-- ═══════════════════════════════════════════════════════════════════ -->
             <!-- CHARACTERS SECTION - Notion-style database view                     -->
@@ -143,6 +176,20 @@
                 <!-- Characters Grid (Notion-style cards) -->
                 <CollectionView ItemsSource="{Binding FeaturedCharacters}"
                                HeightRequest="180">
+                    <CollectionView.EmptyView>
+                        <Label Text="No characters available"
+                               TextColor="{StaticResource HallowTextMuted}"
+                               FontSize="13"
+                               Padding="12,8"
+                               HorizontalOptions="Center"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.Footer>
+                        <Label Text="Tip: Refresh later as characters load."
+                               TextColor="{StaticResource HallowTextMuted}"
+                               FontSize="11"
+                               Padding="12,0"
+                               HorizontalOptions="Center"/>
+                    </CollectionView.Footer>
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Horizontal" ItemSpacing="12"/>
                     </CollectionView.ItemsLayout>
@@ -232,12 +279,24 @@
                     </Border.StrokeShape>
                     <CollectionView ItemsSource="{Binding RecentChats}">
                         <CollectionView.EmptyView>
-                            <Label Text="No conversations yet"
+                        <Border Padding="12,8"
+                                BackgroundColor="Transparent">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding NewChatCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="No conversations yet • Tap to start"
                                    TextColor="{StaticResource HallowTextMuted}"
                                    FontSize="13"
-                                   Padding="12,8"
                                    HorizontalOptions="Center"/>
+                        </Border>
                         </CollectionView.EmptyView>
+                    <CollectionView.Footer>
+                        <Label Text="Tip: Start a new chat to see your history here."
+                               TextColor="{StaticResource HallowTextMuted}"
+                               FontSize="11"
+                               Padding="12,0"
+                               HorizontalOptions="Center"/>
+                    </CollectionView.Footer>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:ChatSession">
                                 <Border Padding="14" Margin="4"
@@ -331,9 +390,12 @@
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="16"/>
                             </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PrayerCommand}"/>
+                            </Border.GestureRecognizers>
                             <VerticalStackLayout Spacing="8" VerticalOptions="Center">
                                 <Label Text="🙏" FontSize="32" HorizontalOptions="Center"/>
-                                <Label Text="No saved prayers yet"
+                                <Label Text="No saved prayers yet • Tap to pray"
                                        TextColor="{StaticResource HallowTextMuted}"
                                        FontSize="13"
                                        HorizontalOptions="Center"/>
