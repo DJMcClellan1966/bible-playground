@@ -36,7 +36,8 @@
                     <Picker ItemsSource="{Binding Characters}"
                             SelectedItem="{Binding SelectedCharacter}"
                             ItemDisplayBinding="{Binding Name}"
-                            HorizontalOptions="FillAndExpand"/>
+                            HorizontalOptions="FillAndExpand"
+                            ToolTipProperties.Text="Select a character to view growth"/>
                 </VerticalStackLayout>
             </Frame>
         </VerticalStackLayout>

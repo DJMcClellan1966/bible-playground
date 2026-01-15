@@ -240,7 +240,8 @@
                         BackgroundColor="{AppThemeBinding Light=#3498DB, Dark=#2980B9}"
                         TextColor="White"
                         CornerRadius="12"
-                        HeightRequest="50"/>
+                        HeightRequest="50"
+                        ToolTipProperties.Text="Refresh diagnostics data"/>
                 
                 <Button Grid.Column="1"
                         Text="🔥 Warmup"
@@ -248,7 +249,8 @@
                         BackgroundColor="{AppThemeBinding Light=#E67E22, Dark=#D35400}"
                         TextColor="White"
                         CornerRadius="12"
-                        HeightRequest="50"/>
+                        HeightRequest="50"
+                        ToolTipProperties.Text="Warm up AI services"/>
                 
                 <Button Grid.Column="2"
                         Text="🧪 Test"
@@ -256,7 +258,8 @@
                         BackgroundColor="{AppThemeBinding Light=#9B59B6, Dark=#8E44AD}"
                         TextColor="White"
                         CornerRadius="12"
-                        HeightRequest="50"/>
+                        HeightRequest="50"
+                        ToolTipProperties.Text="Run enhancement test"/>
             </Grid>
             
             <Button Text="🗑️ Clear Expired Cache"
@@ -266,7 +269,8 @@
                     CornerRadius="12"
                     HeightRequest="45"
                     HorizontalOptions="Center"
-                    WidthRequest="200"/>
+                    WidthRequest="200"
+                    ToolTipProperties.Text="Remove expired cache entries"/>
             
         </VerticalStackLayout>
     </ScrollView>

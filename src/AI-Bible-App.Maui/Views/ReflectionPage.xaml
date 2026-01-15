@@ -42,7 +42,8 @@
                            TextColor="{StaticResource HallowTextPrimary}"
                            ReturnCommand="{Binding SearchCommand}"
                            ClearButtonVisibility="WhileEditing"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center"
+                           ToolTipProperties.Text="Search by title or content"/>
                 </Frame>
                 
                 <Button Grid.Column="1"
@@ -53,7 +54,8 @@
                         CornerRadius="22"
                         Padding="15,0"
                         BackgroundColor="{StaticResource HallowAccentPurple}"
-                        TextColor="{StaticResource HallowTextPrimary}"/>
+                        TextColor="{StaticResource HallowTextPrimary}"
+                        ToolTipProperties.Text="Create a new reflection"/>
             </Grid>
         </Frame>
 
@@ -68,7 +70,8 @@
                         FontSize="13"
                         Padding="16,0"
                         BackgroundColor="{StaticResource HallowAccentPurple}"
-                        TextColor="{StaticResource HallowTextPrimary}"/>
+                        TextColor="{StaticResource HallowTextPrimary}"
+                        ToolTipProperties.Text="Show all reflections"/>
                 <Button Text="⭐ Favorites"
                         Command="{Binding FilterByTypeCommand}"
                         CommandParameter="favorites"
@@ -142,7 +145,8 @@
                     <Frame Margin="15,8" Padding="15"
                            BackgroundColor="{StaticResource HallowCardBackground}"
                            BorderColor="Transparent"
-                           CornerRadius="15">
+                           CornerRadius="15"
+                           ToolTipProperties.Text="Tap to view details">
                         
                         <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
                             <!-- Type Icon with gradient circle -->
@@ -181,7 +185,8 @@
                             <Label Grid.Row="0" Grid.Column="2"
                                    Text="{Binding IsFavorite, Converter={StaticResource BoolToStarConverter}}"
                                    FontSize="22"
-                                   VerticalOptions="Start">
+                                   VerticalOptions="Start"
+                                   ToolTipProperties.Text="Toggle favorite">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer 
                                         Command="{Binding Path=BindingContext.ToggleFavoriteCommand, Source={x:Reference ThisPage}}"

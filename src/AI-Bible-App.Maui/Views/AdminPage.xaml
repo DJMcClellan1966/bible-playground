@@ -76,7 +76,8 @@
                     
                     <Button Text="🔄 Refresh Statistics"
                             Command="{Binding RefreshStatisticsCommand}"
-                            HorizontalOptions="Start"/>
+                            HorizontalOptions="Start"
+                            ToolTipProperties.Text="Reload training stats"/>
                 </VerticalStackLayout>
             </Border>
             
@@ -112,7 +113,8 @@
                             BackgroundColor="{StaticResource Primary}"
                             TextColor="White"
                             FontAttributes="Bold"
-                            Margin="0,12,0,0"/>
+                            Margin="0,12,0,0"
+                            ToolTipProperties.Text="Run a learning cycle now"/>
                     
                     <ProgressBar Progress="{Binding CycleProgress}"
                                 IsVisible="{Binding IsExecutingCycle}"

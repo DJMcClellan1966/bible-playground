@@ -72,7 +72,8 @@
                             BackgroundColor="White"
                             TextColor="{DynamicResource Danger}"
                             HorizontalOptions="Center"
-                            Margin="0,10,0,0"/>
+                            Margin="0,10,0,0"
+                            ToolTipProperties.Text="Proceed without completing setup"/>
                 </VerticalStackLayout>
             </Border>
             

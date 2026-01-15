@@ -155,7 +155,8 @@
                             HeightRequest="50"
                             CornerRadius="25"
                             FontAttributes="Bold"
-                            TextColor="{StaticResource HallowTextPrimary}">
+                            TextColor="{StaticResource HallowTextPrimary}"
+                            ToolTipProperties.Text="Manage offline AI models">
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
@@ -225,7 +226,8 @@
                             BackgroundColor="{StaticResource HallowCardHover}"
                             TextColor="{StaticResource HallowTextPrimary}"
                             CornerRadius="20"
-                            HeightRequest="44"/>
+                            HeightRequest="44"
+                            ToolTipProperties.Text="Refresh AI model status"/>
 
                     <Label Text="Fallback: If the local model is offline, the app will rely on cached responses."
                            FontSize="11"
@@ -248,10 +250,12 @@
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0"
                                Text="Enable Performance Mode"
-                               TextColor="{StaticResource HallowTextPrimary}"/>
+                               TextColor="{StaticResource HallowTextPrimary}"
+                               ToolTipProperties.Text="Reduce context for faster responses"/>
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding IsPerformanceModeEnabled}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Toggle performance mode"/>
                     </Grid>
 
                     <Label Text="Reduces background processing and prioritizes faster responses."
@@ -261,10 +265,12 @@
                     <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
                         <Label Grid.Column="0"
                                Text="Enable RAG Debug"
-                               TextColor="{StaticResource HallowTextPrimary}"/>
+                               TextColor="{StaticResource HallowTextPrimary}"
+                               ToolTipProperties.Text="Show RAG query stats for troubleshooting"/>
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding IsRagDebugEnabled}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Toggle RAG debug stats"/>
                     </Grid>
 
                     <Label Text="{Binding RagStatsSummary}"
@@ -277,15 +283,18 @@
                             TextColor="{StaticResource HallowTextPrimary}"
                             CornerRadius="20"
                             HeightRequest="44"
-                            IsVisible="{Binding IsRagDebugEnabled}"/>
+                            IsVisible="{Binding IsRagDebugEnabled}"
+                            ToolTipProperties.Text="Refresh latest RAG stats"/>
 
                     <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
                         <Label Grid.Column="0"
                                Text="Show Contextual References"
-                               TextColor="{StaticResource HallowTextPrimary}"/>
+                               TextColor="{StaticResource HallowTextPrimary}"
+                               ToolTipProperties.Text="Show inline verse sources in chat"/>
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding IsContextualReferencesEnabled}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Toggle contextual references"/>
                     </Grid>
 
                     <Label Text="Displays scripture sources beneath responses when available."
@@ -300,7 +309,7 @@
                    BorderColor="Transparent"
                    CornerRadius="20">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="🧠 Learning & Research"
+                    <Label Text="🧠 Learning &amp; Research"
                            FontSize="18"
                            FontAttributes="Bold"
                            TextColor="{StaticResource HallowTextPrimary}"/>
@@ -348,19 +357,23 @@
                     <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
                         <Label Grid.Column="0"
                                Text="Enable Autonomous Learning"
-                               TextColor="{StaticResource HallowTextPrimary}"/>
+                               TextColor="{StaticResource HallowTextPrimary}"
+                               ToolTipProperties.Text="Allow background model improvements"/>
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding IsAutonomousLearningEnabled}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Toggle autonomous learning"/>
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0"
                                Text="Enable Autonomous Research"
-                               TextColor="{StaticResource HallowTextPrimary}"/>
+                               TextColor="{StaticResource HallowTextPrimary}"
+                               ToolTipProperties.Text="Allow background research during off-hours"/>
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding IsAutonomousResearchEnabled}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Toggle background research"/>
                     </Grid>
 
                     <Button Text="🔄 Refresh Learning Status"
@@ -368,7 +381,8 @@
                             BackgroundColor="{StaticResource HallowCardHover}"
                             TextColor="{StaticResource HallowTextPrimary}"
                             CornerRadius="20"
-                            HeightRequest="44"/>
+                            HeightRequest="44"
+                            ToolTipProperties.Text="Refresh learning status"/>
                 </VerticalStackLayout>
             </Frame>
 
@@ -460,21 +474,24 @@
                             BackgroundColor="{StaticResource HallowCardHover}"
                             TextColor="{StaticResource HallowTextPrimary}"
                             CornerRadius="20"
-                            HeightRequest="44"/>
+                            HeightRequest="44"
+                            ToolTipProperties.Text="Refresh usage insights"/>
 
                     <Button Text="Export Usage Metrics"
                             Command="{Binding ExportUsageMetricsCommand}"
                             BackgroundColor="{StaticResource HallowCardHover}"
                             TextColor="{StaticResource HallowTextPrimary}"
                             CornerRadius="20"
-                            HeightRequest="44"/>
+                            HeightRequest="44"
+                            ToolTipProperties.Text="Export usage metrics"/>
 
                     <Button Text="Reset Usage Metrics"
                             Command="{Binding ResetUsageMetricsCommand}"
                             BackgroundColor="{StaticResource HallowCardHover}"
                             TextColor="{StaticResource HallowTextSecondary}"
                             CornerRadius="20"
-                            HeightRequest="40"/>
+                            HeightRequest="40"
+                            ToolTipProperties.Text="Reset local usage stats"/>
                 </VerticalStackLayout>
             </Frame>
 
@@ -528,7 +545,8 @@
                             TextColor="{StaticResource HallowTextPrimary}"
                             CornerRadius="20"
                             HeightRequest="44"
-                            IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                            IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                            ToolTipProperties.Text="Recalculate storage sizes"/>
 
                     <Button Text="🗑️ Clear Local Data"
                             Command="{Binding ClearLocalDataCommand}"
@@ -536,7 +554,8 @@
                             TextColor="White"
                             CornerRadius="20"
                             HeightRequest="44"
-                            IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                            IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                            ToolTipProperties.Text="Remove all local data on this device"/>
 
                     <Label Text="Clearing data removes chats, prayers, reflections, bookmarks, and cached files on this device."
                            FontSize="11"
@@ -556,14 +575,16 @@
                                 BackgroundColor="{StaticResource HallowCardHover}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
-                                HeightRequest="40"/>
+                                HeightRequest="40"
+                                ToolTipProperties.Text="Export chat history"/>
                         <Button Grid.Row="0" Grid.Column="1"
                                 Text="Export Prayers"
                                 Command="{Binding ExportPrayersCommand}"
                                 BackgroundColor="{StaticResource HallowCardHover}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
-                                HeightRequest="40"/>
+                                HeightRequest="40"
+                                ToolTipProperties.Text="Export saved prayers"/>
 
                         <Button Grid.Row="1" Grid.Column="0"
                                 Text="Export Reflections"
@@ -571,14 +592,16 @@
                                 BackgroundColor="{StaticResource HallowCardHover}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
-                                HeightRequest="40"/>
+                                HeightRequest="40"
+                                ToolTipProperties.Text="Export reflections"/>
                         <Button Grid.Row="1" Grid.Column="1"
                                 Text="Export Bookmarks"
                                 Command="{Binding ExportBookmarksCommand}"
                                 BackgroundColor="{StaticResource HallowCardHover}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
-                                HeightRequest="40"/>
+                                HeightRequest="40"
+                                ToolTipProperties.Text="Export verse bookmarks"/>
                     </Grid>
 
                     <Label Text="Exports are saved locally and can be shared from your device."
@@ -600,7 +623,8 @@
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
                                 HeightRequest="40"
-                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Clear chat history"/>
                         <Button Grid.Row="0" Grid.Column="1"
                                 Text="Clear Prayers"
                                 Command="{Binding ClearPrayerHistoryCommand}"
@@ -608,7 +632,8 @@
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
                                 HeightRequest="40"
-                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Clear prayer history"/>
 
                         <Button Grid.Row="1" Grid.Column="0"
                                 Text="Clear Reflections"
@@ -617,7 +642,8 @@
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
                                 HeightRequest="40"
-                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Clear reflections"/>
                         <Button Grid.Row="1" Grid.Column="1"
                                 Text="Clear Bookmarks"
                                 Command="{Binding ClearBookmarksCommand}"
@@ -625,7 +651,8 @@
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
                                 HeightRequest="40"
-                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Clear verse bookmarks"/>
 
                         <Button Grid.Row="2" Grid.Column="0"
                                 Text="Clear RAG Cache"
@@ -634,7 +661,8 @@
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
                                 HeightRequest="40"
-                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Clear RAG embeddings cache"/>
 
                         <Button Grid.Row="2" Grid.Column="1"
                                 Text="Clear Exports"
@@ -643,7 +671,8 @@
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
                                 HeightRequest="40"
-                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Delete exported files"/>
 
                         <Button Grid.Row="3" Grid.Column="0"
                                 Text="Clear Usage Metrics"
@@ -652,7 +681,8 @@
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
                                 HeightRequest="40"
-                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Reset usage metrics"/>
                     </Grid>
 
                     <Label Text="{Binding DataClearStatus}"
@@ -681,10 +711,12 @@
                         <Label Grid.Column="0" 
                                Text="Enable Content Filter"
                                TextColor="{StaticResource HallowTextPrimary}"
+                               ToolTipProperties.Text="Block inappropriate language"
                                VerticalOptions="Center"/>
                         <Switch Grid.Column="1" 
                                 IsToggled="{Binding IsModerationEnabled}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Toggle content moderation"/>
                     </Grid>
                 </VerticalStackLayout>
             </Frame>
@@ -709,10 +741,12 @@
                         <Label Grid.Column="0" 
                                Text="Enable Daily Reminder"
                                TextColor="{StaticResource HallowTextPrimary}"
+                               ToolTipProperties.Text="Send a daily reminder notification"
                                VerticalOptions="Center"/>
                         <Switch Grid.Column="1" 
                                 IsToggled="{Binding IsDailyReminderEnabled}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Toggle daily reminders"/>
                     </Grid>
                     
                     <!-- Reminder Time (only visible when enabled) -->
@@ -725,7 +759,8 @@
                                BorderColor="Transparent" CornerRadius="12">
                             <TimePicker Time="{Binding ReminderTime}"
                                         Format="h:mm tt"
-                                        TextColor="{StaticResource HallowTextPrimary}"/>
+                                        TextColor="{StaticResource HallowTextPrimary}"
+                                        ToolTipProperties.Text="Choose reminder time"/>
                         </Frame>
                         
                         <Label Text="{Binding ReminderTimeDescription}"
@@ -772,7 +807,8 @@
                                 CornerRadius="15"
                                 HeightRequest="40"
                                 Padding="15,0"
-                                WidthRequest="100"/>
+                            WidthRequest="100"
+                            ToolTipProperties.Text="Set or change your PIN"/>
                     </Grid>
                     
                     <!-- Remove PIN Button (only visible when PIN is set) -->
@@ -783,15 +819,18 @@
                             CornerRadius="15"
                             HeightRequest="40"
                             IsVisible="{Binding HasPinEnabled}"
-                            HorizontalOptions="Start"/>
+                            HorizontalOptions="Start"
+                            ToolTipProperties.Text="Remove PIN protection"/>
 
                     <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
                         <Label Grid.Column="0"
                                Text="Share anonymized questions to improve the model"
-                               TextColor="{StaticResource HallowTextPrimary}"/>
+                               TextColor="{StaticResource HallowTextPrimary}"
+                               ToolTipProperties.Text="Allow anonymized usage for model improvement"/>
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding IsDataSharingEnabled}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Toggle data sharing"/>
                     </Grid>
                     <Label Text="Only your questions and ratings are used, not personal identity."
                            FontSize="11"
@@ -838,7 +877,8 @@
                                 Padding="15,0"
                                 WidthRequest="90"
                                 IsVisible="{Binding IsSyncEnabled}"
-                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Sync data across linked devices"/>
                     </Grid>
                     
                     <!-- Current Sync Code (if enabled) -->
@@ -858,7 +898,8 @@
                                    FontAttributes="Bold"
                                    TextColor="{StaticResource HallowAccentPurple}"
                                    HorizontalOptions="Center"
-                                   FontFamily="Consolas"/>
+                                   FontFamily="Consolas"
+                                   ToolTipProperties.Text="Share this code to link another device"/>
                             <Label Text="Share this with your other devices"
                                    FontSize="10"
                                    TextColor="{StaticResource HallowTextMuted}"
@@ -874,7 +915,8 @@
                                 CornerRadius="25"
                                 FontAttributes="Bold"
                                 TextColor="{StaticResource HallowTextPrimary}"
-                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}">
+                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Generate a new sync code">
                             <Button.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                     <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
@@ -894,7 +936,8 @@
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="20"
                                 HeightRequest="45"
-                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}"/>
+                                IsEnabled="{Binding IsSyncing, Converter={StaticResource InvertedBoolConverter}}"
+                                ToolTipProperties.Text="Link another device to this account"/>
                     </VerticalStackLayout>
                     
                     <!-- Remove Sync Button -->
@@ -905,7 +948,8 @@
                             CornerRadius="15"
                             HeightRequest="40"
                             IsVisible="{Binding IsSyncEnabled}"
-                            HorizontalOptions="Start"/>
+                            HorizontalOptions="Start"
+                            ToolTipProperties.Text="Remove sync from this device"/>
                     
                     <!-- Syncing Indicator -->
                     <HorizontalStackLayout Spacing="10" 
@@ -1001,7 +1045,8 @@
                             HeightRequest="50"
                             CornerRadius="25"
                             TextColor="{StaticResource HallowTextPrimary}"
-                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                            ToolTipProperties.Text="Export all rated conversations">
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
@@ -1016,7 +1061,8 @@
                             TextColor="White"
                             CornerRadius="25"
                             HeightRequest="50"
-                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"/>
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                            ToolTipProperties.Text="Export only positive ratings"/>
                     
                     <Label Text="Tip: Export positive ratings for training good responses, or all ratings for DPO training."
                            FontSize="11"

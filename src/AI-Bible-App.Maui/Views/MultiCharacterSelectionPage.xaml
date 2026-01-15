@@ -54,7 +54,8 @@
                             CornerRadius="8"
                             Padding="10,6"
                             FontSize="13"
-                            Margin="4"/>
+                            Margin="4"
+                            ToolTipProperties.Text="Debate-style discussion"/>
                     
                     <Button Text="🧠 Wisdom Council"
                             Command="{Binding SetModeCommand}"
@@ -64,7 +65,8 @@
                             CornerRadius="8"
                             Padding="10,6"
                             FontSize="13"
-                            Margin="4"/>
+                            Margin="4"
+                            ToolTipProperties.Text="Collective wisdom responses"/>
                     
                     <Button Text="🙏 Prayer Chain"
                             Command="{Binding SetModeCommand}"
@@ -74,7 +76,8 @@
                             CornerRadius="8"
                             Padding="10,6"
                             FontSize="13"
-                            Margin="4"/>
+                            Margin="4"
+                            ToolTipProperties.Text="Sequential prayer responses"/>
                 </FlexLayout>
             </VerticalStackLayout>
         </Border>
@@ -104,7 +107,8 @@
                                         BorderWidth="0"
                                         HorizontalOptions="Fill"
                                         VerticalOptions="Fill"
-                                        ZIndex="100"/>
+                                        ZIndex="100"
+                                        ToolTipProperties.Text="Toggle selection"/>
                                 
                                 <Border Padding="10"
                                         BackgroundColor="{DynamicResource CardBackground}"
@@ -194,7 +198,8 @@
                 FontSize="16"
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="White"
-                CornerRadius="10"/>
+                CornerRadius="10"
+                ToolTipProperties.Text="Start the selected mode"/>
         
         <!-- Loading Indicator with text -->
         <Border Grid.RowSpan="4"

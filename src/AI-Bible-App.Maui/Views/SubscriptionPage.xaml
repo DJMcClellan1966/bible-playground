@@ -93,14 +93,16 @@
                                 BackgroundColor="{DynamicResource Primary}"
                                 TextColor="White"
                                 CornerRadius="8"
-                                Grid.Column="0"/>
+                                Grid.Column="0"
+                                ToolTipProperties.Text="Upgrade to Premium monthly"/>
                         <Button Text="Yearly $49.99"
                                 Command="{Binding UpgradeCommand}"
                                 CommandParameter="Premium|Yearly"
                                 BackgroundColor="{DynamicResource Primary}"
                                 TextColor="White"
                                 CornerRadius="8"
-                                Grid.Column="1"/>
+                                Grid.Column="1"
+                                ToolTipProperties.Text="Upgrade to Premium yearly"/>
                     </Grid>
                 </VerticalStackLayout>
             </Frame>
@@ -162,14 +164,16 @@
                                 BackgroundColor="#FFD700"
                                 TextColor="Black"
                                 CornerRadius="8"
-                                Grid.Column="0"/>
+                                Grid.Column="0"
+                                ToolTipProperties.Text="Upgrade to Premium Plus monthly"/>
                         <Button Text="Yearly $99"
                                 Command="{Binding UpgradeCommand}"
                                 CommandParameter="PremiumPlus|Yearly"
                                 BackgroundColor="#FFD700"
                                 TextColor="Black"
                                 CornerRadius="8"
-                                Grid.Column="1"/>
+                                Grid.Column="1"
+                                ToolTipProperties.Text="Upgrade to Premium Plus yearly"/>
                     </Grid>
                 </VerticalStackLayout>
             </Frame>
@@ -193,7 +197,8 @@
                             Command="{Binding CancelSubscriptionCommand}"
                             BackgroundColor="{DynamicResource Danger}"
                             TextColor="White"
-                            CornerRadius="8"/>
+                            CornerRadius="8"
+                            ToolTipProperties.Text="Cancel your subscription"/>
                 </VerticalStackLayout>
             </Frame>
 

@@ -1,4 +1,6 @@
 using System.Text.Json;
+using AI_Bible_App.Core.Interfaces;
+using AI_Bible_App.Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace AI_Bible_App.Infrastructure.Services;
@@ -319,91 +321,4 @@ public class UsageMetricsService : IUsageMetricsService
             _logger.LogError(ex, "Failed to save metrics");
         }
     }
-}
-
-/// <summary>
-/// Usage metrics data structure (stored locally, anonymized)
-/// </summary>
-public class UsageMetrics
-{
-    public DateTime? FirstUseDate { get; set; }
-    public DateTime? LastActivityDate { get; set; }
-    public DateTime? SessionStartTime { get; set; }
-    
-    public int TotalSessions { get; set; }
-    public int TotalSessionMinutes { get; set; }
-    public int TotalConversations { get; set; }
-    public int TotalPrayersGenerated { get; set; }
-    public int TotalBibleSearches { get; set; }
-    public int TotalDevotionalsViewed { get; set; }
-    
-    // Character usage (character ID -> count)
-    public Dictionary<string, int> CharacterConversations { get; set; } = new();
-    
-    // Prayer topic categories (anonymized)
-    public Dictionary<string, int> PrayerTopicCategories { get; set; } = new();
-    public Dictionary<string, int> PrayerMoods { get; set; } = new();
-    
-    // Bible book searches
-    public Dictionary<string, int> BooksSearched { get; set; } = new();
-    
-    // Feature usage tracking
-    public Dictionary<string, int> FeatureUsage { get; set; } = new();
-
-    public UsageMetrics Clone()
-    {
-        return new UsageMetrics
-        {
-            FirstUseDate = FirstUseDate,
-            LastActivityDate = LastActivityDate,
-            TotalSessions = TotalSessions,
-            TotalSessionMinutes = TotalSessionMinutes,
-            TotalConversations = TotalConversations,
-            TotalPrayersGenerated = TotalPrayersGenerated,
-            TotalBibleSearches = TotalBibleSearches,
-            TotalDevotionalsViewed = TotalDevotionalsViewed,
-            CharacterConversations = new Dictionary<string, int>(CharacterConversations),
-            PrayerTopicCategories = new Dictionary<string, int>(PrayerTopicCategories),
-            PrayerMoods = new Dictionary<string, int>(PrayerMoods),
-            BooksSearched = new Dictionary<string, int>(BooksSearched),
-            FeatureUsage = new Dictionary<string, int>(FeatureUsage)
-        };
-    }
-}
-
-/// <summary>
-/// Summarized insights from usage data
-/// </summary>
-public class UsageInsights
-{
-    public int TotalConversations { get; set; }
-    public int TotalPrayers { get; set; }
-    public int TotalBibleSearches { get; set; }
-    public int TotalDevotionalsViewed { get; set; }
-    public int TotalSessions { get; set; }
-    public int AverageSessionMinutes { get; set; }
-    public string? FavoriteCharacter { get; set; }
-    public int FavoriteCharacterCount { get; set; }
-    public string? MostSearchedBook { get; set; }
-    public int MostSearchedBookCount { get; set; }
-    public int DaysSinceFirstUse { get; set; }
-}
-
-/// <summary>
-/// Interface for usage metrics service
-/// </summary>
-public interface IUsageMetricsService
-{
-    void TrackCharacterConversation(string characterId);
-    void TrackPrayerGenerated(string topic, string? mood = null);
-    void TrackBibleSearch(string book, int? chapter = null);
-    void TrackDevotionalViewed();
-    void TrackSessionStart();
-    void TrackSessionEnd();
-    void TrackFeatureUsed(string featureName);
-    UsageMetrics GetMetrics();
-    List<(string CharacterId, int Count)> GetPopularCharacters(int top = 5);
-    UsageInsights GetInsights();
-    void ResetMetrics();
-    string ExportMetrics();
 }

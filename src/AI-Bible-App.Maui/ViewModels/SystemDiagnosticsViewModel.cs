@@ -1,3 +1,4 @@
+using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Maui.Services;
 using AI_Bible_App.Maui.Services.Core;
 using AI_Bible_App.Infrastructure.Services;

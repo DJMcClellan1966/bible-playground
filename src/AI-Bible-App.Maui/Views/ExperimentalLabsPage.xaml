@@ -92,7 +92,8 @@
                                     TextColor="White"
                                     CornerRadius="8"
                                     WidthRequest="60"
-                                    HeightRequest="36"/>
+                                    HeightRequest="36"
+                                    ToolTipProperties.Text="Open roundtable discussion"/>
                         </Grid>
                     </Border>
                     
@@ -133,7 +134,8 @@
                                     TextColor="White"
                                     CornerRadius="8"
                                     WidthRequest="60"
-                                    HeightRequest="36"/>
+                                    HeightRequest="36"
+                                    ToolTipProperties.Text="Open wisdom council"/>
                         </Grid>
                     </Border>
                     
@@ -174,7 +176,8 @@
                                     TextColor="White"
                                     CornerRadius="8"
                                     WidthRequest="60"
-                                    HeightRequest="36"/>
+                                    HeightRequest="36"
+                                    ToolTipProperties.Text="Open prayer chain"/>
                         </Grid>
                     </Border>
                 </VerticalStackLayout>
@@ -230,7 +233,8 @@
                                     TextColor="White"
                                     CornerRadius="8"
                                     WidthRequest="60"
-                                    HeightRequest="36"/>
+                                    HeightRequest="36"
+                                    ToolTipProperties.Text="View character growth"/>
                         </Grid>
                     </Border>
                 </VerticalStackLayout>
@@ -286,7 +290,8 @@
                                     TextColor="White"
                                     CornerRadius="8"
                                     WidthRequest="60"
-                                    HeightRequest="36"/>
+                                    HeightRequest="36"
+                                    ToolTipProperties.Text="Open system diagnostics"/>
                         </Grid>
                     </Border>
                     
@@ -327,7 +332,8 @@
                                     TextColor="White"
                                     CornerRadius="8"
                                     WidthRequest="60"
-                                    HeightRequest="36"/>
+                                    HeightRequest="36"
+                                    ToolTipProperties.Text="Open offline models manager"/>
                         </Grid>
                     </Border>
                 </VerticalStackLayout>

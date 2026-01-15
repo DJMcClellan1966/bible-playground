@@ -74,6 +74,7 @@
                                FontAttributes="Bold"
                                HorizontalOptions="Center"/>
                     </VerticalStackLayout>
+                    <ToolTipProperties.Text>Start a new chat</ToolTipProperties.Text>
                 </Border>
                 
                 <!-- Prayer -->
@@ -94,6 +95,7 @@
                                FontAttributes="Bold"
                                HorizontalOptions="Center"/>
                     </VerticalStackLayout>
+                    <ToolTipProperties.Text>Open prayer generator</ToolTipProperties.Text>
                 </Border>
                 
                 <!-- Bible -->
@@ -114,6 +116,7 @@
                                FontAttributes="Bold"
                                HorizontalOptions="Center"/>
                     </VerticalStackLayout>
+                    <ToolTipProperties.Text>Open Bible reader</ToolTipProperties.Text>
                 </Border>
             </Grid>
 
@@ -163,10 +166,11 @@
                                FontSize="18"
                                FontAttributes="Bold"/>
                     </HorizontalStackLayout>
-                    <Label Grid.Column="1"
-                           Text="View All →"
-                           TextColor="{StaticResource HallowAccentPurple}"
-                           FontSize="14">
+                <Label Grid.Column="1"
+                       Text="View All →"
+                       TextColor="{StaticResource HallowAccentPurple}"
+                       FontSize="14"
+                       ToolTipProperties.Text="View all characters">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ViewAllCharactersCommand}"/>
                         </Label.GestureRecognizers>
@@ -260,10 +264,11 @@
                                FontSize="18"
                                FontAttributes="Bold"/>
                     </HorizontalStackLayout>
-                    <Label Grid.Column="1"
-                           Text="View All →"
-                           TextColor="{StaticResource HallowAccentPurple}"
-                           FontSize="14">
+                <Label Grid.Column="1"
+                       Text="View All →"
+                       TextColor="{StaticResource HallowAccentPurple}"
+                       FontSize="14"
+                       ToolTipProperties.Text="View all chats">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ViewAllChatsCommand}"/>
                         </Label.GestureRecognizers>
@@ -366,10 +371,11 @@
                                FontSize="18"
                                FontAttributes="Bold"/>
                     </HorizontalStackLayout>
-                    <Label Grid.Column="1"
-                           Text="View All →"
-                           TextColor="{StaticResource HallowAccentPurple}"
-                           FontSize="14">
+                <Label Grid.Column="1"
+                       Text="View All →"
+                       TextColor="{StaticResource HallowAccentPurple}"
+                       FontSize="14"
+                       ToolTipProperties.Text="View all prayers">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ViewAllPrayersCommand}"/>
                         </Label.GestureRecognizers>

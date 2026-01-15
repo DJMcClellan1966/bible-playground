@@ -32,7 +32,8 @@
                             BackgroundColor="Transparent"
                             TextColor="White"
                             WidthRequest="44"
-                            HeightRequest="44"/>
+                            HeightRequest="44"
+                            ToolTipProperties.Text="Back"/>
                     
                     <Label Grid.Column="1" 
                            Text="{Binding PageTitle}"
@@ -64,7 +65,8 @@
                                     FontSize="14"
                                     FontAttributes="Bold"
                                     CornerRadius="21"
-                                    HeightRequest="42"/>
+                                    HeightRequest="42"
+                                    ToolTipProperties.Text="Switch to sign in"/>
                             <Button Grid.Column="1"
                                     Text="Sign Up"
                                     Command="{Binding SetSignUpModeCommand}"
@@ -73,7 +75,8 @@
                                     FontSize="14"
                                     FontAttributes="Bold"
                                     CornerRadius="21"
-                                    HeightRequest="42"/>
+                                    HeightRequest="42"
+                                    ToolTipProperties.Text="Switch to sign up"/>
                         </Grid>
                     </Border>
                     
@@ -164,7 +167,8 @@
                             FontSize="14"
                             HorizontalOptions="End"
                             Padding="0"
-                            Margin="0,-8,0,0"/>
+                            Margin="0,-8,0,0"
+                            ToolTipProperties.Text="Reset your password"/>
                     
                     <!-- Error message -->
                     <Label Text="{Binding ErrorMessage}"
@@ -182,7 +186,8 @@
                             CornerRadius="28"
                             FontSize="16"
                             FontAttributes="Bold"
-                            Margin="0,8,0,0">
+                            Margin="0,8,0,0"
+                            ToolTipProperties.Text="Submit your credentials">
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="#8B5CF6" Offset="0.0"/>

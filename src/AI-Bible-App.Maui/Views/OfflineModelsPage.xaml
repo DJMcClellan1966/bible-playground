@@ -113,7 +113,8 @@
                                             BackgroundColor="{StaticResource Primary}"
                                             TextColor="White"
                                             FontSize="13"
-                                            HeightRequest="40"/>
+                                            HeightRequest="40"
+                                            ToolTipProperties.Text="Download this model for offline use"/>
 
                                     <!-- Progress Bar (shown during download) -->
                                     <ProgressBar Grid.Column="0" Grid.ColumnSpan="3"
@@ -131,7 +132,8 @@
                                             BackgroundColor="{StaticResource Success}"
                                             TextColor="White"
                                             FontSize="13"
-                                            HeightRequest="40"/>
+                                            HeightRequest="40"
+                                            ToolTipProperties.Text="Set as active offline model"/>
 
                                     <!-- Delete Button -->
                                     <Button Grid.Column="1"
@@ -141,7 +143,8 @@
                                             BackgroundColor="{StaticResource Gray700}"
                                             TextColor="White"
                                             FontSize="13"
-                                            HeightRequest="40"/>
+                                            HeightRequest="40"
+                                            ToolTipProperties.Text="Remove this model from storage"/>
 
                                     <!-- Info Button -->
                                     <Button Grid.Column="2"
@@ -151,7 +154,8 @@
                                             TextColor="White"
                                             FontSize="16"
                                             WidthRequest="40"
-                                            HeightRequest="40"/>
+                                            HeightRequest="40"
+                                            ToolTipProperties.Text="View system requirements"/>
                                 </Grid>
 
                             </Grid>

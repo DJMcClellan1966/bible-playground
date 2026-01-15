@@ -38,7 +38,8 @@
                         FontSize="14"
                         HorizontalOptions="End"
                         Padding="0"
-                        HeightRequest="30"/>
+                        HeightRequest="30"
+                        ToolTipProperties.Text="Skip onboarding"/>
                 
                 <!-- Step title -->
                 <Label Text="{Binding StepTitle}"
@@ -72,7 +73,8 @@
                                    TextColor="White"
                                    PlaceholderColor="#6B7280"
                                    FontSize="18"
-                                   BackgroundColor="Transparent"/>
+                                   BackgroundColor="Transparent"
+                                   ToolTipProperties.Text="Set your display name"/>
                         </Border>
                         <Label Text="💡 This is optional - you can always change it later"
                                FontSize="13"
@@ -178,7 +180,8 @@
                         BackgroundColor="Transparent"
                         TextColor="#A78BFA"
                         FontSize="16"
-                        WidthRequest="100"/>
+                        WidthRequest="100"
+                        ToolTipProperties.Text="Go to previous step"/>
                 
                 <!-- Next/Continue button -->
                 <Button Grid.Column="1"
@@ -189,7 +192,8 @@
                         FontSize="16"
                         FontAttributes="Bold"
                         HeightRequest="56"
-                        CornerRadius="28">
+                        CornerRadius="28"
+                        ToolTipProperties.Text="Continue to next step">
                     <Button.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                             <GradientStop Color="#7C3AED" Offset="0.0"/>

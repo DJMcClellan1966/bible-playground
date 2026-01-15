@@ -40,7 +40,8 @@
                         HeightRequest="44" WidthRequest="44"
                         CornerRadius="22" Padding="0"
                         BackgroundColor="{StaticResource HallowCardHover}"
-                        TextColor="{StaticResource HallowTextPrimary}"/>
+                        TextColor="{StaticResource HallowTextPrimary}"
+                        ToolTipProperties.Text="Show devotional history"/>
                 
                 <Button Grid.Column="2"
                         Text="🔄"
@@ -49,7 +50,8 @@
                         CornerRadius="22" Padding="0"
                         Margin="8,0,0,0"
                         BackgroundColor="{StaticResource HallowAccentPurple}"
-                        TextColor="{StaticResource HallowTextPrimary}"/>
+                        TextColor="{StaticResource HallowTextPrimary}"
+                        ToolTipProperties.Text="Refresh today's devotional"/>
             </Grid>
         </Frame>
 
@@ -129,7 +131,8 @@
                                 HeightRequest="40"
                                 CornerRadius="20"
                                 BackgroundColor="{StaticResource HallowCardHover}"
-                                TextColor="{StaticResource HallowTextPrimary}"/>
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                ToolTipProperties.Text="Close history"/>
                     </VerticalStackLayout>
                 </Frame>
 
@@ -239,21 +242,24 @@
                                 HeightRequest="50"
                                 CornerRadius="25"
                                 BackgroundColor="{StaticResource HallowAccentPurple}"
-                                TextColor="{StaticResource HallowTextPrimary}"/>
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                ToolTipProperties.Text="Mark as complete"/>
                         <Button Grid.Column="1"
                                 Text="📤 Share"
                                 Command="{Binding ShareDevotionalCommand}"
                                 HeightRequest="50"
                                 CornerRadius="25"
                                 BackgroundColor="{StaticResource HallowMidPurple}"
-                                TextColor="{StaticResource HallowTextPrimary}"/>
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                ToolTipProperties.Text="Share devotional"/>
                         <Button Grid.Column="2"
                                 Text="📋 Copy"
                                 Command="{Binding CopyDevotionalCommand}"
                                 HeightRequest="50"
                                 CornerRadius="25"
                                 BackgroundColor="{StaticResource HallowCardHover}"
-                                TextColor="{StaticResource HallowTextPrimary}"/>
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                ToolTipProperties.Text="Copy devotional"/>
                     </Grid>
 
                     <!-- Completion Badge -->

@@ -192,7 +192,8 @@
                                TextColor="{StaticResource HallowTextPrimary}"/>
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding IncludeScripture}"
-                                OnColor="{StaticResource HallowAccentPurple}"/>
+                                OnColor="{StaticResource HallowAccentPurple}"
+                                ToolTipProperties.Text="Include scripture references"/>
                     </Grid>
                 </VerticalStackLayout>
             </Frame>
@@ -205,7 +206,8 @@
                     FontSize="18"
                     FontAttributes="Bold"
                     TextColor="{StaticResource HallowTextPrimary}"
-                    CornerRadius="25">
+                    CornerRadius="25"
+                    ToolTipProperties.Text="Generate a prayer from your request">
                 <Button.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                         <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
@@ -248,28 +250,32 @@
                                 BackgroundColor="{StaticResource HallowAccentPurple}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="12"
-                                HeightRequest="44"/>
+                                HeightRequest="44"
+                                ToolTipProperties.Text="Save prayer"/>
                         <Button Grid.Column="1"
                                 Text="📋 Copy"
                                 Command="{Binding CopyPrayerCommand}"
                                 BackgroundColor="{StaticResource HallowCardHover}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="12"
-                                HeightRequest="44"/>
+                                HeightRequest="44"
+                                ToolTipProperties.Text="Copy prayer"/>
                         <Button Grid.Column="2"
                                 Text="📝 Reflect"
                                 Command="{Binding SaveToReflectionsCommand}"
                                 BackgroundColor="{StaticResource HallowMidPurple}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="12"
-                                HeightRequest="44"/>
+                                HeightRequest="44"
+                                ToolTipProperties.Text="Save to reflections"/>
                         <Button Grid.Column="3"
                                 Text="🆕 New"
                                 Command="{Binding NewPrayerCommand}"
                                 BackgroundColor="{StaticResource HallowCardHover}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="12"
-                                HeightRequest="44"/>
+                                HeightRequest="44"
+                                ToolTipProperties.Text="Start a new prayer"/>
                     </Grid>
                 </VerticalStackLayout>
             </Frame>

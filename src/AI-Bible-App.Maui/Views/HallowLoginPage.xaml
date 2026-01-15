@@ -95,7 +95,8 @@
                             FontSize="18"
                             FontAttributes="Bold"
                             HeightRequest="60"
-                            CornerRadius="30">
+                            CornerRadius="30"
+                            ToolTipProperties.Text="Create a new account">
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="#7C3AED" Offset="0.0"/>
@@ -114,7 +115,8 @@
                             HeightRequest="50"
                             BorderColor="#4C1D95"
                             BorderWidth="1"
-                            CornerRadius="25"/>
+                            CornerRadius="25"
+                            ToolTipProperties.Text="Sign in to your account"/>
                     
                     <!-- Loading indicator -->
                     <ActivityIndicator IsRunning="{Binding IsBusy}"

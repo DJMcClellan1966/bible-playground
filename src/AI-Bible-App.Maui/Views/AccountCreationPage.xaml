@@ -32,7 +32,8 @@
                             TextColor="#A78BFA"
                             FontSize="14"
                             HorizontalOptions="Start"
-                            Padding="0"/>
+                            Padding="0"
+                            ToolTipProperties.Text="Return to previous screen"/>
                     
                     <!-- Animated glow effect behind icon -->
                     <Border WidthRequest="80" HeightRequest="80"
@@ -78,7 +79,8 @@
                             FontAttributes="Bold"
                             HeightRequest="56"
                             CornerRadius="28"
-                            Padding="24,0">
+                            Padding="24,0"
+                            ToolTipProperties.Text="Sign up with Google">
                         <Button.ImageSource>
                             <FontImageSource Glyph="G" 
                                              FontFamily="Arial" 
@@ -97,7 +99,8 @@
                             FontAttributes="Bold"
                             HeightRequest="56"
                             CornerRadius="28"
-                            Padding="24,0">
+                            Padding="24,0"
+                            ToolTipProperties.Text="Sign up with Apple">
                         <Button.ImageSource>
                             <FontImageSource Glyph="" 
                                              FontFamily="Arial" 
@@ -127,7 +130,8 @@
                             FontSize="16"
                             FontAttributes="Bold"
                             HeightRequest="56"
-                            CornerRadius="28"/>
+                            CornerRadius="28"
+                            ToolTipProperties.Text="Create an account with email"/>
                     
                     <!-- Stay Logged In Toggle -->
                     <Border StrokeShape="RoundRectangle 12"
@@ -148,7 +152,8 @@
                             <Switch Grid.Column="1"
                                     IsToggled="{Binding StayLoggedIn}"
                                     OnColor="#8B5CF6"
-                                    ThumbColor="White"/>
+                                    ThumbColor="White"
+                                    ToolTipProperties.Text="Stay signed in on this device"/>
                         </Grid>
                     </Border>
                     
@@ -160,7 +165,8 @@
                             TextColor="#A78BFA"
                             FontSize="14"
                             HeightRequest="44"
-                            Margin="0,8,0,0"/>
+                            Margin="0,8,0,0"
+                            ToolTipProperties.Text="Skip account creation"/>
                     
                     <!-- Loading indicator -->
                     <ActivityIndicator IsRunning="{Binding IsBusy}"

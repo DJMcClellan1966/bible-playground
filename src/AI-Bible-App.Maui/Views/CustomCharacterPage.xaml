@@ -108,7 +108,8 @@
                                                 CornerRadius="20"
                                                 Padding="0"
                                                 BackgroundColor="{DynamicResource Gray200}"
-                                                VerticalOptions="Center"/>
+                                                VerticalOptions="Center"
+                                                ToolTipProperties.Text="Edit this character"/>
                                         
                                         <Button Grid.Column="2"
                                                 Text="🗑️"
@@ -120,7 +121,8 @@
                                                 Padding="0"
                                                 Margin="8,0,0,0"
                                                 BackgroundColor="{DynamicResource ErrorLight}"
-                                                VerticalOptions="Center"/>
+                                                VerticalOptions="Center"
+                                                ToolTipProperties.Text="Delete this character"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -243,7 +245,8 @@
                         </VerticalStackLayout>
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding UseCustomPrompt}"
-                                VerticalOptions="Center"/>
+                                VerticalOptions="Center"
+                                ToolTipProperties.Text="Use your own system prompt"/>
                     </Grid>
 
                     <!-- Custom Prompt Editor -->
@@ -252,7 +255,8 @@
                         <Editor Text="{Binding EditCustomPrompt}"
                                 Placeholder="You are [Name] from the Bible..."
                                 HeightRequest="200"
-                                BackgroundColor="{DynamicResource InputBackground}"/>
+                                BackgroundColor="{DynamicResource InputBackground}"
+                                ToolTipProperties.Text="Define a custom system prompt"/>
                     </VerticalStackLayout>
 
                     <!-- Action Buttons -->
@@ -263,14 +267,16 @@
                                 HeightRequest="50"
                                 CornerRadius="12"
                                 BackgroundColor="{DynamicResource Gray200}"
-                                TextColor="{DynamicResource TextColor}"/>
+                                TextColor="{DynamicResource TextColor}"
+                                ToolTipProperties.Text="Discard edits"/>
                         <Button Grid.Column="1"
                                 Text="💾 Save Character"
                                 Command="{Binding SaveCharacterCommand}"
                                 HeightRequest="50"
                                 CornerRadius="12"
                                 BackgroundColor="{DynamicResource Primary}"
-                                TextColor="White"/>
+                                TextColor="White"
+                                ToolTipProperties.Text="Save this character"/>
                     </Grid>
                 </VerticalStackLayout>
             </Grid>

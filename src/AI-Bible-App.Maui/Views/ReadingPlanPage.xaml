@@ -132,14 +132,16 @@
                                             BackgroundColor="{DynamicResource Primary}"
                                             TextColor="White"
                                             CornerRadius="8"
-                                            Padding="15,10"/>
+                                            Padding="15,10"
+                                            ToolTipProperties.Text="Mark today's reading complete"/>
                                     
                                     <Button Text="📖 Read Passage"
                                             Command="{Binding OpenPassageCommand}"
                                             BackgroundColor="{DynamicResource Gray300}"
                                             TextColor="{DynamicResource TextColor}"
                                             CornerRadius="8"
-                                            Padding="15,10"/>
+                                            Padding="15,10"
+                                            ToolTipProperties.Text="Open today's passage"/>
                                 </HorizontalStackLayout>
                                 
                                 <Label Text="✓ Completed Today!"
@@ -158,7 +160,8 @@
                                     IsEnabled="{Binding CanGoPrevious}"
                                     HorizontalOptions="Start"
                                     BackgroundColor="Transparent"
-                                    TextColor="{DynamicResource Primary}"/>
+                                    TextColor="{DynamicResource Primary}"
+                                    ToolTipProperties.Text="Go to previous day"/>
                             
                             <Label Grid.Column="1"
                                    Text="{Binding ActiveProgress.CurrentDay, StringFormat='Day {0}'}"
@@ -173,7 +176,8 @@
                                     IsEnabled="{Binding CanGoNext}"
                                     HorizontalOptions="End"
                                     BackgroundColor="Transparent"
-                                    TextColor="{DynamicResource Primary}"/>
+                                    TextColor="{DynamicResource Primary}"
+                                    ToolTipProperties.Text="Go to next day"/>
                         </Grid>
                         
                         <Button Text="🗑️ Abandon Plan"
@@ -181,7 +185,8 @@
                                 BackgroundColor="Transparent"
                                 TextColor="{DynamicResource Gray600}"
                                 FontSize="12"
-                                HorizontalOptions="End"/>
+                                HorizontalOptions="End"
+                                ToolTipProperties.Text="Stop this reading plan"/>
                     </VerticalStackLayout>
                 </Border>
 

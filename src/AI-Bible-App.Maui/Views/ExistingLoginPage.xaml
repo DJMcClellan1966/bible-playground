@@ -32,7 +32,8 @@
                             TextColor="#A78BFA"
                             FontSize="14"
                             HorizontalOptions="Start"
-                            Padding="0"/>
+                            Padding="0"
+                            ToolTipProperties.Text="Return to previous screen"/>
                     
                     <!-- Welcome icon -->
                     <Border WidthRequest="80" HeightRequest="80"
@@ -77,7 +78,8 @@
                             FontAttributes="Bold"
                             HeightRequest="56"
                             CornerRadius="28"
-                            Padding="24,0">
+                            Padding="24,0"
+                            ToolTipProperties.Text="Sign in with Google">
                         <Button.ImageSource>
                             <FontImageSource Glyph="G" 
                                              FontFamily="Arial" 
@@ -96,7 +98,8 @@
                             FontAttributes="Bold"
                             HeightRequest="56"
                             CornerRadius="28"
-                            Padding="24,0">
+                            Padding="24,0"
+                            ToolTipProperties.Text="Sign in with Apple">
                         <Button.ImageSource>
                             <FontImageSource Glyph="" 
                                              FontFamily="Arial" 
@@ -126,7 +129,8 @@
                             FontSize="16"
                             FontAttributes="Bold"
                             HeightRequest="56"
-                            CornerRadius="28"/>
+                            CornerRadius="28"
+                            ToolTipProperties.Text="Sign in with email and password"/>
                     
                     <!-- Stay Logged In Toggle -->
                     <Border StrokeShape="RoundRectangle 12"
@@ -147,7 +151,8 @@
                             <Switch Grid.Column="1"
                                     IsToggled="{Binding StayLoggedIn}"
                                     OnColor="#8B5CF6"
-                                    ThumbColor="White"/>
+                                    ThumbColor="White"
+                                    ToolTipProperties.Text="Stay signed in on this device"/>
                         </Grid>
                     </Border>
                     
@@ -182,7 +187,8 @@
                             BackgroundColor="Transparent"
                             TextColor="#A78BFA"
                             FontSize="14"
-                            HeightRequest="40"/>
+                            HeightRequest="40"
+                            ToolTipProperties.Text="Create a new account"/>
                 </VerticalStackLayout>
                 
             </Grid>

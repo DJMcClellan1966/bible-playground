@@ -22,6 +22,7 @@
                 TextColor="White"
                 CornerRadius="25"
                 HeightRequest="50"
-                Clicked="OnContinueClicked"/>
+                Clicked="OnContinueClicked"
+                ToolTipProperties.Text="Go to the main app"/>
     </VerticalStackLayout>
 </ContentPage>

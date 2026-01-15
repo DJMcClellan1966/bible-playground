@@ -27,7 +27,8 @@
                 <Entry Text="{Binding SearchText}"
                        Placeholder="Search bookmarks..."
                        ReturnCommand="{Binding SearchCommand}"
-                       ClearButtonVisibility="WhileEditing"/>
+                       ClearButtonVisibility="WhileEditing"
+                       ToolTipProperties.Text="Search by reference or note"/>
             </Border>
             
             <Button Grid.Column="1"
@@ -37,7 +38,8 @@
                     HeightRequest="44"
                     CornerRadius="22"
                     BackgroundColor="{DynamicResource Primary}"
-                    TextColor="White"/>
+                    TextColor="White"
+                    ToolTipProperties.Text="Add a new bookmark"/>
         </Grid>
 
         <!-- Category Filter -->
@@ -51,7 +53,8 @@
                         FontSize="12"
                         Padding="12,0"
                         BackgroundColor="{DynamicResource Primary}"
-                        TextColor="White"/>
+                        TextColor="White"
+                        ToolTipProperties.Text="Show all categories"/>
                 <Button Text="💪 Strength"
                         Command="{Binding FilterByCategoryCommand}"
                         CommandParameter="Strength"
@@ -142,7 +145,8 @@
                                 Padding="15"
                                 BackgroundColor="{DynamicResource CardBackground}"
                                 StrokeThickness="1"
-                                Stroke="{DynamicResource Gray200}">
+                                Stroke="{DynamicResource Gray200}"
+                                ToolTipProperties.Text="Tap to view details">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="12"/>
                             </Border.StrokeShape>
@@ -213,7 +217,8 @@
                                     CornerRadius="18"
                                     Padding="0"
                                     BackgroundColor="{DynamicResource Gray200}"
-                                    TextColor="{DynamicResource TextColor}"/>
+                                    TextColor="{DynamicResource TextColor}"
+                                    ToolTipProperties.Text="Close details"/>
                         </HorizontalStackLayout>
 
                         <!-- Reference Header -->
@@ -292,7 +297,8 @@
                                     <Label Text="Category" FontSize="12" TextColor="{DynamicResource Gray600}"/>
                                     <Picker ItemsSource="{Binding Categories}"
                                             SelectedItem="{Binding EditCategory}"
-                                            BackgroundColor="{DynamicResource InputBackground}"/>
+                                            BackgroundColor="{DynamicResource InputBackground}"
+                                            ToolTipProperties.Text="Choose a category"/>
                                 </VerticalStackLayout>
                                 
                                 <VerticalStackLayout Spacing="5">
@@ -300,7 +306,8 @@
                                     <Editor Text="{Binding EditNote}"
                                             Placeholder="Add your thoughts about this verse..."
                                             HeightRequest="120"
-                                            BackgroundColor="{DynamicResource InputBackground}"/>
+                                            BackgroundColor="{DynamicResource InputBackground}"
+                                            ToolTipProperties.Text="Add or edit notes"/>
                                 </VerticalStackLayout>
                                 
                                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
@@ -310,14 +317,16 @@
                                             HeightRequest="44"
                                             CornerRadius="8"
                                             BackgroundColor="{DynamicResource Gray200}"
-                                            TextColor="{DynamicResource TextColor}"/>
+                                            TextColor="{DynamicResource TextColor}"
+                                            ToolTipProperties.Text="Discard changes"/>
                                     <Button Grid.Column="1"
                                             Text="Save"
                                             Command="{Binding SaveBookmarkCommand}"
                                             HeightRequest="44"
                                             CornerRadius="8"
                                             BackgroundColor="{DynamicResource Primary}"
-                                            TextColor="White"/>
+                                            TextColor="White"
+                                            ToolTipProperties.Text="Save bookmark changes"/>
                                 </Grid>
                             </VerticalStackLayout>
                         </Border>
@@ -364,21 +373,24 @@
                                     HeightRequest="44"
                                     CornerRadius="8"
                                     BackgroundColor="{DynamicResource Gray200}"
-                                    TextColor="{DynamicResource TextColor}"/>
+                                    TextColor="{DynamicResource TextColor}"
+                                    ToolTipProperties.Text="Edit this bookmark"/>
                             <Button Grid.Column="1"
                                     Text="📤 Share"
                                     Command="{Binding ShareBookmarkCommand}"
                                     HeightRequest="44"
                                     CornerRadius="8"
                                     BackgroundColor="{DynamicResource Primary}"
-                                    TextColor="White"/>
+                                    TextColor="White"
+                                    ToolTipProperties.Text="Share this bookmark"/>
                             <Button Grid.Column="2"
                                     Text="🗑️"
                                     Command="{Binding DeleteBookmarkCommand}"
                                     HeightRequest="44"
                                     CornerRadius="8"
                                     BackgroundColor="{DynamicResource Danger}"
-                                    TextColor="White"/>
+                                    TextColor="White"
+                                    ToolTipProperties.Text="Delete this bookmark"/>
                         </Grid>
 
                         <!-- Metadata -->

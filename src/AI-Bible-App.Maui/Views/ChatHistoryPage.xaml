@@ -55,7 +55,8 @@
                       Text="{Binding SearchText}"
                       BackgroundColor="Transparent"
                       TextColor="{StaticResource HallowTextPrimary}"
-                      PlaceholderColor="{StaticResource HallowTextMuted}"/>
+                      PlaceholderColor="{StaticResource HallowTextMuted}"
+                      ToolTipProperties.Text="Search by character or message"/>
         </Frame>
 
         <!-- Loading Indicator -->
@@ -95,7 +96,8 @@
                     CornerRadius="25"
                     HeightRequest="50"
                     WidthRequest="220"
-                    Margin="0,10,0,0">
+                    Margin="0,10,0,0"
+                    ToolTipProperties.Text="Pick a character to chat">
                 <Button.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                         <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
@@ -140,7 +142,8 @@
                         <Frame Padding="15" Margin="0,0,0,10"
                                BackgroundColor="{StaticResource HallowCardBackground}"
                                BorderColor="Transparent"
-                               CornerRadius="15">
+                               CornerRadius="15"
+                               ToolTipProperties.Text="Tap to open this conversation">
                             
                             <Grid ColumnDefinitions="65,*,Auto" ColumnSpacing="15">
                                 <!-- Character Avatar -->

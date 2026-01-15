@@ -18,7 +18,8 @@
                     TextColor="{DynamicResource Primary}"
                     FontSize="14"
                     HeightRequest="36"
-                    SemanticProperties.Description="Go back"/>
+                    SemanticProperties.Description="Go back"
+                    ToolTipProperties.Text="Return to previous screen"/>
             <Label Grid.Column="1"
                    Text="📊 Your Journey"
                    FontSize="22"
@@ -34,7 +35,8 @@
                     TextColor="{DynamicResource Gray600}"
                     FontSize="20"
                     HeightRequest="36"
-                    SemanticProperties.Description="Export options"/>
+                    SemanticProperties.Description="Export options"
+                    ToolTipProperties.Text="Export or share your history"/>
         </Grid>
         
         <!-- Summary Stats Cards -->
@@ -153,7 +155,8 @@
                         HeightRequest="36"
                         CornerRadius="18"
                         FontSize="13"
-                        Padding="15,0"/>
+                        Padding="15,0"
+                        ToolTipProperties.Text="Show chat history"/>
                 <Button Text="🙏 Prayers"
                         x:Name="PrayersTab"
                         Clicked="OnPrayersTabClicked"
@@ -162,7 +165,8 @@
                         HeightRequest="36"
                         CornerRadius="18"
                         FontSize="13"
-                        Padding="15,0"/>
+                        Padding="15,0"
+                        ToolTipProperties.Text="Show saved prayers"/>
                 <Button Text="📝 Reflections"
                         x:Name="ReflectionsTab"
                         Clicked="OnReflectionsTabClicked"
@@ -171,7 +175,8 @@
                         HeightRequest="36"
                         CornerRadius="18"
                         FontSize="13"
-                        Padding="15,0"/>
+                        Padding="15,0"
+                        ToolTipProperties.Text="Show saved reflections"/>
             </HorizontalStackLayout>
             
             <!-- Chats List -->

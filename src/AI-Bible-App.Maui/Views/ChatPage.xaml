@@ -95,7 +95,8 @@
                                                 WidthRequest="32"
                                                 HeightRequest="32"
                                                 Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.CopyMessageCommand}"
-                                                CommandParameter="{Binding .}"/>
+                                                CommandParameter="{Binding .}"
+                                                ToolTipProperties.Text="Copy"/>
                                         <Button Text="👍"
                                                 FontSize="14"
                                                 BackgroundColor="Transparent"
@@ -103,7 +104,8 @@
                                                 WidthRequest="32"
                                                 HeightRequest="32"
                                                 Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
-                                                CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='1'}"/>
+                                                CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='1'}"
+                                                ToolTipProperties.Text="Thumbs up"/>
                                         <Button Text="👎"
                                                 FontSize="14"
                                                 BackgroundColor="Transparent"
@@ -111,7 +113,8 @@
                                                 WidthRequest="32"
                                                 HeightRequest="32"
                                                 Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
-                                                CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='-1'}"/>
+                                                CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='-1'}"
+                                                ToolTipProperties.Text="Thumbs down"/>
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Border>
@@ -380,7 +383,8 @@
                        FontSize="{StaticResource BodyFontSize}"
                        VerticalOptions="Center"
                        SemanticProperties.Description="Message input"
-                       SemanticProperties.Hint="Type your message here and press Enter to send"/>
+                       SemanticProperties.Hint="Type your message here and press Enter to send"
+                       ToolTipProperties.Text="Type a message"/>
             </Border>
 
             <!-- Send Button (visible when not typing) -->
@@ -394,7 +398,8 @@
                     CornerRadius="20"
                     FontSize="{StaticResource ButtonFontSize}"
                     BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{StaticResource White}"/>
+                    TextColor="{StaticResource White}"
+                    ToolTipProperties.Text="Send message"/>
             
             <!-- Stop Button (visible when AI is typing) -->
             <Button Grid.Column="1"
@@ -407,7 +412,8 @@
                     CornerRadius="26"
                     FontSize="{StaticResource ButtonFontSize}"
                     BackgroundColor="#C17B6F"
-                    TextColor="{StaticResource White}">
+                    TextColor="{StaticResource White}"
+                    ToolTipProperties.Text="Stop generating response">
                 <Button.Shadow>
                     <Shadow Brush="#40000000" Offset="2,3" Radius="6" Opacity="0.3" />
                 </Button.Shadow>

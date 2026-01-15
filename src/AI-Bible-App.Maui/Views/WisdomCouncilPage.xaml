@@ -149,7 +149,8 @@
                         AutoSize="TextChanges"
                         MaximumHeightRequest="120"
                         VerticalOptions="Center"
-                        FontSize="15"/>
+                        FontSize="15"
+                        ToolTipProperties.Text="Ask the council a question"/>
             </Border>
             
             <Button Grid.Column="1"
@@ -162,7 +163,8 @@
                     FontAttributes="Bold"
                     BackgroundColor="{DynamicResource Primary}"
                     TextColor="White"
-                    CornerRadius="12"/>
+                    CornerRadius="12"
+                    ToolTipProperties.Text="Send question to the council"/>
         </Grid>
         
         <!-- Loading Indicator -->

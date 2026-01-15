@@ -229,13 +229,15 @@
                                                     TextColor="{StaticResource HallowTextMuted}"
                                                     WidthRequest="32" HeightRequest="32"
                                                     Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
-                                                    CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='1'}"/>
+                                                    CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='1'}"
+                                                    ToolTipProperties.Text="Thumbs up"/>
                                             <Button Text="👎" FontSize="14"
                                                     BackgroundColor="Transparent"
                                                     TextColor="{StaticResource HallowTextMuted}"
                                                     WidthRequest="32" HeightRequest="32"
                                                     Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
-                                                    CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='-1'}"/>
+                                                    CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='-1'}"
+                                                    ToolTipProperties.Text="Thumbs down"/>
                                             <Button Text="🔊" FontSize="14"
                                                     BackgroundColor="Transparent"
                                                     TextColor="{StaticResource HallowTextMuted}"
@@ -315,14 +317,16 @@
                                ReturnCommand="{Binding SendMessageCommand}"
                                IsEnabled="{Binding IsAiTyping, Converter={StaticResource InvertedBoolConverter}}"
                                BackgroundColor="Transparent"
-                               MaxLength="2000"/>
+                               MaxLength="2000"
+                               ToolTipProperties.Text="Type a message"/>
                         
                         <!-- Send/Stop Button -->
                         <Grid Grid.Column="1" WidthRequest="44" HeightRequest="44">
                             <!-- Send Button -->
                             <Border IsVisible="{Binding IsAiTyping, Converter={StaticResource InvertedBoolConverter}}"
                                     WidthRequest="40" HeightRequest="40"
-                                    StrokeThickness="0">
+                                    StrokeThickness="0"
+                                    ToolTipProperties.Text="Send message">
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="20"/>
                                 </Border.StrokeShape>
@@ -347,7 +351,8 @@
                             <Border IsVisible="{Binding IsAiTyping}"
                                     WidthRequest="40" HeightRequest="40"
                                     BackgroundColor="{StaticResource HallowDanger}"
-                                    StrokeThickness="0">
+                                    StrokeThickness="0"
+                                    ToolTipProperties.Text="Stop generating">
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="20"/>
                                 </Border.StrokeShape>

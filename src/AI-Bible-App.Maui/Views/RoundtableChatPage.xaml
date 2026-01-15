@@ -83,7 +83,12 @@
                                            VerticalOptions="Center"/>
                                 </Border>
                                 <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center" FontSize="12" TextColor="{DynamicResource Gray700}"/>
-                                <CheckBox Grid.Column="2" IsChecked="{Binding IsContrarian}" CheckedChanged="OnContrarianCheckedChanged" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                <CheckBox Grid.Column="2"
+                                          IsChecked="{Binding IsContrarian}"
+                                          CheckedChanged="OnContrarianCheckedChanged"
+                                          HorizontalOptions="Center"
+                                          VerticalOptions="Center"
+                                          ToolTipProperties.Text="Let this character argue the opposite view"/>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -101,7 +106,8 @@
                        TextColor="{DynamicResource Gray600}"/>
                 <Switch IsToggled="{Binding IsDiscussionMode}"
                         OnColor="{DynamicResource Primary}"
-                        ThumbColor="White"/>
+                        ThumbColor="White"
+                        ToolTipProperties.Text="Toggle dynamic discussion mode"/>
                 <Label Text="{Binding IsDiscussionMode, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Dynamic Discussion|Standard Roundtable'}"
                        VerticalOptions="Center"
                        FontSize="12"
@@ -118,7 +124,8 @@
                     TextColor="White"
                     FontSize="11"
                     HeightRequest="32"
-                    CornerRadius="8"/>
+                    CornerRadius="8"
+                    ToolTipProperties.Text="Stop the discussion"/>
         </Grid>
 
         <!-- Empty State / Instructions -->
@@ -254,7 +261,8 @@
                                     FontAttributes="Bold"
                                     HeightRequest="40"
                                     Padding="20,0"
-                                    CornerRadius="8"/>
+                                    CornerRadius="8"
+                                    ToolTipProperties.Text="Continue the discussion"/>
                             <Button Text="✓ End Discussion"
                                     Command="{Binding ConcludeDiscussionCommand}"
                                     BackgroundColor="{DynamicResource Success}"
@@ -262,7 +270,8 @@
                                     FontSize="13"
                                     HeightRequest="40"
                                     Padding="20,0"
-                                    CornerRadius="8"/>
+                                    CornerRadius="8"
+                                    ToolTipProperties.Text="End and summarize"/>
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
                 </Border>
@@ -305,7 +314,8 @@
                         AutoSize="TextChanges"
                         MaximumHeightRequest="100"
                         VerticalOptions="Center"
-                        FontSize="14"/>
+                        FontSize="14"
+                        ToolTipProperties.Text="Enter a topic or response"/>
             </Border>
             
             <Button Grid.Column="1"
@@ -318,7 +328,8 @@
                     FontAttributes="Bold"
                     BackgroundColor="{DynamicResource Primary}"
                     TextColor="White"
-                    CornerRadius="12"/>
+                    CornerRadius="12"
+                    ToolTipProperties.Text="Send to the roundtable"/>
         </Grid>
         
         <!-- Loading Indicator (full screen overlay) -->

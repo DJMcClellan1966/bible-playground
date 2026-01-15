@@ -55,7 +55,8 @@
                     <Border Padding="15" 
                             StrokeShape="RoundRectangle 12"
                             Stroke="{AppThemeBinding Light=LightGray, Dark=DarkSlateGray}"
-                            BackgroundColor="{AppThemeBinding Light=White, Dark='#2D2D2D'}">
+                            BackgroundColor="{AppThemeBinding Light=White, Dark='#2D2D2D'}"
+                            ToolTipProperties.Text="Select this profile">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer 
                                 Command="{Binding Path=BindingContext.SelectUserCommand, Source={x:Reference ThisPage}}"
@@ -124,14 +125,16 @@
                            Text="{Binding NewUserName}"
                            ReturnCommand="{Binding CreateUserCommand}"
                            MaxLength="50"
-                           FontSize="16"/>
+                           FontSize="16"
+                           ToolTipProperties.Text="Name for the new profile"/>
                     <Button Grid.Column="1"
                             Text="Create"
                             Command="{Binding CreateUserCommand}"
                             BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
                             TextColor="White"
                             CornerRadius="8"
-                            Padding="20,10"/>
+                            Padding="20,10"
+                            ToolTipProperties.Text="Create profile"/>
                 </Grid>
             </Frame>
             
@@ -154,7 +157,8 @@
                            FontSize="18"
                            MaxLength="2"
                            WidthRequest="150"
-                           HorizontalOptions="Start"/>
+                           HorizontalOptions="Start"
+                           ToolTipProperties.Text="Set profile avatar"/>
                     <Label Text="Type any emoji or letter" FontSize="11" TextColor="Gray"/>
                 </VerticalStackLayout>
             </Grid>
