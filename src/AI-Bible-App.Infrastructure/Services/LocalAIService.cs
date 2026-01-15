@@ -170,15 +170,30 @@ public class LocalAIService : IAIService
     /// </summary>
     private RequestOptions GetOptimizedRequestOptions(int? overrideNumPredict = null)
     {
+        var maxPredict = overrideNumPredict ?? _numPredict;
+        var maxCtx = _numCtx;
+        var temperature = 0.8f;
+        var topP = 0.95f;
+        var repeatPenalty = 1.15f;
+
+        if (PerformanceSettings.IsEnabled)
+        {
+            maxPredict = Math.Min(maxPredict, 512);
+            maxCtx = Math.Min(maxCtx, 2048);
+            temperature = 0.6f;
+            topP = 0.9f;
+            repeatPenalty = 1.2f;
+        }
+
         return new RequestOptions
         {
-            NumCtx = _numCtx,
-            NumPredict = overrideNumPredict ?? _numPredict,
+            NumCtx = maxCtx,
+            NumPredict = maxPredict,
             NumGpu = _numGpu,
             NumThread = _numThread > 0 ? _numThread : null,
-            Temperature = 0.8f,  // Increased for more varied, less repetitive responses
-            TopP = 0.95f,       // Slightly higher for more creativity
-            RepeatPenalty = 1.15f // Penalty for repetition
+            Temperature = temperature,
+            TopP = topP,
+            RepeatPenalty = repeatPenalty
         };
     }
 
@@ -214,7 +229,8 @@ Remember: You are having a CONVERSATION, not giving a prepared speech. Listen to
 
             // RAG: Retrieve relevant Bible verses if enabled
             string? retrievedContext = null;
-            if (_useRAG && _ragService != null && _ragService.IsInitialized)
+            if (!PerformanceSettings.IsEnabled &&
+                _useRAG && _ragService != null && _ragService.IsInitialized)
             {
                 retrievedContext = await GetRelevantScriptureContextAsync(userMessage, cancellationToken);
                 
@@ -232,7 +248,7 @@ Remember: You are having a CONVERSATION, not giving a prepared speech. Listen to
             }
 
             // Knowledge Base: Add historical/cultural context and language insights
-            if (_knowledgeBaseService != null)
+            if (!PerformanceSettings.IsEnabled && _knowledgeBaseService != null)
             {
                 // Get historical context
                 var historicalContexts = await _knowledgeBaseService.GetHistoricalContextAsync(
@@ -376,7 +392,8 @@ Remember: You are having a CONVERSATION, not giving a prepared speech. Listen to
         };
 
         // RAG: Retrieve relevant Bible verses if enabled (with caching)
-        if (_useRAG && _ragService != null && _ragService.IsInitialized)
+        if (!PerformanceSettings.IsEnabled &&
+            _useRAG && _ragService != null && _ragService.IsInitialized)
         {
             var retrievedContext = await GetCachedRelevantScriptureContextAsync(userMessage, cancellationToken);
             

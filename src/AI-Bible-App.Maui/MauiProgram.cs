@@ -120,6 +120,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ContentValidator>();
 		builder.Services.AddSingleton<ICharacterResearchService, CharacterResearchService>();
 		builder.Services.AddSingleton<ResearchScheduler>();
+		builder.Services.AddSingleton<LearningScheduler>();
 		
 		// Monetization services - conversation quotas and subscription management
 		builder.Services.AddSingleton<IConversationQuotaService, ConversationQuotaService>();

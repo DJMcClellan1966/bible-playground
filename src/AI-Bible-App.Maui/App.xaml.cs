@@ -14,9 +14,12 @@ public partial class App : Application
 	private readonly IConfiguration? _configuration;
 	private readonly IFontScaleService? _fontScaleService;
 	private readonly IBibleVerseIndexService? _bibleIndexService;
+	private readonly ResearchScheduler? _researchScheduler;
+	private readonly LearningScheduler? _learningScheduler;
 
 	public App(IUserService userService, IModelWarmupService? warmupService = null, IConfiguration? configuration = null,
-		IFontScaleService? fontScaleService = null, IBibleVerseIndexService? bibleIndexService = null)
+		IFontScaleService? fontScaleService = null, IBibleVerseIndexService? bibleIndexService = null,
+		ResearchScheduler? researchScheduler = null, LearningScheduler? learningScheduler = null)
 	{
 		InitializeComponent();
 		_userService = userService;
@@ -24,6 +27,8 @@ public partial class App : Application
 		_configuration = configuration;
 		_fontScaleService = fontScaleService;
 		_bibleIndexService = bibleIndexService;
+		_researchScheduler = researchScheduler;
+		_learningScheduler = learningScheduler;
 		
 		// Global exception handling
 		AppDomain.CurrentDomain.UnhandledException += (s, e) =>
@@ -121,6 +126,17 @@ public partial class App : Application
 					});
 				}
 				
+				// Start background schedulers (non-blocking)
+				if (_researchScheduler != null)
+				{
+					_researchScheduler.Start();
+				}
+
+				if (_learningScheduler != null)
+				{
+					_learningScheduler.Start();
+				}
+
 				// Try auto-login ONLY if user opted to stay logged in
 				var stayLoggedIn = Preferences.Get("stay_logged_in", false);
 				var autoLoggedIn = false;

@@ -101,13 +101,6 @@
             Route="devotional" />
     </FlyoutItem>
     
-    <FlyoutItem Title="Reading Plans" Icon="{OnPlatform Default='📅'}">
-        <ShellContent
-            Title="Reading Plans"
-            ContentTemplate="{DataTemplate views:ReadingPlanPage}"
-            Route="readingplan" />
-    </FlyoutItem>
-    
     <FlyoutItem Title="Bible Reader" Icon="{OnPlatform Default='📜'}">
         <ShellContent
             Title="Bible Reader"
@@ -115,44 +108,11 @@
             Route="BibleReader" />
     </FlyoutItem>
     
-    <FlyoutItem Title="My Journey" Icon="{OnPlatform Default='📊'}">
-        <ShellContent
-            Title="My Journey"
-            ContentTemplate="{DataTemplate views:HistoryDashboardPage}"
-            Route="HistoryDashboard" />
-    </FlyoutItem>
-    
-    <FlyoutItem Title="My Bookmarks" Icon="{OnPlatform Default='🔖'}">
-        <ShellContent
-            Title="My Bookmarks"
-            ContentTemplate="{DataTemplate views:BookmarksPage}"
-            Route="bookmarks" />
-    </FlyoutItem>
-    
-    <FlyoutItem Title="Custom Characters" Icon="{OnPlatform Default='✨'}">
-        <ShellContent
-            Title="Custom Characters"
-            ContentTemplate="{DataTemplate views:CustomCharacterPage}"
-            Route="customcharacters" />
-    </FlyoutItem>
-    
     <FlyoutItem Title="Settings" Icon="{OnPlatform Default='⚙️'}">
         <ShellContent
             Title="Settings"
             ContentTemplate="{DataTemplate views:SettingsPage}"
             Route="settings" />
-    </FlyoutItem>
-
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- EXPERIMENTAL FEATURES                                                -->
-    <!-- Access experimental/beta features from a single hub                  -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    
-    <FlyoutItem Title="🧪 Experimental Labs" Icon="{OnPlatform Default='🧪'}">
-        <ShellContent
-            Title="Experimental Labs"
-            ContentTemplate="{DataTemplate views:ExperimentalLabsPage}"
-            Route="labs" />
     </FlyoutItem>
 
 </Shell>

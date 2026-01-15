@@ -1,7 +1,10 @@
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Maui.Services;
+using AI_Bible_App.Core.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Maui.Storage;
 
 #pragma warning disable MVVMTK0045
 
@@ -17,6 +20,39 @@ public partial class SettingsViewModel : BaseViewModel
     private readonly IFontScaleService? _fontScaleService;
     private readonly AI_Bible_App.Core.Interfaces.INotificationService? _notificationService;
     private readonly IAuthenticationService _authService;
+    private readonly IHealthCheckService? _healthCheckService;
+    private readonly IBibleRAGService? _ragService;
+    private readonly IConfiguration? _configuration;
+    private readonly IAutonomousLearningService? _learningService;
+
+    private static readonly string[] StorageDirectories =
+    {
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AI-Bible-App"),
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VoicesOfScripture")
+    };
+
+    private static readonly string RelativeDataDirectory = Path.Combine(Directory.GetCurrentDirectory(), "data");
+    private static readonly string ChatDataPath = Path.Combine(RelativeDataDirectory, "chat_sessions.json");
+    private static readonly string PrayerDataPath = Path.Combine(RelativeDataDirectory, "prayers.json");
+    private static readonly string ReflectionDataPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "AI-Bible-App",
+        "reflections.json");
+    private static readonly string BookmarkDataPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "VoicesOfScripture",
+        "verse_bookmarks.json");
+    private static readonly string ExportDirectory = Path.Combine(FileSystem.AppDataDirectory, "exports");
+    private static readonly string RagCachePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "AI-Bible-App",
+        "embeddings_cache.json");
+
+    private static readonly string[] DataRootCandidates =
+    {
+        Path.Combine(Directory.GetCurrentDirectory(), "data"),
+        Path.Combine(FileSystem.AppDataDirectory, "data")
+    };
 
     [ObservableProperty]
     private int totalSessions;
@@ -74,6 +110,73 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty]
     private string syncStatusText = "Not synced";
 
+    // Model Status Properties
+    [ObservableProperty]
+    private string modelStatusText = "Unknown";
+
+    [ObservableProperty]
+    private string modelStatusDetail = "Health check not run yet";
+
+    [ObservableProperty]
+    private DateTime? lastHealthCheckAt;
+
+    [ObservableProperty]
+    private string activeModelName = "Local (Ollama)";
+
+    // Data Management Properties
+    [ObservableProperty]
+    private string localDataSize = "Calculating...";
+
+    [ObservableProperty]
+    private bool isClearingData;
+
+    [ObservableProperty]
+    private string dataClearStatus = string.Empty;
+
+    [ObservableProperty]
+    private string chatDataSize = "—";
+
+    [ObservableProperty]
+    private string prayerDataSize = "—";
+
+    [ObservableProperty]
+    private string reflectionDataSize = "—";
+
+    [ObservableProperty]
+    private string bookmarkDataSize = "—";
+
+    [ObservableProperty]
+    private string exportDataSize = "—";
+
+    [ObservableProperty]
+    private string ragCacheSize = "—";
+
+    // Learning & Research Properties
+    [ObservableProperty]
+    private string learningStatusText = "Not available";
+
+    [ObservableProperty]
+    private string learningModelVersion = "Unknown";
+
+    [ObservableProperty]
+    private string learningLastRun = "Never";
+
+    [ObservableProperty]
+    private string learningSummary = "No learning cycles yet";
+
+    [ObservableProperty]
+    private string researchWindowText = "Not configured";
+
+    // Performance & Debug Properties
+    [ObservableProperty]
+    private bool isPerformanceModeEnabled;
+
+    [ObservableProperty]
+    private bool isRagDebugEnabled;
+
+    [ObservableProperty]
+    private string ragStatsSummary = "No RAG activity yet";
+
     // Daily Reminder Properties
     [ObservableProperty]
     private bool isDailyReminderEnabled;
@@ -95,7 +198,11 @@ public partial class SettingsViewModel : BaseViewModel
         ICloudSyncService cloudSyncService,
         IAuthenticationService authService,
         IFontScaleService? fontScaleService = null,
-        AI_Bible_App.Core.Interfaces.INotificationService? notificationService = null)
+        AI_Bible_App.Core.Interfaces.INotificationService? notificationService = null,
+        IHealthCheckService? healthCheckService = null,
+        IBibleRAGService? ragService = null,
+        IConfiguration? configuration = null,
+        IAutonomousLearningService? learningService = null)
     {
         _exporter = exporter;
         _dialogService = dialogService;
@@ -105,6 +212,10 @@ public partial class SettingsViewModel : BaseViewModel
         _authService = authService;
         _fontScaleService = fontScaleService;
         _notificationService = notificationService;
+        _healthCheckService = healthCheckService;
+        _ragService = ragService;
+        _configuration = configuration;
+        _learningService = learningService;
         Title = "Settings";
         
         // Subscribe to user changes
@@ -113,6 +224,16 @@ public partial class SettingsViewModel : BaseViewModel
         
         // Load notification settings
         _ = LoadNotificationSettingsAsync();
+
+        // Load preferences
+        IsPerformanceModeEnabled = Preferences.Get("performance_mode_enabled", false);
+        PerformanceSettings.IsEnabled = IsPerformanceModeEnabled;
+        IsRagDebugEnabled = Preferences.Get("rag_debug_enabled", false);
+
+        LoadModelConfig();
+        _ = RefreshModelStatusAsync();
+        _ = RefreshStorageStatsAsync();
+        _ = RefreshLearningStatsAsync();
     }
 
     private void OnCurrentUserChanged(object? sender, Core.Models.AppUser? user)
@@ -214,6 +335,18 @@ public partial class SettingsViewModel : BaseViewModel
     {
         // Save and update notification when toggled
         _ = SaveNotificationSettingAsync();
+    }
+
+    partial void OnIsPerformanceModeEnabledChanged(bool value)
+    {
+        Preferences.Set("performance_mode_enabled", value);
+        PerformanceSettings.IsEnabled = value;
+    }
+
+    partial void OnIsRagDebugEnabledChanged(bool value)
+    {
+        Preferences.Set("rag_debug_enabled", value);
+        RagStatsSummary = value ? BuildRagStatsSummary() : "RAG debug is disabled";
     }
 
     partial void OnReminderTimeChanged(TimeSpan value)
@@ -483,6 +616,354 @@ public partial class SettingsViewModel : BaseViewModel
     {
         LoadUserProfile();
         await RefreshStatsAsync();
+        await RefreshModelStatusAsync();
+        await RefreshStorageStatsAsync();
+        await RefreshLearningStatsAsync();
+        RagStatsSummary = IsRagDebugEnabled ? BuildRagStatsSummary() : "RAG debug is disabled";
+    }
+
+    private void LoadModelConfig()
+    {
+        if (_configuration == null)
+            return;
+
+        var modelName = _configuration["Ollama:ModelName"] ?? "phi4";
+        ActiveModelName = $"Local (Ollama) - {modelName}";
+    }
+
+    [RelayCommand]
+    private async Task RefreshModelStatusAsync()
+    {
+        if (_healthCheckService == null)
+        {
+            ModelStatusText = "Unavailable";
+            ModelStatusDetail = "Health check service not configured";
+            LastHealthCheckAt = DateTime.UtcNow;
+            return;
+        }
+
+        try
+        {
+            var status = await _healthCheckService.GetHealthStatusAsync();
+            LastHealthCheckAt = DateTime.UtcNow;
+            ModelStatusText = status.IsHealthy ? "Online" : "Offline";
+            ModelStatusDetail = status.IsHealthy
+                ? "Local model is reachable"
+                : status.ErrorMessage ?? "Local model is not reachable";
+        }
+        catch (Exception ex)
+        {
+            LastHealthCheckAt = DateTime.UtcNow;
+            ModelStatusText = "Unknown";
+            ModelStatusDetail = $"Health check failed: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task RefreshStorageStatsAsync()
+    {
+        try
+        {
+            var bytes = await Task.Run(() => StorageDirectories.Sum(GetDirectorySize));
+            LocalDataSize = FormatBytes(bytes);
+
+            ChatDataSize = FormatBytes(GetFileSize(ChatDataPath));
+            PrayerDataSize = FormatBytes(GetFileSize(PrayerDataPath));
+            ReflectionDataSize = FormatBytes(GetFileSize(ReflectionDataPath));
+            BookmarkDataSize = FormatBytes(GetFileSize(BookmarkDataPath));
+            ExportDataSize = FormatBytes(GetDirectorySize(ExportDirectory));
+            RagCacheSize = FormatBytes(GetFileSize(RagCachePath));
+        }
+        catch
+        {
+            LocalDataSize = "Unknown";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ClearLocalDataAsync()
+    {
+        var confirm = await _dialogService.ShowConfirmAsync(
+            "Clear Local Data",
+            "This will remove chats, prayers, reflections, bookmarks, and cached files stored on this device. Continue?",
+            "Clear", "Cancel");
+
+        if (!confirm)
+            return;
+
+        try
+        {
+            IsClearingData = true;
+            await Task.Run(() =>
+            {
+                foreach (var dir in StorageDirectories)
+                {
+                    if (Directory.Exists(dir))
+                    {
+                        Directory.Delete(dir, recursive: true);
+                    }
+                }
+
+                foreach (var dir in DataRootCandidates)
+                {
+                    if (Directory.Exists(dir))
+                    {
+                        Directory.Delete(dir, recursive: true);
+                    }
+                }
+            });
+
+            await _dialogService.ShowAlertAsync("Cleared", "Local data has been removed.");
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Error", $"Failed to clear data: {ex.Message}");
+        }
+        finally
+        {
+            IsClearingData = false;
+            await RefreshStorageStatsAsync();
+        }
+    }
+
+
+    [RelayCommand]
+    private async Task ClearExportsAsync()
+    {
+        var confirm = await _dialogService.ShowConfirmAsync(
+            "Clear Exports",
+            "This will remove all exported training data files on this device. Continue?",
+            "Clear", "Cancel");
+
+        if (!confirm)
+            return;
+
+        try
+        {
+            IsClearingData = true;
+            if (Directory.Exists(ExportDirectory))
+            {
+                Directory.Delete(ExportDirectory, recursive: true);
+            }
+            DataClearStatus = "Exported files removed.";
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Error", $"Failed to clear exports: {ex.Message}");
+        }
+        finally
+        {
+            IsClearingData = false;
+            await RefreshStorageStatsAsync();
+        }
+    }
+
+
+    [RelayCommand]
+    private async Task ClearChatHistoryAsync()
+    {
+        await ClearDataFilesAsync("Clear Chat History",
+            "This removes all saved chat sessions on this device.",
+            GetDataFileCandidates("chat_sessions.json"));
+    }
+
+    [RelayCommand]
+    private async Task ClearPrayerHistoryAsync()
+    {
+        await ClearDataFilesAsync("Clear Prayer History",
+            "This removes all saved prayers on this device.",
+            GetDataFileCandidates("prayers.json"));
+    }
+
+    [RelayCommand]
+    private async Task ClearReflectionsAsync()
+    {
+        var file = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "AI-Bible-App",
+            "reflections.json");
+
+        await ClearDataFilesAsync("Clear Reflections",
+            "This removes all saved reflections on this device.",
+            new[] { file });
+    }
+
+    [RelayCommand]
+    private async Task ClearBookmarksAsync()
+    {
+        var file = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "VoicesOfScripture",
+            "verse_bookmarks.json");
+
+        await ClearDataFilesAsync("Clear Bookmarks",
+            "This removes all saved verse bookmarks on this device.",
+            new[] { file });
+    }
+
+    [RelayCommand]
+    private async Task ClearRagCacheAsync()
+    {
+        var file = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "AI-Bible-App",
+            "embeddings_cache.json");
+
+        await ClearDataFilesAsync("Clear RAG Cache",
+            "This clears cached embeddings used for RAG.",
+            new[] { file });
+    }
+
+    private async Task ClearDataFilesAsync(string title, string message, IEnumerable<string> files)
+    {
+        var confirm = await _dialogService.ShowConfirmAsync(title, $"{message}\n\nContinue?", "Clear", "Cancel");
+        if (!confirm)
+            return;
+
+        try
+        {
+            IsClearingData = true;
+            await Task.Run(() =>
+            {
+                foreach (var file in files)
+                {
+                    TryDeleteFile(file);
+                }
+            });
+
+            DataClearStatus = $"{title} complete";
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Error", $"Failed to clear data: {ex.Message}");
+            DataClearStatus = $"{title} failed";
+        }
+        finally
+        {
+            IsClearingData = false;
+            await RefreshStorageStatsAsync();
+        }
+    }
+
+    private static IEnumerable<string> GetDataFileCandidates(string fileName)
+    {
+        foreach (var dir in DataRootCandidates)
+        {
+            yield return Path.Combine(dir, fileName);
+        }
+    }
+
+    private static void TryDeleteFile(string filePath)
+    {
+        try
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
+        catch
+        {
+            // Ignore deletion failures for individual files
+        }
+    }
+
+    [RelayCommand]
+    private void RefreshRagStats()
+    {
+        RagStatsSummary = BuildRagStatsSummary();
+    }
+
+    private string BuildRagStatsSummary()
+    {
+        if (_ragService == null)
+            return "RAG service not configured";
+
+        var stats = _ragService.LastSearchStats;
+        if (string.IsNullOrWhiteSpace(stats.Query))
+            return "No RAG activity yet";
+
+        var durationMs = (int)stats.SearchDuration.TotalMilliseconds;
+        return $"Last query: \"{stats.Query}\" | Results: {stats.TotalResults} | " +
+               $"Semantic: {stats.SemanticResults} | Keyword: {stats.KeywordFallbackResults} | " +
+               $"Duration: {durationMs}ms";
+    }
+
+    private static long GetDirectorySize(string path)
+    {
+        if (!Directory.Exists(path))
+            return 0;
+
+        long size = 0;
+        foreach (var file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
+        {
+            try
+            {
+                size += new FileInfo(file).Length;
+            }
+            catch
+            {
+                // Ignore unreadable files
+            }
+        }
+        return size;
+    }
+
+    private static long GetFileSize(string path)
+    {
+        try
+        {
+            return File.Exists(path) ? new FileInfo(path).Length : 0;
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
+        var value = (double)bytes;
+        var order = 0;
+        while (value >= 1024 && order < suffixes.Length - 1)
+        {
+            order++;
+            value /= 1024;
+        }
+        return $"{value:0.##} {suffixes[order]}";
+    }
+
+    [RelayCommand]
+    private async Task RefreshLearningStatsAsync()
+    {
+        if (_learningService == null)
+        {
+            LearningStatusText = "Not available";
+            return;
+        }
+
+        try
+        {
+            var stats = await _learningService.GetLearningStatisticsAsync();
+            LearningStatusText = stats.TotalLearningCycles > 0 ? "Active" : "Idle";
+            LearningModelVersion = stats.CurrentModelVersion;
+            LearningLastRun = stats.LastLearningCycle?.ToString("MMM d, h:mm tt") ?? "Never";
+            LearningSummary = $"Cycles: {stats.TotalLearningCycles} | Deployments: {stats.SuccessfulDeployments}";
+        }
+        catch (Exception ex)
+        {
+            LearningStatusText = "Error";
+            LearningSummary = ex.Message;
+        }
+
+        if (_configuration != null)
+        {
+            var enabled = _configuration["AutonomousResearch:Enabled"] == "true";
+            var startHour = int.TryParse(_configuration["AutonomousResearch:StartHour"], out var sh) ? sh : 2;
+            var endHour = int.TryParse(_configuration["AutonomousResearch:EndHour"], out var eh) ? eh : 6;
+            ResearchWindowText = enabled ? $"{startHour:00}:00–{endHour:00}:00" : "Disabled";
+        }
     }
 
     [RelayCommand]

@@ -10,16 +10,33 @@
              Title="{Binding Title}"
              BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}">
     
-    <Grid RowDefinitions="*,Auto,Auto,Auto" Padding="5">
+    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto" Padding="5">
+        
+        <!-- Model Warning Banner -->
+        <Border Grid.Row="0"
+                IsVisible="{Binding IsModelWarningVisible}"
+                Margin="12,10,12,0"
+                Padding="12,10"
+                BackgroundColor="{DynamicResource Warning}"
+                StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+            <Label Text="{Binding ModelWarningText}"
+                   FontSize="{StaticResource CaptionFontSize}"
+                   TextColor="White"
+                   LineBreakMode="WordWrap"/>
+        </Border>
         
         <!-- Chat Messages -->
-        <ScrollView Grid.Row="0" x:Name="ChatScrollView">
+        <ScrollView Grid.Row="1" x:Name="ChatScrollView">
             <CollectionView ItemsSource="{Binding Messages}"
                            Margin="20,15">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:ChatMessage">
                         <Grid Margin="0,8">
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
@@ -56,15 +73,41 @@
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="20"/>
                                 </Border.StrokeShape>
-                                <controls:BibleLinkLabel LinkedText="{Binding Content}"
-                                       TextColor="{AppThemeBinding Light={StaticResource TextColor}, Dark={StaticResource TextColorDark}}"
-                                       FontSize="{StaticResource BodyFontSize}"
-                                       LineBreakMode="WordWrap"/>
+                                <VerticalStackLayout Spacing="6">
+                                    <controls:BibleLinkLabel LinkedText="{Binding Content}"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextColor}, Dark={StaticResource TextColorDark}}"
+                                           FontSize="{StaticResource BodyFontSize}"
+                                           LineBreakMode="WordWrap"/>
+                                    <Label Text="Sources available"
+                                           IsVisible="{Binding HasContextualReferences}"
+                                           FontSize="{StaticResource CaptionFontSize}"
+                                           TextColor="{DynamicResource Primary}"/>
+                                </VerticalStackLayout>
                             </Border>
 
+                            <!-- Sources Toggle -->
+                            <HorizontalStackLayout Grid.Row="1"
+                                                   IsVisible="{Binding HasContextualReferences}"
+                                                   HorizontalOptions="Start"
+                                                   Margin="0,6,0,0"
+                                                   Spacing="8">
+                                <Button Text="{Binding IsReferencesExpanded, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Hide Sources,Show Sources'}"
+                                        FontSize="{StaticResource CaptionFontSize}"
+                                        BackgroundColor="{DynamicResource CardBackground}"
+                                        TextColor="{DynamicResource Primary}"
+                                        CornerRadius="14"
+                                        Padding="12,4"
+                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.ToggleReferencesCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                <Label Text="{Binding ContextualReferences.Count, StringFormat='({0})'}"
+                                       FontSize="{StaticResource CaptionFontSize}"
+                                       TextColor="{DynamicResource Gray600}"
+                                       VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+
                             <!-- Contextual References (shown below assistant messages) -->
-                            <Border Grid.Row="1"
-                                    IsVisible="{Binding HasContextualReferences}"
+                            <Border Grid.Row="2"
+                                    IsVisible="{Binding IsReferencesExpanded}"
                                     HorizontalOptions="Start"
                                     MaximumWidthRequest="500"
                                     Margin="0,5,0,0"
@@ -128,8 +171,8 @@
             </CollectionView>
         </ScrollView>
 
-        <!-- Typing Indicator (Row 1 - between messages and input) -->
-        <Border Grid.Row="1"
+        <!-- Typing Indicator (Row 2 - between messages and input) -->
+        <Border Grid.Row="2"
                 IsVisible="{Binding IsAiTyping}"
                 HorizontalOptions="Start"
                 Margin="20,10"
@@ -152,8 +195,8 @@
             </HorizontalStackLayout>
         </Border>
 
-        <!-- Response Action Buttons (Row 2 - linked to latest assistant message) -->
-        <HorizontalStackLayout Grid.Row="2"
+        <!-- Response Action Buttons (Row 3 - linked to latest assistant message) -->
+        <HorizontalStackLayout Grid.Row="3"
                                Spacing="10"
                                HorizontalOptions="Start"
                                Margin="20,8"
@@ -282,7 +325,7 @@
         </HorizontalStackLayout>
 
         <!-- Input Area -->
-        <Grid Grid.Row="3" 
+        <Grid Grid.Row="4" 
               ColumnDefinitions="*,Auto"
               Padding="20,12,20,18"
               BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}">

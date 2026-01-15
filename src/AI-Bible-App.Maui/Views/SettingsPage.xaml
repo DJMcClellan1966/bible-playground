@@ -170,6 +170,288 @@
                            TextColor="{StaticResource HallowTextMuted}"/>
                 </VerticalStackLayout>
             </Frame>
+
+            <!-- Model Status Section -->
+            <Frame Padding="20"
+                   BackgroundColor="{StaticResource HallowCardBackground}"
+                   BorderColor="Transparent"
+                   CornerRadius="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="🧠 Model Status"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource HallowTextPrimary}"/>
+
+                    <Label Text="{Binding ActiveModelName}"
+                           FontSize="14"
+                           TextColor="{StaticResource HallowTextSecondary}"/>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Status:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding ModelStatusText}"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource HallowAccentPurple}"/>
+                    </Grid>
+
+                    <Label Text="{Binding ModelStatusDetail}"
+                           FontSize="12"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+
+                    <Label Text="{Binding LastHealthCheckAt, StringFormat='Last check: {0:MMM d, h:mm tt}'}"
+                           FontSize="11"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+
+                    <Button Text="🔄 Refresh Model Status"
+                            Command="{Binding RefreshModelStatusCommand}"
+                            BackgroundColor="{StaticResource HallowCardHover}"
+                            TextColor="{StaticResource HallowTextPrimary}"
+                            CornerRadius="20"
+                            HeightRequest="44"/>
+
+                    <Label Text="Fallback: If the local model is offline, the app will rely on cached responses."
+                           FontSize="11"
+                           FontAttributes="Italic"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Performance & Debug Section -->
+            <Frame Padding="20"
+                   BackgroundColor="{StaticResource HallowCardBackground}"
+                   BorderColor="Transparent"
+                   CornerRadius="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="⚡ Performance &amp; Debug"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource HallowTextPrimary}"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Enable Performance Mode"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsPerformanceModeEnabled}"
+                                OnColor="{StaticResource HallowAccentPurple}"/>
+                    </Grid>
+
+                    <Label Text="Reduces background processing and prioritizes faster responses."
+                           FontSize="12"
+                           TextColor="{StaticResource HallowTextSecondary}"/>
+
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                        <Label Grid.Column="0"
+                               Text="Enable RAG Debug"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsRagDebugEnabled}"
+                                OnColor="{StaticResource HallowAccentPurple}"/>
+                    </Grid>
+
+                    <Label Text="{Binding RagStatsSummary}"
+                           FontSize="11"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+
+                    <Button Text="📌 Refresh RAG Stats"
+                            Command="{Binding RefreshRagStatsCommand}"
+                            BackgroundColor="{StaticResource HallowCardHover}"
+                            TextColor="{StaticResource HallowTextPrimary}"
+                            CornerRadius="20"
+                            HeightRequest="44"
+                            IsVisible="{Binding IsRagDebugEnabled}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Learning & Research Section -->
+            <Frame Padding="20"
+                   BackgroundColor="{StaticResource HallowCardBackground}"
+                   BorderColor="Transparent"
+                   CornerRadius="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="🧠 Learning & Research"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource HallowTextPrimary}"/>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Learning:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding LearningStatusText}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Model:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding LearningModelVersion}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Last Run:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding LearningLastRun}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Label Text="{Binding LearningSummary}"
+                           FontSize="12"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Research Window:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding ResearchWindowText}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Button Text="🔄 Refresh Learning Status"
+                            Command="{Binding RefreshLearningStatsCommand}"
+                            BackgroundColor="{StaticResource HallowCardHover}"
+                            TextColor="{StaticResource HallowTextPrimary}"
+                            CornerRadius="20"
+                            HeightRequest="44"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Data Management Section -->
+            <Frame Padding="20"
+                   BackgroundColor="{StaticResource HallowCardBackground}"
+                   BorderColor="Transparent"
+                   CornerRadius="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="🗂️ Data Management"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource HallowTextPrimary}"/>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Local Data:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding LocalDataSize}"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
+                        <Label Grid.Row="0" Text="Chats" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding ChatDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+
+                        <Label Grid.Row="1" Text="Prayers" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding PrayerDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+
+                        <Label Grid.Row="2" Text="Reflections" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding ReflectionDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+
+                        <Label Grid.Row="3" Text="Bookmarks" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding BookmarkDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+
+                        <Label Grid.Row="4" Text="Exports" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding ExportDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+
+                        <Label Grid.Row="5" Text="RAG Cache" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding RagCacheSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+                    </Grid>
+
+                    <Button Text="🔄 Refresh Storage"
+                            Command="{Binding RefreshStorageStatsCommand}"
+                            BackgroundColor="{StaticResource HallowCardHover}"
+                            TextColor="{StaticResource HallowTextPrimary}"
+                            CornerRadius="20"
+                            HeightRequest="44"
+                            IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                    <Button Text="🗑️ Clear Local Data"
+                            Command="{Binding ClearLocalDataCommand}"
+                            BackgroundColor="{StaticResource HallowRose}"
+                            TextColor="White"
+                            CornerRadius="20"
+                            HeightRequest="44"
+                            IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                    <Label Text="Clearing data removes chats, prayers, reflections, bookmarks, and cached files on this device."
+                           FontSize="11"
+                           FontAttributes="Italic"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+
+                    <Label Text="Clear Specific Data"
+                           FontSize="13"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource HallowTextPrimary}"
+                           Margin="0,10,0,0"/>
+
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                        <Button Grid.Row="0" Grid.Column="0"
+                                Text="Clear Chats"
+                                Command="{Binding ClearChatHistoryCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Text="Clear Prayers"
+                                Command="{Binding ClearPrayerHistoryCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                        <Button Grid.Row="1" Grid.Column="0"
+                                Text="Clear Reflections"
+                                Command="{Binding ClearReflectionsCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Text="Clear Bookmarks"
+                                Command="{Binding ClearBookmarksCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                        <Button Grid.Row="2" Grid.Column="0"
+                                Text="Clear RAG Cache"
+                                Command="{Binding ClearRagCacheCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                        <Button Grid.Row="2" Grid.Column="1"
+                                Text="Clear Exports"
+                                Command="{Binding ClearExportsCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+                    </Grid>
+
+                    <Label Text="{Binding DataClearStatus}"
+                           FontSize="11"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+                </VerticalStackLayout>
+            </Frame>
             
             <!-- Content Moderation Section -->
             <Frame Padding="20"

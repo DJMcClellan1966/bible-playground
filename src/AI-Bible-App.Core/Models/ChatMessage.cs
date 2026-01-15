@@ -9,6 +9,7 @@ public class ChatMessage : INotifyPropertyChanged
 {
     private string _content = string.Empty;
     private List<ContextualReference>? _contextualReferences;
+    private bool _isReferencesExpanded;
     
     public event PropertyChangedEventHandler? PropertyChanged;
     
@@ -65,6 +66,19 @@ public class ChatMessage : INotifyPropertyChanged
     }
 
     public bool HasContextualReferences => ContextualReferences?.Any() == true;
+
+    public bool IsReferencesExpanded
+    {
+        get => _isReferencesExpanded;
+        set
+        {
+            if (_isReferencesExpanded != value)
+            {
+                _isReferencesExpanded = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsReferencesExpanded)));
+            }
+        }
+    }
 }
 
 /// <summary>

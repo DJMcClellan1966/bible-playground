@@ -32,6 +32,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
     private readonly IUserQuestionCollector? _questionCollector;
     private readonly IConversationQuotaService _quotaService;
     private readonly bool _enableContextualReferences;
+    private readonly IHealthCheckService? _healthCheckService;
     private ChatSession? _currentSession;
     private CancellationTokenSource? _speechCancellationTokenSource;
     private CancellationTokenSource? _aiResponseCancellationTokenSource;
@@ -75,7 +76,13 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
     [ObservableProperty]
     private bool isActionInProgress;
 
-    public ChatViewModel(IAIService aiService, IChatRepository chatRepository, IBibleLookupService bibleLookupService, IReflectionRepository reflectionRepository, IPrayerRepository prayerRepository, IDialogService dialogService, IContentModerationService moderationService, IUserService userService, ICharacterVoiceService voiceService, IConfiguration configuration, IConversationQuotaService quotaService, CharacterIntelligenceService? intelligenceService = null, PersonalizedPromptService? personalizedPromptService = null, IUserQuestionCollector? questionCollector = null, UserProgressionService? progressionService = null)
+    [ObservableProperty]
+    private bool isModelWarningVisible;
+
+    [ObservableProperty]
+    private string modelWarningText = string.Empty;
+
+    public ChatViewModel(IAIService aiService, IChatRepository chatRepository, IBibleLookupService bibleLookupService, IReflectionRepository reflectionRepository, IPrayerRepository prayerRepository, IDialogService dialogService, IContentModerationService moderationService, IUserService userService, ICharacterVoiceService voiceService, IConfiguration configuration, IConversationQuotaService quotaService, CharacterIntelligenceService? intelligenceService = null, PersonalizedPromptService? personalizedPromptService = null, IUserQuestionCollector? questionCollector = null, UserProgressionService? progressionService = null, IHealthCheckService? healthCheckService = null)
     {
         _aiService = aiService;
         _chatRepository = chatRepository;
@@ -92,6 +99,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
         _questionCollector = questionCollector;
         _quotaService = quotaService;
         _enableContextualReferences = configuration["Features:ContextualReferences"]?.ToLower() == "true";
+        _healthCheckService = healthCheckService;
     }
 
     public async Task InitializeAsync(BiblicalCharacter character, ChatSession? existingSession = null, bool forceNewChat = false)
@@ -156,6 +164,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
                 LatestAssistantMessage = welcomeMessage;
             }
             
+            await CheckModelHealthAsync();
             System.Diagnostics.Debug.WriteLine($"[DEBUG] ChatViewModel.InitializeAsync END - messages: {Messages.Count}");
         }
         catch (Exception ex)
@@ -169,6 +178,36 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
     private async Task GoBack()
     {
         await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private void ToggleReferences(ChatMessage? message)
+    {
+        if (message == null)
+            return;
+
+        message.IsReferencesExpanded = !message.IsReferencesExpanded;
+    }
+
+    private async Task CheckModelHealthAsync()
+    {
+        if (_healthCheckService == null)
+            return;
+
+        try
+        {
+            var status = await _healthCheckService.GetHealthStatusAsync();
+            if (!status.IsHealthy)
+            {
+                IsModelWarningVisible = true;
+                ModelWarningText = status.ErrorMessage ?? UserFriendlyErrors.OllamaConnectionError;
+            }
+        }
+        catch (Exception ex)
+        {
+            IsModelWarningVisible = true;
+            ModelWarningText = $"Model health check failed: {ex.Message}";
+        }
     }
 
     [RelayCommand]
@@ -253,6 +292,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
 
         try
         {
+            ClearModelWarning();
             // Check conversation quota before proceeding
             var currentUserId = _userService.CurrentUser?.Id ?? "default";
             if (!await _quotaService.CanSendMessageAsync(currentUserId))
@@ -339,6 +379,22 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
             
             // Use personalized character (with user context) if available
             var characterForAI = _personalizedCharacter ?? Character;
+
+            if (_intelligenceService != null)
+            {
+                try
+                {
+                    var synthesizedPrompt = await _intelligenceService.SynthesizePromptAsync(
+                        characterForAI,
+                        characterForAI.SystemPrompt,
+                        userMsg);
+                    characterForAI = CloneCharacterWithPrompt(characterForAI, synthesizedPrompt);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG] Intelligence synth error: {ex.Message}");
+                }
+            }
             
             // Stream the response on background thread, update UI on main thread
             // Use ConfigureAwait(false) to not block UI thread while waiting for tokens
@@ -383,6 +439,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
             {
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] Streaming ERROR: {streamEx}");
                 var userFriendlyError = UserFriendlyErrors.GetUserFriendlyMessage(streamEx);
+                ShowModelWarningIfRelevant(userFriendlyError);
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     aiMessage.Content += $"\n\n⚠️ {userFriendlyError}";
@@ -407,6 +464,26 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
             ScrollToBottomRequested?.Invoke(this, EventArgs.Empty);
             
             _currentSession?.Messages.Add(aiMessage);
+
+            if (_intelligenceService != null && !string.IsNullOrWhiteSpace(aiMessage.Content))
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _intelligenceService.RecordInteractionAsync(
+                            characterForAI,
+                            MemoryType.Chat,
+                            userMsg,
+                            aiMessage.Content,
+                            userMsg);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG] Intelligence record error: {ex.Message}");
+                    }
+                });
+            }
 
             // Fetch contextual Bible references in background (only if enabled)
             if (_enableContextualReferences)
@@ -497,6 +574,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
         {
             System.Diagnostics.Debug.WriteLine($"[DEBUG] SendMessage ERROR: {ex}");
             var userFriendlyError = UserFriendlyErrors.GetUserFriendlyMessage(ex);
+            ShowModelWarningIfRelevant(userFriendlyError);
             var errorMessage = new ChatMessage
             {
                 Role = "assistant",
@@ -512,6 +590,45 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
             _aiResponseCancellationTokenSource?.Dispose();
             _aiResponseCancellationTokenSource = null;
         }
+    }
+
+    private static BiblicalCharacter CloneCharacterWithPrompt(BiblicalCharacter source, string prompt)
+    {
+        return new BiblicalCharacter
+        {
+            Id = source.Id,
+            Name = source.Name,
+            Title = source.Title,
+            Description = source.Description,
+            Era = source.Era,
+            BiblicalReferences = new List<string>(source.BiblicalReferences),
+            SystemPrompt = prompt,
+            Attributes = new Dictionary<string, string>(source.Attributes),
+            IconFileName = source.IconFileName,
+            Voice = source.Voice,
+            PrimaryTone = source.PrimaryTone,
+            Relationships = new Dictionary<string, string>(source.Relationships),
+            PrayerStyle = source.PrayerStyle,
+            IsCustom = source.IsCustom,
+            RoundtableEnabled = source.RoundtableEnabled,
+            IsContrarian = source.IsContrarian
+        };
+    }
+
+    private void ShowModelWarningIfRelevant(string message)
+    {
+        if (string.Equals(message, UserFriendlyErrors.OllamaConnectionError, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(message, UserFriendlyErrors.OfflineMode, StringComparison.OrdinalIgnoreCase))
+        {
+            IsModelWarningVisible = true;
+            ModelWarningText = message;
+        }
+    }
+
+    private void ClearModelWarning()
+    {
+        IsModelWarningVisible = false;
+        ModelWarningText = string.Empty;
     }
 
     [RelayCommand]
