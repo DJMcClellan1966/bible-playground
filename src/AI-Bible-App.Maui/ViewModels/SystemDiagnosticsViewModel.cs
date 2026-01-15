@@ -1,5 +1,6 @@
 using AI_Bible_App.Maui.Services;
 using AI_Bible_App.Maui.Services.Core;
+using AI_Bible_App.Infrastructure.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -14,6 +15,7 @@ public partial class SystemDiagnosticsViewModel : BaseViewModel
     private readonly IIntelligentCacheService _cache;
     private readonly ICoreServicesOrchestrator _orchestrator;
     private readonly IChatEnhancementService _enhancement;
+    private readonly IUsageMetricsService? _usageMetrics;
     private Timer? _refreshTimer;
 
     [ObservableProperty]
@@ -62,17 +64,20 @@ public partial class SystemDiagnosticsViewModel : BaseViewModel
         IPerformanceMonitor performance,
         IIntelligentCacheService cache,
         ICoreServicesOrchestrator orchestrator,
-        IChatEnhancementService enhancement)
+        IChatEnhancementService enhancement,
+        IUsageMetricsService? usageMetrics = null)
     {
         _performance = performance;
         _cache = cache;
         _orchestrator = orchestrator;
         _enhancement = enhancement;
+        _usageMetrics = usageMetrics;
         Title = "System Diagnostics";
     }
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("SystemDiagnostics");
         await RefreshDataAsync();
         
         // Auto-refresh every 5 seconds

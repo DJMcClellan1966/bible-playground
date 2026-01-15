@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,6 +15,7 @@ public partial class ReflectionViewModel : BaseViewModel
     private readonly IReflectionRepository _reflectionRepository;
     private readonly IDialogService _dialogService;
     private readonly IUserService _userService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private ObservableCollection<Reflection> reflections = new();
@@ -39,16 +41,22 @@ public partial class ReflectionViewModel : BaseViewModel
     [ObservableProperty]
     private bool showFavoritesOnly;
 
-    public ReflectionViewModel(IReflectionRepository reflectionRepository, IDialogService dialogService, IUserService userService)
+    public ReflectionViewModel(
+        IReflectionRepository reflectionRepository,
+        IDialogService dialogService,
+        IUserService userService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _reflectionRepository = reflectionRepository;
         _dialogService = dialogService;
         _userService = userService;
+        _usageMetrics = usageMetrics;
         Title = "My Reflections";
     }
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("Reflections");
         await LoadReflectionsAsync();
     }
 

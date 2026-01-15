@@ -231,7 +231,7 @@
                     </Frame>
 
                     <!-- Action Buttons -->
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10">
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" Margin="0,10">
                         <Button Grid.Column="0"
                                 Text="✓ Mark Complete"
                                 Command="{Binding MarkAsReadCommand}"
@@ -246,6 +246,13 @@
                                 HeightRequest="50"
                                 CornerRadius="25"
                                 BackgroundColor="{StaticResource HallowMidPurple}"
+                                TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Button Grid.Column="2"
+                                Text="📋 Copy"
+                                Command="{Binding CopyDevotionalCommand}"
+                                HeightRequest="50"
+                                CornerRadius="25"
+                                BackgroundColor="{StaticResource HallowCardHover}"
                                 TextColor="{StaticResource HallowTextPrimary}"/>
                     </Grid>
 

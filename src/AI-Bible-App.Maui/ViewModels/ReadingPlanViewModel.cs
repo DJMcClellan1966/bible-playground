@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,6 +15,7 @@ public partial class ReadingPlanViewModel : BaseViewModel
 {
     private readonly IReadingPlanRepository _repository;
     private readonly IDialogService _dialogService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private bool isLoading;
@@ -33,10 +35,14 @@ public partial class ReadingPlanViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<CompletedPlanViewModel> completedProgress = new();
 
-    public ReadingPlanViewModel(IReadingPlanRepository repository, IDialogService dialogService)
+    public ReadingPlanViewModel(
+        IReadingPlanRepository repository,
+        IDialogService dialogService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _repository = repository;
         _dialogService = dialogService;
+        _usageMetrics = usageMetrics;
         Title = "Reading Plans";
     }
 
@@ -74,6 +80,7 @@ public partial class ReadingPlanViewModel : BaseViewModel
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("ReadingPlans");
         await LoadDataAsync();
     }
 

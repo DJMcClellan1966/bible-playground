@@ -201,6 +201,7 @@ public class UsageMetricsService : IUsageMetricsService
                 TotalConversations = _metrics.TotalConversations,
                 TotalPrayers = _metrics.TotalPrayersGenerated,
                 TotalBibleSearches = _metrics.TotalBibleSearches,
+                TotalDevotionalsViewed = _metrics.TotalDevotionalsViewed,
                 TotalSessions = _metrics.TotalSessions,
                 AverageSessionMinutes = avgSessionMinutes,
                 FavoriteCharacter = mostUsedCharacter.Key,
@@ -378,6 +379,7 @@ public class UsageInsights
     public int TotalConversations { get; set; }
     public int TotalPrayers { get; set; }
     public int TotalBibleSearches { get; set; }
+    public int TotalDevotionalsViewed { get; set; }
     public int TotalSessions { get; set; }
     public int AverageSessionMinutes { get; set; }
     public string? FavoriteCharacter { get; set; }

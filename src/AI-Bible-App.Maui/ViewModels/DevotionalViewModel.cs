@@ -1,7 +1,9 @@
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Storage;
 using System.Collections.ObjectModel;
 
 #pragma warning disable MVVMTK0045
@@ -12,6 +14,7 @@ public partial class DevotionalViewModel : BaseViewModel
 {
     private readonly IDevotionalRepository _devotionalRepository;
     private readonly IDialogService _dialogService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private Devotional? todaysDevotional;
@@ -28,15 +31,20 @@ public partial class DevotionalViewModel : BaseViewModel
     [ObservableProperty]
     private string generatingMessage = "Generating today's devotional...";
 
-    public DevotionalViewModel(IDevotionalRepository devotionalRepository, IDialogService dialogService)
+    public DevotionalViewModel(
+        IDevotionalRepository devotionalRepository,
+        IDialogService dialogService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _devotionalRepository = devotionalRepository;
         _dialogService = dialogService;
+        _usageMetrics = usageMetrics;
         Title = "Daily Devotional";
     }
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("Devotional");
         await LoadTodaysDevotionalAsync();
         await LoadRecentDevotionalsAsync();
     }
@@ -56,6 +64,10 @@ public partial class DevotionalViewModel : BaseViewModel
             if (TodaysDevotional == null)
             {
                 await GenerateDevotionalAsync();
+            }
+            else
+            {
+                _usageMetrics?.TrackDevotionalViewed();
             }
         }
         catch (Exception ex)
@@ -79,6 +91,7 @@ public partial class DevotionalViewModel : BaseViewModel
             
             var today = DateTime.Today;
             TodaysDevotional = await _devotionalRepository.GenerateDevotionalAsync(today);
+            _usageMetrics?.TrackDevotionalViewed();
             
             // Refresh the recent list
             await LoadRecentDevotionalsAsync();
@@ -134,6 +147,7 @@ public partial class DevotionalViewModel : BaseViewModel
         
         TodaysDevotional = devotional;
         ShowHistory = false;
+        _usageMetrics?.TrackDevotionalViewed();
     }
 
     [RelayCommand]
@@ -166,6 +180,22 @@ public partial class DevotionalViewModel : BaseViewModel
         {
             System.Diagnostics.Debug.WriteLine($"[Devotional] Error sharing: {ex.Message}");
         }
+    }
+
+    [RelayCommand]
+    private async Task CopyDevotionalAsync()
+    {
+        if (TodaysDevotional == null) return;
+
+        var text = $"📖 {TodaysDevotional.Title}\n\n" +
+                   $"📜 {TodaysDevotional.ScriptureReference}\n" +
+                   $"\"{TodaysDevotional.Scripture}\"\n\n" +
+                   $"💭 {TodaysDevotional.Content}\n\n" +
+                   $"🙏 {TodaysDevotional.Prayer}\n\n" +
+                   $"— Voices of Scripture";
+
+        await Clipboard.Default.SetTextAsync(text);
+        await _dialogService.ShowAlertAsync("Copied", "Devotional copied to clipboard.");
     }
 
     [RelayCommand]

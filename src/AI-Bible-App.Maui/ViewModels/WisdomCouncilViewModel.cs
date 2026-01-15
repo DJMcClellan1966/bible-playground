@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -12,6 +13,7 @@ public partial class WisdomCouncilViewModel : BaseViewModel
     private readonly IMultiCharacterChatService _multiCharacterChatService;
     private readonly ICharacterRepository _characterRepository;
     private readonly IChatRepository _chatRepository;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private string _sessionId = string.Empty;
@@ -33,11 +35,13 @@ public partial class WisdomCouncilViewModel : BaseViewModel
     public WisdomCouncilViewModel(
         IMultiCharacterChatService multiCharacterChatService,
         ICharacterRepository characterRepository,
-        IChatRepository chatRepository)
+        IChatRepository chatRepository,
+        IUsageMetricsService? usageMetrics = null)
     {
         _multiCharacterChatService = multiCharacterChatService;
         _characterRepository = characterRepository;
         _chatRepository = chatRepository;
+        _usageMetrics = usageMetrics;
         
         Title = "Wisdom Council";
     }
@@ -49,6 +53,7 @@ public partial class WisdomCouncilViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            _usageMetrics?.TrackFeatureUsed("WisdomCouncil");
 
             // Load session
             _session = await _chatRepository.GetSessionAsync(SessionId);

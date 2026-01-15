@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -93,6 +94,7 @@ public partial class RoundtableChatViewModel : BaseViewModel
     private readonly ICharacterRepository _characterRepository;
     private readonly IChatRepository _chatRepository;
     private readonly ICrossCharacterLearningService _learningService;
+    private readonly IUsageMetricsService? _usageMetrics;
     private readonly IPromptTemplateService? _promptService;
     private readonly IRetrievalService? _retrievalService;
     private readonly IContextCompressor? _compressor;
@@ -170,7 +172,8 @@ public partial class RoundtableChatViewModel : BaseViewModel
             IRetrievalService? retrievalService = null,
             IContextCompressor? compressor = null,
             IModelOrchestrator? modelOrchestrator = null,
-            IUnconsciousService? unconsciousService = null)
+            IUnconsciousService? unconsciousService = null,
+            IUsageMetricsService? usageMetrics = null)
         {
             _multiCharacterChatService = multiCharacterChatService;
             _characterRepository = characterRepository;
@@ -181,6 +184,7 @@ public partial class RoundtableChatViewModel : BaseViewModel
             _compressor = compressor;
             _modelOrchestrator = modelOrchestrator;
             _unconsciousService = unconsciousService;
+            _usageMetrics = usageMetrics;
             if (_unconsciousService != null)
             {
                 _unconsciousService.ConsolidationCompleted += id =>
@@ -199,6 +203,7 @@ public partial class RoundtableChatViewModel : BaseViewModel
             try
             {
                 IsBusy = true;
+                _usageMetrics?.TrackFeatureUsed("Roundtable");
 
                 // Step 1: Use extracted session loader
                 var session = await TryLoadSessionAsync(SessionId);

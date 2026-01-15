@@ -21,6 +21,12 @@ public partial class PrayerViewModel : BaseViewModel
     private string prayerRequest = string.Empty;
 
     [ObservableProperty]
+    private int prayerRequestLength;
+
+    [ObservableProperty]
+    private int prayerRequestRemaining = 1000;
+
+    [ObservableProperty]
     private string generatedPrayer = string.Empty;
 
     [ObservableProperty]
@@ -66,6 +72,15 @@ public partial class PrayerViewModel : BaseViewModel
     public List<PrayerLength> AvailableLengths => Enum.GetValues<PrayerLength>().ToList();
     public List<PrayerTradition> AvailableTraditions => Enum.GetValues<PrayerTradition>().ToList();
     public List<TimeOfDayContext> AvailableTimeContexts => Enum.GetValues<TimeOfDayContext>().ToList();
+    public ObservableCollection<string> QuickPrompts { get; } = new()
+    {
+        "Peace and anxiety relief",
+        "Guidance for a big decision",
+        "Strength in hardship",
+        "Healing for a loved one",
+        "Gratitude and thanksgiving",
+        "Forgiveness and renewal"
+    };
 
     public PrayerViewModel(
         IAIService aiService,
@@ -92,6 +107,13 @@ public partial class PrayerViewModel : BaseViewModel
         };
     }
 
+    partial void OnPrayerRequestChanged(string value)
+    {
+        var length = value?.Length ?? 0;
+        PrayerRequestLength = length;
+        PrayerRequestRemaining = Math.Max(0, 1000 - length);
+    }
+
     partial void OnSelectedPrayerChanged(Prayer? value)
     {
         if (value != null)
@@ -108,6 +130,7 @@ public partial class PrayerViewModel : BaseViewModel
     
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("PrayerGenerator");
         await LoadSavedPrayersAsync();
     }
 
@@ -128,6 +151,15 @@ public partial class PrayerViewModel : BaseViewModel
     private void ToggleAdvancedOptions()
     {
         ShowAdvancedOptions = !ShowAdvancedOptions;
+    }
+
+    [RelayCommand]
+    private void UsePrompt(string prompt)
+    {
+        if (string.IsNullOrWhiteSpace(prompt))
+            return;
+
+        PrayerRequest = prompt;
     }
 
     [RelayCommand]

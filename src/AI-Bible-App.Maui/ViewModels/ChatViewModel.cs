@@ -114,6 +114,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
             
             Character = character;
             Title = $"Chat with {character.Name}";
+            _usageMetrics?.TrackFeatureUsed("Chat");
             
             // Get personalized character with user context injected into system prompt
             var currentUserId = _userService.CurrentUser?.Id ?? "default";
@@ -685,6 +686,16 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
 
         // Start speaking this message
         await SpeakMessageAsync(message);
+    }
+
+    [RelayCommand]
+    private async Task CopyMessage(ChatMessage? message)
+    {
+        if (message == null || string.IsNullOrWhiteSpace(message.Content))
+            return;
+
+        await Clipboard.Default.SetTextAsync(message.Content);
+        await _dialogService.ShowAlertAsync("Copied", "Message copied to clipboard.");
     }
 
     private async Task SpeakMessageAsync(ChatMessage message)

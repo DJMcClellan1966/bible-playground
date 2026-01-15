@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -51,6 +52,7 @@ public partial class HistoryDashboardViewModel : BaseViewModel
     private readonly IReflectionRepository _reflectionRepository;
     private readonly IDialogService _dialogService;
     private readonly ICharacterRepository _characterRepository;
+    private readonly IUsageMetricsService? _usageMetrics;
     
     [ObservableProperty]
     private ObservableCollection<ChatSessionSummary> chatSessions = new();
@@ -78,13 +80,15 @@ public partial class HistoryDashboardViewModel : BaseViewModel
         IPrayerRepository prayerRepository,
         IReflectionRepository reflectionRepository,
         IDialogService dialogService,
-        ICharacterRepository characterRepository)
+        ICharacterRepository characterRepository,
+        IUsageMetricsService? usageMetrics = null)
     {
         _chatRepository = chatRepository;
         _prayerRepository = prayerRepository;
         _reflectionRepository = reflectionRepository;
         _dialogService = dialogService;
         _characterRepository = characterRepository;
+        _usageMetrics = usageMetrics;
         Title = "Your Journey";
     }
     
@@ -95,6 +99,7 @@ public partial class HistoryDashboardViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            _usageMetrics?.TrackFeatureUsed("HistoryDashboard");
             
             await LoadChatSessions();
             await LoadPrayers();

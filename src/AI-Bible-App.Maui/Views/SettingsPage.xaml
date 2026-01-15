@@ -211,6 +211,11 @@
                            FontSize="12"
                            TextColor="{StaticResource HallowTextMuted}"/>
 
+                    <Label Text="{Binding AiBackendWarning}"
+                           FontSize="12"
+                           TextColor="{StaticResource Warning}"
+                           IsVisible="{Binding AiBackendWarning, Converter={StaticResource StringNotEmptyConverter}}"/>
+
                     <Label Text="{Binding LastHealthCheckAt, StringFormat='Last check: {0:MMM d, h:mm tt}'}"
                            FontSize="11"
                            TextColor="{StaticResource HallowTextMuted}"/>
@@ -382,6 +387,11 @@
                            FontSize="12"
                            TextColor="{StaticResource HallowTextSecondary}"/>
 
+                    <Label Text="All usage metrics are stored locally on this device."
+                           FontSize="11"
+                           FontAttributes="Italic"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <Label Grid.Column="0"
                                Text="Favorite Character:"
@@ -400,8 +410,60 @@
                                TextColor="{StaticResource HallowTextSecondary}"/>
                     </Grid>
 
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Devotionals Viewed:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding TotalDevotionalsViewed}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Avg Session:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding AverageSessionText}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Days Since First Use:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding DaysSinceFirstUseText}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Top Features:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding TopFeaturesText}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Last Active:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding LastActivityText}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
                     <Button Text="🔄 Refresh Insights"
                             Command="{Binding RefreshUsageInsightsCommand}"
+                            BackgroundColor="{StaticResource HallowCardHover}"
+                            TextColor="{StaticResource HallowTextPrimary}"
+                            CornerRadius="20"
+                            HeightRequest="44"/>
+
+                    <Button Text="Export Usage Metrics"
+                            Command="{Binding ExportUsageMetricsCommand}"
                             BackgroundColor="{StaticResource HallowCardHover}"
                             TextColor="{StaticResource HallowTextPrimary}"
                             CornerRadius="20"
@@ -437,7 +499,7 @@
                                TextColor="{StaticResource HallowTextSecondary}"/>
                     </Grid>
 
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
                         <Label Grid.Row="0" Text="Chats" TextColor="{StaticResource HallowTextSecondary}"/>
                         <Label Grid.Row="0" Grid.Column="1" Text="{Binding ChatDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
 
@@ -450,11 +512,14 @@
                         <Label Grid.Row="3" Text="Bookmarks" TextColor="{StaticResource HallowTextSecondary}"/>
                         <Label Grid.Row="3" Grid.Column="1" Text="{Binding BookmarkDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
 
-                        <Label Grid.Row="4" Text="Exports" TextColor="{StaticResource HallowTextSecondary}"/>
-                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding ExportDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Row="4" Text="Usage Metrics" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding UsageMetricsSize}" TextColor="{StaticResource HallowTextPrimary}"/>
 
-                        <Label Grid.Row="5" Text="RAG Cache" TextColor="{StaticResource HallowTextSecondary}"/>
-                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding RagCacheSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Row="5" Text="Exports" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding ExportDataSize}" TextColor="{StaticResource HallowTextPrimary}"/>
+
+                        <Label Grid.Row="6" Text="RAG Cache" TextColor="{StaticResource HallowTextSecondary}"/>
+                        <Label Grid.Row="6" Grid.Column="1" Text="{Binding RagCacheSize}" TextColor="{StaticResource HallowTextPrimary}"/>
                     </Grid>
 
                     <Button Text="🔄 Refresh Storage"
@@ -527,7 +592,7 @@
                            TextColor="{StaticResource HallowTextPrimary}"
                            Margin="0,10,0,0"/>
 
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
                         <Button Grid.Row="0" Grid.Column="0"
                                 Text="Clear Chats"
                                 Command="{Binding ClearChatHistoryCommand}"
@@ -574,6 +639,15 @@
                         <Button Grid.Row="2" Grid.Column="1"
                                 Text="Clear Exports"
                                 Command="{Binding ClearExportsCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"
+                                IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
+
+                        <Button Grid.Row="3" Grid.Column="0"
+                                Text="Clear Usage Metrics"
+                                Command="{Binding ClearUsageMetricsCommand}"
                                 BackgroundColor="{StaticResource HallowCardHover}"
                                 TextColor="{StaticResource HallowTextPrimary}"
                                 CornerRadius="18"
@@ -916,6 +990,11 @@
                     <Label Text="Export rated conversations in JSONL format for LLM fine-tuning."
                            FontSize="13"
                            TextColor="{StaticResource HallowTextSecondary}"/>
+
+                    <Label Text="Exports stay on this device unless you choose to share them."
+                           FontSize="11"
+                           FontAttributes="Italic"
+                           TextColor="{StaticResource HallowTextMuted}"/>
                     
                     <Button Text="Export All Rated Conversations"
                             Command="{Binding ExportAllRatedCommand}"

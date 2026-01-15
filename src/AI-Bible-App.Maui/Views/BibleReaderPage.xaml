@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:AI_Bible_App.Maui.ViewModels"
              x:Class="AI_Bible_App.Maui.Views.BibleReaderPage"
              x:DataType="vm:BibleReaderViewModel"
+             x:Name="ThisPage"
              Title="{Binding Title}">
 
     <!-- Hallow gradient background -->
@@ -156,8 +157,16 @@
                                 <SwipeView>
                                     <SwipeView.RightItems>
                                         <SwipeItems Mode="Execute">
-                                            <SwipeItem Text="🔖 Bookmark"
+                                            <SwipeItem Text="📋 Copy"
+                                                       BackgroundColor="{StaticResource HallowCardHover}"
+                                                       Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.CopySearchResultCommand}"
+                                                       CommandParameter="{Binding .}"/>
+                                            <SwipeItem Text="💬 Discuss"
                                                        BackgroundColor="{StaticResource HallowAccentPurple}"
+                                                       Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DiscussReferenceCommand}"
+                                                       CommandParameter="{Binding Reference}"/>
+                                            <SwipeItem Text="🔖 Bookmark"
+                                                       BackgroundColor="{StaticResource HallowRose}"
                                                        Invoked="OnBookmarkSwipe"/>
                                         </SwipeItems>
                                     </SwipeView.RightItems>

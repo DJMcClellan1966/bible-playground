@@ -1,4 +1,5 @@
 using AI_Bible_App.Core.Services;
+using AI_Bible_App.Infrastructure.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ public partial class OfflineModelsViewModel : BaseViewModel
     private readonly IOfflineAIService _offlineService;
     private readonly IConnectivityService _connectivity;
     private readonly ILogger<OfflineModelsViewModel> _logger;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private ObservableCollection<LocalModelItemViewModel> _models = new();
@@ -27,11 +29,13 @@ public partial class OfflineModelsViewModel : BaseViewModel
     public OfflineModelsViewModel(
         IOfflineAIService offlineService,
         IConnectivityService connectivity,
-        ILogger<OfflineModelsViewModel> logger)
+        ILogger<OfflineModelsViewModel> logger,
+        IUsageMetricsService? usageMetrics = null)
     {
         _offlineService = offlineService;
         _connectivity = connectivity;
         _logger = logger;
+        _usageMetrics = usageMetrics;
         Title = "Offline AI Models";
 
         _isOnline = _connectivity.IsConnected;
@@ -40,6 +44,7 @@ public partial class OfflineModelsViewModel : BaseViewModel
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("OfflineModels");
         await LoadModelsAsync();
     }
 

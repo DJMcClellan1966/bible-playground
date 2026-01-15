@@ -137,6 +137,7 @@ public partial class BibleReaderViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            _usageMetrics?.TrackFeatureUsed("BibleReader");
             
             // Initialize verse index if needed
             if (!_verseIndexService.IsInitialized)
@@ -425,6 +426,23 @@ public partial class BibleReaderViewModel : BaseViewModel
                 await Shell.Current.GoToAsync($"///Reflections?newReflection={Uri.EscapeDataString(reference)}");
                 break;
         }
+    }
+
+    [RelayCommand]
+    private async Task CopySearchResult(BibleVerseSearchResult result)
+    {
+        if (result == null) return;
+
+        await Clipboard.Default.SetTextAsync($"{result.Reference}\n{result.Text}");
+        await _dialogService.ShowAlertAsync("Copied", "Verse copied to clipboard.");
+    }
+
+    [RelayCommand]
+    private async Task DiscussReference(string reference)
+    {
+        if (string.IsNullOrWhiteSpace(reference)) return;
+
+        await Shell.Current.GoToAsync($"///CharacterSelection?discussVerse={Uri.EscapeDataString(reference)}");
     }
     
     [RelayCommand]

@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -15,6 +16,7 @@ public partial class ChatHistoryViewModel : BaseViewModel
     private readonly ICharacterRepository _characterRepository;
     private readonly IDialogService _dialogService;
     private readonly IUserService _userService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private ObservableCollection<ChatHistoryItem> chatSessions = new();
@@ -33,12 +35,18 @@ public partial class ChatHistoryViewModel : BaseViewModel
 
     private ObservableCollection<ChatHistoryItem> _allSessions = new();
 
-    public ChatHistoryViewModel(IChatRepository chatRepository, ICharacterRepository characterRepository, IDialogService dialogService, IUserService userService)
+    public ChatHistoryViewModel(
+        IChatRepository chatRepository,
+        ICharacterRepository characterRepository,
+        IDialogService dialogService,
+        IUserService userService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _chatRepository = chatRepository;
         _characterRepository = characterRepository;
         _dialogService = dialogService;
         _userService = userService;
+        _usageMetrics = usageMetrics;
         Title = "Chat History";
     }
 
@@ -59,6 +67,7 @@ public partial class ChatHistoryViewModel : BaseViewModel
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("ChatHistory");
         await LoadSessionsAsync();
     }
 

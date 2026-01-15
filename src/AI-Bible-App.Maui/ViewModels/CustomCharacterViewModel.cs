@@ -1,4 +1,5 @@
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,6 +13,7 @@ public partial class CustomCharacterViewModel : BaseViewModel
 {
     private readonly ICustomCharacterRepository _repository;
     private readonly IDialogService _dialogService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private ObservableCollection<CustomCharacter> characters = new();
@@ -58,15 +60,20 @@ public partial class CustomCharacterViewModel : BaseViewModel
 
     private string? _editingCharacterId;
 
-    public CustomCharacterViewModel(ICustomCharacterRepository repository, IDialogService dialogService)
+    public CustomCharacterViewModel(
+        ICustomCharacterRepository repository,
+        IDialogService dialogService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _repository = repository;
         _dialogService = dialogService;
+        _usageMetrics = usageMetrics;
         Title = "Custom Characters";
     }
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("CustomCharacters");
         await LoadCharactersAsync();
     }
 

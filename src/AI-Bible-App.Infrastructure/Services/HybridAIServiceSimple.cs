@@ -376,28 +376,76 @@ public class HybridAIServiceSimple : IAIService
 
     public async Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default)
     {
-        if (_groqAvailable)
+        var preference = GetPreferredBackend();
+
+        if (preference == AiBackendPreference.Cloud)
         {
-            try
+            var cloudResponse = await TryGroqDevotionalAsync(date, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+
+            var localResponse = await TryLocalDevotionalAsync(date, cancellationToken);
+            if (localResponse != null)
+                return localResponse;
+        }
+        else if (preference == AiBackendPreference.Local)
+        {
+            var localResponse = await TryLocalDevotionalAsync(date, cancellationToken);
+            if (localResponse != null)
+                return localResponse;
+
+            var cloudResponse = await TryGroqDevotionalAsync(date, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+        }
+        else
+        {
+            if (ShouldPreferLocal())
             {
-                return await _groqService.GenerateDevotionalAsync(date, cancellationToken);
+                var localResponse = await TryLocalDevotionalAsync(date, cancellationToken);
+                if (localResponse != null)
+                    return localResponse;
             }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Groq devotional failed, trying local");
-            }
+
+            var cloudResponse = await TryGroqDevotionalAsync(date, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+
+            var localFallback = await TryLocalDevotionalAsync(date, cancellationToken);
+            if (localFallback != null)
+                return localFallback;
         }
 
+        return await _cachedService.GenerateDevotionalAsync(date, cancellationToken);
+    }
+
+    private async Task<string?> TryGroqDevotionalAsync(DateTime date, CancellationToken cancellationToken)
+    {
+        if (!_groqAvailable)
+            return null;
+
+        try
+        {
+            return await _groqService.GenerateDevotionalAsync(date, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Groq devotional failed");
+            return null;
+        }
+    }
+
+    private async Task<string?> TryLocalDevotionalAsync(DateTime date, CancellationToken cancellationToken)
+    {
         try
         {
             return await _localService.GenerateDevotionalAsync(date, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Local devotional failed, using cached");
+            _logger.LogWarning(ex, "Local devotional failed");
+            return null;
         }
-
-        return await _cachedService.GenerateDevotionalAsync(date, cancellationToken);
     }
 }
 

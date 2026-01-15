@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -14,6 +15,7 @@ public partial class CharacterEvolutionViewModel : BaseViewModel
 {
     private readonly ICharacterRepository _characterRepository;
     private readonly ICrossCharacterLearningService _learningService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private ObservableCollection<BiblicalCharacter> _characters = new();
@@ -32,10 +34,12 @@ public partial class CharacterEvolutionViewModel : BaseViewModel
 
     public CharacterEvolutionViewModel(
         ICharacterRepository characterRepository,
-        ICrossCharacterLearningService learningService)
+        ICrossCharacterLearningService learningService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _characterRepository = characterRepository;
         _learningService = learningService;
+        _usageMetrics = usageMetrics;
         
         Title = "Character Growth";
     }
@@ -47,6 +51,7 @@ public partial class CharacterEvolutionViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            _usageMetrics?.TrackFeatureUsed("CharacterEvolution");
 
             var allCharacters = await _characterRepository.GetAllCharactersAsync();
             Characters = new ObservableCollection<BiblicalCharacter>(allCharacters);

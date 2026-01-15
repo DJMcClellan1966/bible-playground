@@ -49,6 +49,10 @@ public partial class SettingsViewModel : BaseViewModel
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "AI-Bible-App",
         "embeddings_cache.json");
+    private static readonly string UsageMetricsPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "AIBibleApp",
+        "usage_metrics.json");
 
     private static readonly string[] DataRootCandidates =
     {
@@ -131,6 +135,9 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty]
     private string activeModelName = "Local (Ollama)";
 
+    [ObservableProperty]
+    private string aiBackendWarning = string.Empty;
+
     // Data Management Properties
     [ObservableProperty]
     private string localDataSize = "Calculating...";
@@ -158,6 +165,9 @@ public partial class SettingsViewModel : BaseViewModel
 
     [ObservableProperty]
     private string ragCacheSize = "—";
+
+    [ObservableProperty]
+    private string usageMetricsSize = "—";
 
     // Learning & Research Properties
     [ObservableProperty]
@@ -193,6 +203,21 @@ public partial class SettingsViewModel : BaseViewModel
 
     [ObservableProperty]
     private string mostSearchedBook = "—";
+
+    [ObservableProperty]
+    private string averageSessionText = "—";
+
+    [ObservableProperty]
+    private string daysSinceFirstUseText = "—";
+
+    [ObservableProperty]
+    private string topFeaturesText = "—";
+
+    [ObservableProperty]
+    private string lastActivityText = "—";
+
+    [ObservableProperty]
+    private int totalDevotionalsViewed;
 
     // Performance & Debug Properties
     [ObservableProperty]
@@ -296,6 +321,8 @@ public partial class SettingsViewModel : BaseViewModel
             SelectedAiBackend = AiBackendOptions.FirstOrDefault(option =>
                 string.Equals(option.Value, user.Settings.PreferredAIBackend, StringComparison.OrdinalIgnoreCase))
                 ?? AiBackendOptions[0];
+            UpdateActiveModelName();
+            UpdateBackendWarning();
             
             // Load sync information
             IsSyncEnabled = user.HasSyncEnabled;
@@ -321,6 +348,8 @@ public partial class SettingsViewModel : BaseViewModel
             SelectedTheme = "System";
             SelectedFontSize = "Medium";
             SelectedAiBackend = AiBackendOptions[0];
+            UpdateActiveModelName();
+            UpdateBackendWarning();
             IsSyncEnabled = false;
             SyncCode = null;
             SyncStatusText = "Not set up";
@@ -466,6 +495,8 @@ public partial class SettingsViewModel : BaseViewModel
     partial void OnSelectedAiBackendChanged(AiBackendOption value)
     {
         _ = SavePreferredAiBackendAsync(value?.Value ?? "auto");
+        UpdateActiveModelName();
+        UpdateBackendWarning();
     }
 
     private async Task SaveAndApplyThemeAsync(string theme)
@@ -528,6 +559,34 @@ public partial class SettingsViewModel : BaseViewModel
         {
             System.Diagnostics.Debug.WriteLine($"[Settings] Failed to save AI backend setting: {ex.Message}");
         }
+    }
+
+    private void UpdateActiveModelName()
+    {
+        var modelName = _configuration?["Ollama:ModelName"] ?? "phi4";
+        var backend = SelectedAiBackend?.Value ?? "auto";
+
+        ActiveModelName = backend switch
+        {
+            "local" => $"Local (Ollama) - {modelName}",
+            "cloud" => "Cloud (Groq)",
+            _ => $"Auto (local: {modelName}, cloud: Groq)"
+        };
+    }
+
+    private void UpdateBackendWarning(bool? localHealthy = null)
+    {
+        var backend = SelectedAiBackend?.Value ?? "auto";
+        var hasGroqKey = !string.IsNullOrWhiteSpace(_configuration?["Groq:ApiKey"]);
+
+        AiBackendWarning = backend switch
+        {
+            "cloud" when !hasGroqKey => "Cloud selected but Groq API key is not configured.",
+            "local" when localHealthy.HasValue && !localHealthy.Value => "Local model is offline. Start Ollama to use local mode.",
+            "auto" when localHealthy.HasValue && !localHealthy.Value && !hasGroqKey => "Auto mode has no available backend. Start Ollama or configure Groq.",
+            "auto" when localHealthy.HasValue && !localHealthy.Value => "Local is offline; auto mode will use cloud if configured.",
+            _ => string.Empty
+        };
     }
 
     private async Task SaveModerationSettingAsync(bool enabled)
@@ -699,6 +758,7 @@ public partial class SettingsViewModel : BaseViewModel
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("Settings");
         LoadUserProfile();
         await RefreshStatsAsync();
         await RefreshModelStatusAsync();
@@ -751,12 +811,14 @@ public partial class SettingsViewModel : BaseViewModel
             ModelStatusDetail = status.IsHealthy
                 ? "Local model is reachable"
                 : status.ErrorMessage ?? "Local model is not reachable";
+            UpdateBackendWarning(status.IsHealthy);
         }
         catch (Exception ex)
         {
             LastHealthCheckAt = DateTime.UtcNow;
             ModelStatusText = "Unknown";
             ModelStatusDetail = $"Health check failed: {ex.Message}";
+            UpdateBackendWarning(null);
         }
     }
 
@@ -774,6 +836,7 @@ public partial class SettingsViewModel : BaseViewModel
             BookmarkDataSize = FormatBytes(GetFileSize(BookmarkDataPath));
             ExportDataSize = FormatBytes(GetDirectorySize(ExportDirectory));
             RagCacheSize = FormatBytes(GetFileSize(RagCachePath));
+            UsageMetricsSize = FormatBytes(GetFileSize(UsageMetricsPath));
         }
         catch
         {
@@ -851,6 +914,47 @@ public partial class SettingsViewModel : BaseViewModel
         catch (Exception ex)
         {
             await _dialogService.ShowAlertAsync("Error", $"Failed to clear exports: {ex.Message}");
+        }
+        finally
+        {
+            IsClearingData = false;
+            await RefreshStorageStatsAsync();
+        }
+    }
+
+    [RelayCommand]
+    private async Task ClearUsageMetricsAsync()
+    {
+        if (_usageMetrics == null)
+        {
+            await _dialogService.ShowAlertAsync("Not Available", "Usage metrics are not available on this device.");
+            return;
+        }
+
+        var confirm = await _dialogService.ShowConfirmAsync(
+            "Clear Usage Metrics",
+            "This will reset local usage stats and remove the metrics file on this device. Continue?",
+            "Clear", "Cancel");
+
+        if (!confirm)
+            return;
+
+        try
+        {
+            IsClearingData = true;
+            _usageMetrics.ResetMetrics();
+
+            if (File.Exists(UsageMetricsPath))
+            {
+                File.Delete(UsageMetricsPath);
+            }
+
+            DataClearStatus = "Usage metrics cleared.";
+            await RefreshUsageInsightsAsync();
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Error", $"Failed to clear usage metrics: {ex.Message}");
         }
         finally
         {
@@ -1134,15 +1238,78 @@ public partial class SettingsViewModel : BaseViewModel
         }
 
         var insights = _usageMetrics.GetInsights();
-        UsageSummary = $"Conversations: {insights.TotalConversations} | Prayers: {insights.TotalPrayers} | Searches: {insights.TotalBibleSearches}";
+        var metrics = _usageMetrics.GetMetrics();
+        UsageSummary = $"Conversations: {insights.TotalConversations} | Prayers: {insights.TotalPrayers} | " +
+                       $"Searches: {insights.TotalBibleSearches} | Devotionals: {insights.TotalDevotionalsViewed}";
         FavoriteCharacter = insights.FavoriteCharacter != null
             ? $"{insights.FavoriteCharacter} ({insights.FavoriteCharacterCount})"
             : "—";
         MostSearchedBook = insights.MostSearchedBook != null
             ? $"{insights.MostSearchedBook} ({insights.MostSearchedBookCount})"
             : "—";
+        TotalDevotionalsViewed = insights.TotalDevotionalsViewed;
+        AverageSessionText = insights.TotalSessions > 0
+            ? $"{insights.AverageSessionMinutes} min"
+            : "—";
+        DaysSinceFirstUseText = insights.DaysSinceFirstUse > 0
+            ? $"{insights.DaysSinceFirstUse} days"
+            : "—";
+        TopFeaturesText = BuildTopFeaturesText();
+        LastActivityText = FormatLastActivity(metrics.LastActivityDate);
 
         return Task.CompletedTask;
+    }
+
+    private string BuildTopFeaturesText()
+    {
+        if (_usageMetrics == null)
+            return "—";
+
+        var metrics = _usageMetrics.GetMetrics();
+        if (metrics.FeatureUsage.Count == 0)
+            return "—";
+
+        return string.Join(" | ", metrics.FeatureUsage
+            .OrderByDescending(pair => pair.Value)
+            .Take(3)
+            .Select(pair => $"{MapFeatureName(pair.Key)} ({pair.Value})"));
+    }
+
+    private static string FormatLastActivity(DateTime? lastActivity)
+    {
+        if (!lastActivity.HasValue)
+            return "Never";
+
+        return lastActivity.Value.ToLocalTime().ToString("MMM d, h:mm tt");
+    }
+
+    private static string MapFeatureName(string key)
+    {
+        return key switch
+        {
+            "Chat" => "Chat",
+            "PrayerGenerator" => "Prayer",
+            "BibleReader" => "Bible Reader",
+            "Devotional" => "Devotional",
+            "Bookmarks" => "Bookmarks",
+            "Reflections" => "Reflections",
+            "ChatHistory" => "Chat History",
+            "CharacterSelection" => "Character Selection",
+            "MultiCharacterSelection" => "Multi-Character",
+            "Roundtable" => "Roundtable",
+            "WisdomCouncil" => "Wisdom Council",
+            "PrayerChain" => "Prayer Chain",
+            "ReadingPlans" => "Reading Plans",
+            "CustomCharacters" => "Custom Characters",
+            "CharacterEvolution" => "Character Growth",
+            "HistoryDashboard" => "My Journey",
+            "OfflineModels" => "Offline Models",
+            "SystemDiagnostics" => "Diagnostics",
+            "Settings" => "Settings",
+            "Initialization" => "Startup",
+            "Admin" => "Admin",
+            _ => key
+        };
     }
 
     [RelayCommand]
@@ -1161,6 +1328,32 @@ public partial class SettingsViewModel : BaseViewModel
 
         _usageMetrics.ResetMetrics();
         await RefreshUsageInsightsAsync();
+    }
+
+    [RelayCommand]
+    private async Task ExportUsageMetricsAsync()
+    {
+        if (_usageMetrics == null)
+            return;
+
+        try
+        {
+            Directory.CreateDirectory(ExportDirectory);
+            var fileName = $"usage_metrics_{DateTime.UtcNow:yyyyMMdd_HHmmss}.json";
+            var destination = Path.Combine(ExportDirectory, fileName);
+            File.WriteAllText(destination, _usageMetrics.ExportMetrics());
+
+            await _dialogService.ShowAlertAsync(
+                "Export Complete",
+                $"Exported usage metrics to:\n{destination}");
+
+            await ShareFileAsync(destination);
+            await RefreshStorageStatsAsync();
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Export Failed", ex.Message);
+        }
     }
 
     [RelayCommand]

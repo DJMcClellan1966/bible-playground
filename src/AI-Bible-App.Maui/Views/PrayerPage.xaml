@@ -67,6 +67,47 @@
                             MaxLength="1000"
                             HeightRequest="120"
                             AutoSize="TextChanges"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Share as much or as little as you want."
+                               FontSize="11"
+                               TextColor="{StaticResource HallowTextMuted}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding PrayerRequestLength, StringFormat='{0}/1000'}"
+                               FontSize="11"
+                               TextColor="{StaticResource HallowTextMuted}"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Quick Prompts -->
+            <Frame Padding="15"
+                   BackgroundColor="{StaticResource HallowCardBackground}"
+                   BorderColor="Transparent"
+                   CornerRadius="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Quick prompts"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource HallowTextPrimary}"/>
+                    <FlexLayout BindableLayout.ItemsSource="{Binding QuickPrompts}"
+                                Wrap="Wrap"
+                                JustifyContent="Start"
+                                AlignItems="Start">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Button Text="{Binding .}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PrayerViewModel}}, Path=UsePromptCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="{StaticResource HallowCardHover}"
+                                        TextColor="{StaticResource HallowTextPrimary}"
+                                        CornerRadius="18"
+                                        Margin="0,0,8,8"
+                                        HeightRequest="36"
+                                        FontSize="12"/>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
                 </VerticalStackLayout>
             </Frame>
 

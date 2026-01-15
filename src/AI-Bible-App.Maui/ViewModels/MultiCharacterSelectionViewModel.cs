@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,6 +13,7 @@ public partial class MultiCharacterSelectionViewModel : BaseViewModel
     private readonly ICharacterRepository _characterRepository;
     private readonly IChatRepository _chatRepository;
     private readonly INavigationService _navigationService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private ObservableCollection<SelectableCharacter> _characters = new();
@@ -46,11 +48,13 @@ public partial class MultiCharacterSelectionViewModel : BaseViewModel
     public MultiCharacterSelectionViewModel(
         ICharacterRepository characterRepository,
         IChatRepository chatRepository,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _characterRepository = characterRepository;
         _chatRepository = chatRepository;
         _navigationService = navigationService;
+        _usageMetrics = usageMetrics;
         
         Title = "Multi-Character Chat";
         
@@ -64,6 +68,7 @@ public partial class MultiCharacterSelectionViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            _usageMetrics?.TrackFeatureUsed("MultiCharacterSelection");
             HasNoCharacters = false;
             var allCharacters = await _characterRepository.GetAllCharactersAsync();
             

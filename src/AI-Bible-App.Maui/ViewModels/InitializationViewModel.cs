@@ -1,4 +1,5 @@
 using AI_Bible_App.Core.Interfaces;
+using AI_Bible_App.Infrastructure.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 #pragma warning disable MVVMTK0045 // AOT compatibility warning for WinRT scenarios
@@ -9,6 +10,7 @@ public partial class InitializationViewModel : BaseViewModel
 {
     private readonly IBibleRAGService _ragService;
     private readonly IHealthCheckService _healthCheckService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private string statusMessage = "Initializing...";
@@ -25,10 +27,14 @@ public partial class InitializationViewModel : BaseViewModel
     [ObservableProperty]
     private string? errorMessage;
 
-    public InitializationViewModel(IBibleRAGService ragService, IHealthCheckService healthCheckService)
+    public InitializationViewModel(
+        IBibleRAGService ragService,
+        IHealthCheckService healthCheckService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _ragService = ragService;
         _healthCheckService = healthCheckService;
+        _usageMetrics = usageMetrics;
         Title = "Voices of Scripture";
     }
 
@@ -36,6 +42,7 @@ public partial class InitializationViewModel : BaseViewModel
     {
         try
         {
+            _usageMetrics?.TrackFeatureUsed("Initialization");
             // Quick startup - just verify AI service is reachable
             StatusMessage = "Connecting...";
             Progress = 0.3;

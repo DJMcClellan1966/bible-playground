@@ -87,6 +87,32 @@
                                            IsVisible="{Binding HasContextualReferences}"
                                            FontSize="{StaticResource CaptionFontSize}"
                                            TextColor="{DynamicResource Primary}"/>
+                                    <HorizontalStackLayout Spacing="8" Margin="0,4,0,0">
+                                        <Button Text="📋"
+                                                FontSize="14"
+                                                BackgroundColor="Transparent"
+                                                TextColor="{DynamicResource Gray600}"
+                                                WidthRequest="32"
+                                                HeightRequest="32"
+                                                Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.CopyMessageCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        <Button Text="👍"
+                                                FontSize="14"
+                                                BackgroundColor="Transparent"
+                                                TextColor="{DynamicResource Gray600}"
+                                                WidthRequest="32"
+                                                HeightRequest="32"
+                                                Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
+                                                CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='1'}"/>
+                                        <Button Text="👎"
+                                                FontSize="14"
+                                                BackgroundColor="Transparent"
+                                                TextColor="{DynamicResource Gray600}"
+                                                WidthRequest="32"
+                                                HeightRequest="32"
+                                                Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
+                                                CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='-1'}"/>
+                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Border>
 

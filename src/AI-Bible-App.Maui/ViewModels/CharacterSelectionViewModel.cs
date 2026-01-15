@@ -57,6 +57,7 @@ public partial class CharacterSelectionViewModel : BaseViewModel
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("CharacterSelection");
         await LoadCharactersAsync();
         await CheckOllamaStatusAsync();
     }

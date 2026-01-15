@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Models;
 using AI_Bible_App.Core.Services;
+using AI_Bible_App.Infrastructure.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,7 @@ public partial class AdminViewModel : ObservableObject
     private readonly IAutonomousLearningService _learningService;
     private readonly ITrainingDataRepository _trainingRepo;
     private readonly ILogger<AdminViewModel> _logger;
+    private readonly IUsageMetricsService? _usageMetrics;
     
     [ObservableProperty]
     private LearningStatistics? statistics;
@@ -36,15 +38,18 @@ public partial class AdminViewModel : ObservableObject
     public AdminViewModel(
         IAutonomousLearningService learningService,
         ITrainingDataRepository trainingRepo,
-        ILogger<AdminViewModel> logger)
+        ILogger<AdminViewModel> logger,
+        IUsageMetricsService? usageMetrics = null)
     {
         _learningService = learningService;
         _trainingRepo = trainingRepo;
         _logger = logger;
+        _usageMetrics = usageMetrics;
     }
     
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("Admin");
         await RefreshStatisticsAsync();
     }
     

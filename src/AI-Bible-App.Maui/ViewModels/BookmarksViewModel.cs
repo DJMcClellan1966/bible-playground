@@ -1,5 +1,6 @@
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
+using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -15,6 +16,7 @@ public partial class BookmarksViewModel : BaseViewModel
     private readonly IDialogService _dialogService;
     private readonly IUserService _userService;
     private readonly IBibleLookupService _bibleLookupService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private ObservableCollection<VerseBookmark> bookmarks = new();
@@ -57,17 +59,20 @@ public partial class BookmarksViewModel : BaseViewModel
         IVerseBookmarkRepository bookmarkRepository, 
         IDialogService dialogService, 
         IUserService userService,
-        IBibleLookupService bibleLookupService)
+        IBibleLookupService bibleLookupService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _bookmarkRepository = bookmarkRepository;
         _dialogService = dialogService;
         _userService = userService;
         _bibleLookupService = bibleLookupService;
+        _usageMetrics = usageMetrics;
         Title = "My Bookmarks";
     }
 
     public async Task InitializeAsync()
     {
+        _usageMetrics?.TrackFeatureUsed("Bookmarks");
         await LoadBookmarksAsync();
     }
 
