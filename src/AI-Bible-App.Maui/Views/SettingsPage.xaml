@@ -900,6 +900,13 @@
                                    HorizontalOptions="Center"
                                    FontFamily="Consolas"
                                    ToolTipProperties.Text="Share this code to link another device"/>
+                            <Button Text="Copy Code"
+                                    Command="{Binding CopySyncCodeCommand}"
+                                    BackgroundColor="{StaticResource HallowCardHover}"
+                                    TextColor="{StaticResource HallowTextPrimary}"
+                                    CornerRadius="12"
+                                    HeightRequest="36"
+                                    ToolTipProperties.Text="Copy sync code"/>
                             <Label Text="Share this with your other devices"
                                    FontSize="10"
                                    TextColor="{StaticResource HallowTextMuted}"

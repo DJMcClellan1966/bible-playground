@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.Storage;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
 using System.Linq;
 
 #pragma warning disable MVVMTK0045
@@ -1515,6 +1516,19 @@ public partial class SettingsViewModel : BaseViewModel
         {
             IsSyncing = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task CopySyncCodeAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SyncCode))
+        {
+            await _dialogService.ShowAlertAsync("Copy Sync Code", "No sync code available yet.", "OK");
+            return;
+        }
+
+        await Clipboard.Default.SetTextAsync(SyncCode);
+        await _dialogService.ShowAlertAsync("Copied", "Sync code copied to clipboard.", "OK");
     }
 
     [RelayCommand]
