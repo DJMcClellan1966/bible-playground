@@ -17,10 +17,12 @@ public partial class App : Application
 	private readonly IBibleVerseIndexService? _bibleIndexService;
 	private readonly ResearchScheduler? _researchScheduler;
 	private readonly LearningScheduler? _learningScheduler;
+	private readonly IUsageMetricsService? _usageMetrics;
 
 	public App(IUserService userService, IModelWarmupService? warmupService = null, IConfiguration? configuration = null,
 		IFontScaleService? fontScaleService = null, IBibleVerseIndexService? bibleIndexService = null,
-		ResearchScheduler? researchScheduler = null, LearningScheduler? learningScheduler = null)
+		ResearchScheduler? researchScheduler = null, LearningScheduler? learningScheduler = null,
+		IUsageMetricsService? usageMetrics = null)
 	{
 		InitializeComponent();
 		_userService = userService;
@@ -30,6 +32,7 @@ public partial class App : Application
 		_bibleIndexService = bibleIndexService;
 		_researchScheduler = researchScheduler;
 		_learningScheduler = learningScheduler;
+		_usageMetrics = usageMetrics;
 		
 		// Global exception handling
 		AppDomain.CurrentDomain.UnhandledException += (s, e) =>
@@ -140,6 +143,8 @@ public partial class App : Application
 					_learningScheduler.Start();
 				}
 
+				_usageMetrics?.TrackSessionStart();
+
 				// Try auto-login ONLY if user opted to stay logged in
 				var stayLoggedIn = Preferences.Get("stay_logged_in", false);
 				var autoLoggedIn = false;
@@ -166,6 +171,11 @@ public partial class App : Application
 			{
 				System.Diagnostics.Debug.WriteLine($"[App] Startup error: {ex.Message}");
 			}
+		};
+		
+		window.Destroying += (s, e) =>
+		{
+			_usageMetrics?.TrackSessionEnd();
 		};
 		
 		return window;

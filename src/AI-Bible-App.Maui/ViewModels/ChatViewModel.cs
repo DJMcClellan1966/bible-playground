@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.Accessibility;
+using Microsoft.Maui.Storage;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -33,6 +34,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
     private readonly IConversationQuotaService _quotaService;
     private readonly bool _enableContextualReferences;
     private readonly IHealthCheckService? _healthCheckService;
+    private readonly IUsageMetricsService? _usageMetrics;
     private ChatSession? _currentSession;
     private CancellationTokenSource? _speechCancellationTokenSource;
     private CancellationTokenSource? _aiResponseCancellationTokenSource;
@@ -82,7 +84,7 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
     [ObservableProperty]
     private string modelWarningText = string.Empty;
 
-    public ChatViewModel(IAIService aiService, IChatRepository chatRepository, IBibleLookupService bibleLookupService, IReflectionRepository reflectionRepository, IPrayerRepository prayerRepository, IDialogService dialogService, IContentModerationService moderationService, IUserService userService, ICharacterVoiceService voiceService, IConfiguration configuration, IConversationQuotaService quotaService, CharacterIntelligenceService? intelligenceService = null, PersonalizedPromptService? personalizedPromptService = null, IUserQuestionCollector? questionCollector = null, UserProgressionService? progressionService = null, IHealthCheckService? healthCheckService = null)
+    public ChatViewModel(IAIService aiService, IChatRepository chatRepository, IBibleLookupService bibleLookupService, IReflectionRepository reflectionRepository, IPrayerRepository prayerRepository, IDialogService dialogService, IContentModerationService moderationService, IUserService userService, ICharacterVoiceService voiceService, IConfiguration configuration, IConversationQuotaService quotaService, CharacterIntelligenceService? intelligenceService = null, PersonalizedPromptService? personalizedPromptService = null, IUserQuestionCollector? questionCollector = null, UserProgressionService? progressionService = null, IHealthCheckService? healthCheckService = null, IUsageMetricsService? usageMetrics = null)
     {
         _aiService = aiService;
         _chatRepository = chatRepository;
@@ -98,8 +100,10 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
         _progressionService = progressionService;
         _questionCollector = questionCollector;
         _quotaService = quotaService;
-        _enableContextualReferences = configuration["Features:ContextualReferences"]?.ToLower() == "true";
+        var defaultContextual = configuration["Features:ContextualReferences"]?.ToLower() == "true";
+        _enableContextualReferences = Preferences.Get("contextual_refs_enabled", defaultContextual);
         _healthCheckService = healthCheckService;
+        _usageMetrics = usageMetrics;
     }
 
     public async Task InitializeAsync(BiblicalCharacter character, ChatSession? existingSession = null, bool forceNewChat = false)
@@ -349,6 +353,8 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
             Messages.Add(chatMessage);
             _currentSession?.Messages.Add(chatMessage);
             System.Diagnostics.Debug.WriteLine($"[DEBUG] Added user message: {userMsg}");
+
+            _usageMetrics?.TrackCharacterConversation(Character.Id);
             
             // Record message sent for quota tracking
             await _quotaService.RecordMessageSentAsync(currentUserId);
@@ -912,6 +918,8 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
                     CreatedAt = DateTime.UtcNow
                 };
                 await _prayerRepository.SavePrayerAsync(prayerEntity);
+
+                _usageMetrics?.TrackPrayerGenerated(userQuestion);
 
                 await _dialogService.ShowAlertAsync("Saved! ✓", "Prayer saved to your prayer history.");
             }

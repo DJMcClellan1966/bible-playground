@@ -196,6 +196,17 @@
                                TextColor="{StaticResource HallowAccentPurple}"/>
                     </Grid>
 
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="AI Backend:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Picker Grid.Column="1"
+                                ItemsSource="{Binding AiBackendOptions}"
+                                SelectedItem="{Binding SelectedAiBackend}"
+                                ItemDisplayBinding="{Binding Label}"
+                                TextColor="{StaticResource HallowTextPrimary}"/>
+                    </Grid>
+
                     <Label Text="{Binding ModelStatusDetail}"
                            FontSize="12"
                            TextColor="{StaticResource HallowTextMuted}"/>
@@ -262,6 +273,19 @@
                             CornerRadius="20"
                             HeightRequest="44"
                             IsVisible="{Binding IsRagDebugEnabled}"/>
+
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                        <Label Grid.Column="0"
+                               Text="Show Contextual References"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsContextualReferencesEnabled}"
+                                OnColor="{StaticResource HallowAccentPurple}"/>
+                    </Grid>
+
+                    <Label Text="Displays scripture sources beneath responses when available."
+                           FontSize="11"
+                           TextColor="{StaticResource HallowTextMuted}"/>
                 </VerticalStackLayout>
             </Frame>
 
@@ -343,6 +367,55 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Usage Insights Section -->
+            <Frame Padding="20"
+                   BackgroundColor="{StaticResource HallowCardBackground}"
+                   BorderColor="Transparent"
+                   CornerRadius="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📈 Usage Insights"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource HallowTextPrimary}"/>
+
+                    <Label Text="{Binding UsageSummary}"
+                           FontSize="12"
+                           TextColor="{StaticResource HallowTextSecondary}"/>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Favorite Character:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding FavoriteCharacter}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0"
+                               Text="Most Searched Book:"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding MostSearchedBook}"
+                               TextColor="{StaticResource HallowTextSecondary}"/>
+                    </Grid>
+
+                    <Button Text="🔄 Refresh Insights"
+                            Command="{Binding RefreshUsageInsightsCommand}"
+                            BackgroundColor="{StaticResource HallowCardHover}"
+                            TextColor="{StaticResource HallowTextPrimary}"
+                            CornerRadius="20"
+                            HeightRequest="44"/>
+
+                    <Button Text="Reset Usage Metrics"
+                            Command="{Binding ResetUsageMetricsCommand}"
+                            BackgroundColor="{StaticResource HallowCardHover}"
+                            TextColor="{StaticResource HallowTextSecondary}"
+                            CornerRadius="20"
+                            HeightRequest="40"/>
+                </VerticalStackLayout>
+            </Frame>
+
             <!-- Data Management Section -->
             <Frame Padding="20"
                    BackgroundColor="{StaticResource HallowCardBackground}"
@@ -401,6 +474,49 @@
                             IsEnabled="{Binding IsClearingData, Converter={StaticResource InvertedBoolConverter}}"/>
 
                     <Label Text="Clearing data removes chats, prayers, reflections, bookmarks, and cached files on this device."
+                           FontSize="11"
+                           FontAttributes="Italic"
+                           TextColor="{StaticResource HallowTextMuted}"/>
+
+                    <Label Text="Export Local Data"
+                           FontSize="13"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource HallowTextPrimary}"
+                           Margin="0,10,0,0"/>
+
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                        <Button Grid.Row="0" Grid.Column="0"
+                                Text="Export Chats"
+                                Command="{Binding ExportChatsCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"/>
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Text="Export Prayers"
+                                Command="{Binding ExportPrayersCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"/>
+
+                        <Button Grid.Row="1" Grid.Column="0"
+                                Text="Export Reflections"
+                                Command="{Binding ExportReflectionsCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"/>
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Text="Export Bookmarks"
+                                Command="{Binding ExportBookmarksCommand}"
+                                BackgroundColor="{StaticResource HallowCardHover}"
+                                TextColor="{StaticResource HallowTextPrimary}"
+                                CornerRadius="18"
+                                HeightRequest="40"/>
+                    </Grid>
+
+                    <Label Text="Exports are saved locally and can be shared from your device."
                            FontSize="11"
                            FontAttributes="Italic"
                            TextColor="{StaticResource HallowTextMuted}"/>
@@ -594,6 +710,18 @@
                             HeightRequest="40"
                             IsVisible="{Binding HasPinEnabled}"
                             HorizontalOptions="Start"/>
+
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                        <Label Grid.Column="0"
+                               Text="Share anonymized questions to improve the model"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsDataSharingEnabled}"
+                                OnColor="{StaticResource HallowAccentPurple}"/>
+                    </Grid>
+                    <Label Text="Only your questions and ratings are used, not personal identity."
+                           FontSize="11"
+                           TextColor="{StaticResource HallowTextMuted}"/>
                 </VerticalStackLayout>
             </Frame>
             

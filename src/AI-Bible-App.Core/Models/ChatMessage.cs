@@ -61,11 +61,16 @@ public class ChatMessage : INotifyPropertyChanged
                 _contextualReferences = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ContextualReferences)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasContextualReferences)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InlineReferencesText)));
             }
         }
     }
 
     public bool HasContextualReferences => ContextualReferences?.Any() == true;
+
+    public string InlineReferencesText => ContextualReferences?.Any() == true
+        ? $"Sources: {string.Join("; ", ContextualReferences.Select(r => r.Reference).Distinct())}"
+        : string.Empty;
 
     public bool IsReferencesExpanded
     {

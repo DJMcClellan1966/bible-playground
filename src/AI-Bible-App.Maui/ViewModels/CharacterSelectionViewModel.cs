@@ -4,6 +4,8 @@ using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
 
 #pragma warning disable MVVMTK0045 // AOT compatibility warning for WinRT scenarios
 
@@ -16,6 +18,7 @@ public partial class CharacterSelectionViewModel : BaseViewModel
     private readonly IHealthCheckService? _healthCheckService;
     private readonly IChatRepository _chatRepository;
     private readonly IDialogService _dialogService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private ObservableCollection<BiblicalCharacter> characters = new();
@@ -32,18 +35,23 @@ public partial class CharacterSelectionViewModel : BaseViewModel
     [ObservableProperty]
     private Color ollamaStatusColor = Colors.Gray;
 
+    [ObservableProperty]
+    private string usageSummary = string.Empty;
+
     public CharacterSelectionViewModel(
         ICharacterRepository characterRepository,
         INavigationService navigationService,
         IChatRepository chatRepository,
         IDialogService dialogService,
-        IHealthCheckService? healthCheckService = null)
+        IHealthCheckService? healthCheckService = null,
+        IUsageMetricsService? usageMetrics = null)
     {
         _characterRepository = characterRepository;
         _navigationService = navigationService;
         _chatRepository = chatRepository;
         _dialogService = dialogService;
         _healthCheckService = healthCheckService;
+        _usageMetrics = usageMetrics;
         Title = "Choose a Biblical Character";
     }
 
@@ -60,6 +68,7 @@ public partial class CharacterSelectionViewModel : BaseViewModel
             IsBusy = true;
             var chars = await _characterRepository.GetAllCharactersAsync();
             Characters = new ObservableCollection<BiblicalCharacter>(chars);
+            UpdateUsageSummary(chars);
         }
         finally
         {
@@ -205,5 +214,23 @@ public partial class CharacterSelectionViewModel : BaseViewModel
     private async Task NavigateToMultiCharacter()
     {
         await _navigationService.NavigateToAsync("MultiCharacterSelectionPage");
+    }
+
+    private void UpdateUsageSummary(IEnumerable<BiblicalCharacter> characters)
+    {
+        if (_usageMetrics == null)
+            return;
+
+        var insights = _usageMetrics.GetInsights();
+        if (insights.TotalConversations <= 0)
+        {
+            UsageSummary = "No conversations yet. Start with your favorite character!";
+            return;
+        }
+
+        var favoriteName = characters
+            .FirstOrDefault(c => c.Id == insights.FavoriteCharacter)?.Name ?? "—";
+
+        UsageSummary = $"Most chatted: {favoriteName} • Conversations: {insights.TotalConversations}";
     }
 }

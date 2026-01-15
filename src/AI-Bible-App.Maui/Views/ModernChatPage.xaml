@@ -131,6 +131,12 @@
                                                LineBreakMode="WordWrap"
                                                LineHeight="1.5"/>
                                         
+                                        <Label Text="{Binding InlineReferencesText}"
+                                               IsVisible="{Binding HasContextualReferences}"
+                                               FontSize="12"
+                                               FontAttributes="Italic"
+                                               TextColor="{StaticResource HallowTextMuted}"/>
+                                        
                                         <!-- ═══════════════════════════════════════════════════════ -->
                                         <!-- PERPLEXITY-STYLE SCRIPTURE SOURCES                     -->
                                         <!-- Shows grounded scripture citations                     -->

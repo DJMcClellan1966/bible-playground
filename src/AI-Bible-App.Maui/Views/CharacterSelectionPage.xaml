@@ -44,6 +44,11 @@
                        FontSize="14"
                        HorizontalOptions="Center"
                        FontAttributes="Italic"/>
+                <Label Text="{Binding UsageSummary}"
+                       TextColor="{StaticResource HallowTextMuted}"
+                       FontSize="12"
+                       HorizontalOptions="Center"
+                       IsVisible="{Binding UsageSummary, Converter={StaticResource StringNotEmptyConverter}}"/>
             </VerticalStackLayout>
         </Frame>
 

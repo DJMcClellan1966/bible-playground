@@ -15,6 +15,7 @@ public class HybridAIServiceSimple : IAIService
     private readonly LocalAIService _localService;
     private readonly GroqAIService _groqService;
     private readonly CachedResponseAIService _cachedService;
+    private readonly IUserService _userService;
     private readonly ILogger<HybridAIServiceSimple> _logger;
     private readonly bool _preferLocal;
     private readonly TimeSpan _localTimeout;
@@ -24,12 +25,14 @@ public class HybridAIServiceSimple : IAIService
         LocalAIService localService,
         GroqAIService groqService,
         CachedResponseAIService cachedService,
+        IUserService userService,
         IConfiguration configuration,
         ILogger<HybridAIServiceSimple> logger)
     {
         _localService = localService;
         _groqService = groqService;
         _cachedService = cachedService;
+        _userService = userService;
         _logger = logger;
         
         _preferLocal = configuration["AI:PreferLocal"] != "false";
@@ -49,43 +52,29 @@ public class HybridAIServiceSimple : IAIService
         string userMessage,
         CancellationToken cancellationToken = default)
     {
-        if (_preferLocal)
+        var preference = GetPreferredBackend();
+
+        if (preference == AiBackendPreference.Cloud)
         {
-            try
-            {
-                using var timeoutCts = new CancellationTokenSource(_localTimeout);
-                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-                
-                _logger.LogDebug("Trying local AI service with {Timeout}s timeout", _localTimeout.TotalSeconds);
-                var response = await _localService.GetChatResponseAsync(character, conversationHistory, userMessage, linkedCts.Token);
-                _logger.LogDebug("Local AI responded successfully");
-                return response;
-            }
-            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogWarning("Local AI timed out after {Timeout}s, falling back to Groq", _localTimeout.TotalSeconds);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Local AI failed, falling back to Groq");
-            }
+            var cloudResponse = await TryGroqAsync(character, conversationHistory, userMessage, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+
+            var localResponse = await TryLocalAsync(character, conversationHistory, userMessage, cancellationToken);
+            if (localResponse != null)
+                return localResponse;
+        }
+        else
+        {
+            var localResponse = await TryLocalAsync(character, conversationHistory, userMessage, cancellationToken);
+            if (localResponse != null)
+                return localResponse;
+
+            var cloudResponse = await TryGroqAsync(character, conversationHistory, userMessage, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
         }
 
-        // Fallback to Groq
-        if (_groqAvailable)
-        {
-            try
-            {
-                _logger.LogInformation("Using Groq cloud service for fast response");
-                return await _groqService.GetChatResponseAsync(character, conversationHistory, userMessage, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Groq failed, trying cached responses");
-            }
-        }
-
-        // Final fallback to cached responses
         return await _cachedService.GetChatResponseAsync(character, conversationHistory, userMessage, cancellationToken);
     }
 
@@ -95,8 +84,19 @@ public class HybridAIServiceSimple : IAIService
         string userMessage,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        var preference = GetPreferredBackend();
+
+        if (preference == AiBackendPreference.Cloud && _groqAvailable)
+        {
+            await foreach (var chunk in _groqService.StreamChatResponseAsync(character, conversationHistory, userMessage, cancellationToken))
+            {
+                yield return chunk;
+            }
+            yield break;
+        }
+
         // Try local first with timeout
-        if (_preferLocal)
+        if (preference != AiBackendPreference.Cloud && ShouldPreferLocal())
         {
             Exception? localError = null;
             using var timeoutCts = new CancellationTokenSource(_localTimeout);
@@ -155,28 +155,44 @@ public class HybridAIServiceSimple : IAIService
 
     public async Task<string> GeneratePrayerAsync(string topic, CancellationToken cancellationToken = default)
     {
-        // For prayers, try Groq first if available (much faster for short content)
-        if (_groqAvailable)
-        {
-            try
-            {
-                _logger.LogDebug("Using Groq for fast prayer generation");
-                return await _groqService.GeneratePrayerAsync(topic, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Groq prayer failed, trying local");
-            }
-        }
+        var preference = GetPreferredBackend();
 
-        // Fallback to local
-        try
+        if (preference == AiBackendPreference.Cloud)
         {
-            return await _localService.GeneratePrayerAsync(topic, cancellationToken);
+            var cloudResponse = await TryGroqPrayerAsync(topic, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+
+            var localResponse = await TryLocalPrayerAsync(topic, cancellationToken);
+            if (localResponse != null)
+                return localResponse;
         }
-        catch (Exception ex)
+        else if (preference == AiBackendPreference.Local)
         {
-            _logger.LogWarning(ex, "Local prayer failed, using cached");
+            var localResponse = await TryLocalPrayerAsync(topic, cancellationToken);
+            if (localResponse != null)
+                return localResponse;
+
+            var cloudResponse = await TryGroqPrayerAsync(topic, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+        }
+        else
+        {
+            if (ShouldPreferLocal())
+            {
+                var localResponse = await TryLocalPrayerAsync(topic, cancellationToken);
+                if (localResponse != null)
+                    return localResponse;
+            }
+
+            var cloudResponse = await TryGroqPrayerAsync(topic, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+
+            var localFallback = await TryLocalPrayerAsync(topic, cancellationToken);
+            if (localFallback != null)
+                return localFallback;
         }
 
         return await _cachedService.GeneratePrayerAsync(topic, cancellationToken);
@@ -184,29 +200,178 @@ public class HybridAIServiceSimple : IAIService
 
     public async Task<string> GeneratePersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken = default)
     {
-        // For prayers, try Groq first if available
-        if (_groqAvailable)
+        var preference = GetPreferredBackend();
+
+        if (preference == AiBackendPreference.Cloud)
         {
-            try
+            var cloudResponse = await TryGroqPersonalizedPrayerAsync(options, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+
+            var localResponse = await TryLocalPersonalizedPrayerAsync(options, cancellationToken);
+            if (localResponse != null)
+                return localResponse;
+        }
+        else if (preference == AiBackendPreference.Local)
+        {
+            var localResponse = await TryLocalPersonalizedPrayerAsync(options, cancellationToken);
+            if (localResponse != null)
+                return localResponse;
+
+            var cloudResponse = await TryGroqPersonalizedPrayerAsync(options, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+        }
+        else
+        {
+            if (ShouldPreferLocal())
             {
-                return await _groqService.GeneratePersonalizedPrayerAsync(options, cancellationToken);
+                var localResponse = await TryLocalPersonalizedPrayerAsync(options, cancellationToken);
+                if (localResponse != null)
+                    return localResponse;
             }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Groq personalized prayer failed, trying local");
-            }
+
+            var cloudResponse = await TryGroqPersonalizedPrayerAsync(options, cancellationToken);
+            if (cloudResponse != null)
+                return cloudResponse;
+
+            var localFallback = await TryLocalPersonalizedPrayerAsync(options, cancellationToken);
+            if (localFallback != null)
+                return localFallback;
         }
 
+        return await _cachedService.GeneratePersonalizedPrayerAsync(options, cancellationToken);
+    }
+
+    private bool ShouldPreferLocal()
+    {
+        if (!_preferLocal)
+            return false;
+
+        var preference = GetPreferredBackend();
+        return preference == AiBackendPreference.Auto || preference == AiBackendPreference.Local;
+    }
+
+    private AiBackendPreference GetPreferredBackend()
+    {
+        var preferred = _userService.CurrentUser?.Settings.PreferredAIBackend?.ToLowerInvariant();
+        return preferred switch
+        {
+            "local" => AiBackendPreference.Local,
+            "cloud" => AiBackendPreference.Cloud,
+            _ => AiBackendPreference.Auto
+        };
+    }
+
+    private async Task<string?> TryLocalAsync(
+        BiblicalCharacter character,
+        List<ChatMessage> conversationHistory,
+        string userMessage,
+        CancellationToken cancellationToken)
+    {
+        if (!ShouldPreferLocal())
+            return null;
+
+        try
+        {
+            using var timeoutCts = new CancellationTokenSource(_localTimeout);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+
+            _logger.LogDebug("Trying local AI service with {Timeout}s timeout", _localTimeout.TotalSeconds);
+            var response = await _localService.GetChatResponseAsync(character, conversationHistory, userMessage, linkedCts.Token);
+            _logger.LogDebug("Local AI responded successfully");
+            return response;
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning("Local AI timed out after {Timeout}s, falling back", _localTimeout.TotalSeconds);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Local AI failed, falling back");
+            return null;
+        }
+    }
+
+    private async Task<string?> TryGroqAsync(
+        BiblicalCharacter character,
+        List<ChatMessage> conversationHistory,
+        string userMessage,
+        CancellationToken cancellationToken)
+    {
+        if (!_groqAvailable)
+            return null;
+
+        try
+        {
+            _logger.LogInformation("Using Groq cloud service for response");
+            return await _groqService.GetChatResponseAsync(character, conversationHistory, userMessage, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Groq failed, falling back");
+            return null;
+        }
+    }
+
+    private async Task<string?> TryGroqPrayerAsync(string topic, CancellationToken cancellationToken)
+    {
+        if (!_groqAvailable)
+            return null;
+
+        try
+        {
+            _logger.LogDebug("Using Groq for prayer generation");
+            return await _groqService.GeneratePrayerAsync(topic, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Groq prayer failed");
+            return null;
+        }
+    }
+
+    private async Task<string?> TryLocalPrayerAsync(string topic, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _localService.GeneratePrayerAsync(topic, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Local prayer failed");
+            return null;
+        }
+    }
+
+    private async Task<string?> TryGroqPersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken)
+    {
+        if (!_groqAvailable)
+            return null;
+
+        try
+        {
+            return await _groqService.GeneratePersonalizedPrayerAsync(options, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Groq personalized prayer failed");
+            return null;
+        }
+    }
+
+    private async Task<string?> TryLocalPersonalizedPrayerAsync(PrayerOptions options, CancellationToken cancellationToken)
+    {
         try
         {
             return await _localService.GeneratePersonalizedPrayerAsync(options, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Local personalized prayer failed, using cached");
+            _logger.LogWarning(ex, "Local personalized prayer failed");
+            return null;
         }
-
-        return await _cachedService.GeneratePersonalizedPrayerAsync(options, cancellationToken);
     }
 
     public async Task<string> GenerateDevotionalAsync(DateTime date, CancellationToken cancellationToken = default)
@@ -234,4 +399,11 @@ public class HybridAIServiceSimple : IAIService
 
         return await _cachedService.GenerateDevotionalAsync(date, cancellationToken);
     }
+}
+
+public enum AiBackendPreference
+{
+    Auto,
+    Local,
+    Cloud
 }

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.Storage;
+using System.Linq;
 
 #pragma warning disable MVVMTK0045
 
@@ -24,6 +25,7 @@ public partial class SettingsViewModel : BaseViewModel
     private readonly IBibleRAGService? _ragService;
     private readonly IConfiguration? _configuration;
     private readonly IAutonomousLearningService? _learningService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     private static readonly string[] StorageDirectories =
     {
@@ -93,6 +95,12 @@ public partial class SettingsViewModel : BaseViewModel
 
     [ObservableProperty]
     private string selectedFontSize = "Medium";
+
+    [ObservableProperty]
+    private bool isDataSharingEnabled;
+
+    [ObservableProperty]
+    private AiBackendOption selectedAiBackend = new("auto", "Auto (local first, fallback to cloud)");
 
     // Cross-Device Sync Properties
     [ObservableProperty]
@@ -173,6 +181,19 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty]
     private bool isAutonomousResearchEnabled;
 
+    [ObservableProperty]
+    private bool isContextualReferencesEnabled;
+
+    // Usage Insights
+    [ObservableProperty]
+    private string usageSummary = "No usage data yet";
+
+    [ObservableProperty]
+    private string favoriteCharacter = "—";
+
+    [ObservableProperty]
+    private string mostSearchedBook = "—";
+
     // Performance & Debug Properties
     [ObservableProperty]
     private bool isPerformanceModeEnabled;
@@ -195,6 +216,12 @@ public partial class SettingsViewModel : BaseViewModel
 
     public List<string> ThemeOptions { get; } = new() { "System", "Light", "Dark" };
     public List<string> FontSizeOptions { get; } = new() { "Small", "Medium", "Large", "Extra Large" };
+    public List<AiBackendOption> AiBackendOptions { get; } = new()
+    {
+        new AiBackendOption("auto", "Auto (local first, fallback to cloud)"),
+        new AiBackendOption("local", "Local only (Ollama)"),
+        new AiBackendOption("cloud", "Cloud preferred (Groq)")
+    };
 
     public SettingsViewModel(
         ITrainingDataExporter exporter, 
@@ -208,7 +235,8 @@ public partial class SettingsViewModel : BaseViewModel
         IHealthCheckService? healthCheckService = null,
         IBibleRAGService? ragService = null,
         IConfiguration? configuration = null,
-        IAutonomousLearningService? learningService = null)
+        IAutonomousLearningService? learningService = null,
+        IUsageMetricsService? usageMetrics = null)
     {
         _exporter = exporter;
         _dialogService = dialogService;
@@ -222,6 +250,7 @@ public partial class SettingsViewModel : BaseViewModel
         _ragService = ragService;
         _configuration = configuration;
         _learningService = learningService;
+        _usageMetrics = usageMetrics;
         Title = "Settings";
         
         // Subscribe to user changes
@@ -234,12 +263,16 @@ public partial class SettingsViewModel : BaseViewModel
         // Load preferences
         IsPerformanceModeEnabled = Preferences.Get("performance_mode_enabled", false);
         PerformanceSettings.IsEnabled = IsPerformanceModeEnabled;
+
+        var defaultContextual = _configuration?["Features:ContextualReferences"]?.ToLower() == "true";
+        IsContextualReferencesEnabled = Preferences.Get("contextual_refs_enabled", defaultContextual);
         IsRagDebugEnabled = Preferences.Get("rag_debug_enabled", false);
 
         LoadModelConfig();
         _ = RefreshModelStatusAsync();
         _ = RefreshStorageStatsAsync();
         _ = RefreshLearningStatsAsync();
+        _ = RefreshUsageInsightsAsync();
     }
 
     private void OnCurrentUserChanged(object? sender, Core.Models.AppUser? user)
@@ -256,9 +289,13 @@ public partial class SettingsViewModel : BaseViewModel
             CurrentUserEmoji = user.AvatarEmoji ?? "👤";
             CurrentUserSince = user.CreatedAt;
             IsModerationEnabled = user.Settings.EnableContentModeration;
+            IsDataSharingEnabled = user.Settings.ShareDataForImprovement;
             HasPinEnabled = user.HasPin;
             SelectedTheme = user.Settings.ThemePreference;
             SelectedFontSize = user.Settings.FontSizePreference;
+            SelectedAiBackend = AiBackendOptions.FirstOrDefault(option =>
+                string.Equals(option.Value, user.Settings.PreferredAIBackend, StringComparison.OrdinalIgnoreCase))
+                ?? AiBackendOptions[0];
             
             // Load sync information
             IsSyncEnabled = user.HasSyncEnabled;
@@ -279,9 +316,11 @@ public partial class SettingsViewModel : BaseViewModel
             CurrentUserEmoji = "👤";
             CurrentUserSince = DateTime.UtcNow;
             IsModerationEnabled = true;
+            IsDataSharingEnabled = false;
             HasPinEnabled = false;
             SelectedTheme = "System";
             SelectedFontSize = "Medium";
+            SelectedAiBackend = AiBackendOptions[0];
             IsSyncEnabled = false;
             SyncCode = null;
             SyncStatusText = "Not set up";
@@ -335,6 +374,11 @@ public partial class SettingsViewModel : BaseViewModel
     {
         // Save the setting when toggled
         _ = SaveModerationSettingAsync(value);
+    }
+
+    partial void OnIsDataSharingEnabledChanged(bool value)
+    {
+        _ = SaveDataSharingSettingAsync(value);
     }
 
     partial void OnIsDailyReminderEnabledChanged(bool value)
@@ -419,6 +463,11 @@ public partial class SettingsViewModel : BaseViewModel
         _ = SaveFontSizeAsync(value);
     }
 
+    partial void OnSelectedAiBackendChanged(AiBackendOption value)
+    {
+        _ = SavePreferredAiBackendAsync(value?.Value ?? "auto");
+    }
+
     private async Task SaveAndApplyThemeAsync(string theme)
     {
         try
@@ -466,6 +515,21 @@ public partial class SettingsViewModel : BaseViewModel
         }
     }
 
+    private async Task SavePreferredAiBackendAsync(string backend)
+    {
+        try
+        {
+            await _userService.UpdateCurrentUserAsync(user =>
+            {
+                user.Settings.PreferredAIBackend = backend;
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Settings] Failed to save AI backend setting: {ex.Message}");
+        }
+    }
+
     private async Task SaveModerationSettingAsync(bool enabled)
     {
         try
@@ -478,6 +542,21 @@ public partial class SettingsViewModel : BaseViewModel
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[Settings] Failed to save moderation setting: {ex.Message}");
+        }
+    }
+
+    private async Task SaveDataSharingSettingAsync(bool enabled)
+    {
+        try
+        {
+            await _userService.UpdateCurrentUserAsync(user =>
+            {
+                user.Settings.ShareDataForImprovement = enabled;
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Settings] Failed to save data sharing setting: {ex.Message}");
         }
     }
 
@@ -625,6 +704,7 @@ public partial class SettingsViewModel : BaseViewModel
         await RefreshModelStatusAsync();
         await RefreshStorageStatsAsync();
         await RefreshLearningStatsAsync();
+        await RefreshUsageInsightsAsync();
         RagStatsSummary = IsRagDebugEnabled ? BuildRagStatsSummary() : "RAG debug is disabled";
     }
 
@@ -636,6 +716,11 @@ public partial class SettingsViewModel : BaseViewModel
     partial void OnIsAutonomousResearchEnabledChanged(bool value)
     {
         Preferences.Set("autonomous_research_enabled", value);
+    }
+
+    partial void OnIsContextualReferencesEnabledChanged(bool value)
+    {
+        Preferences.Set("contextual_refs_enabled", value);
     }
 
     private void LoadModelConfig()
@@ -771,6 +856,58 @@ public partial class SettingsViewModel : BaseViewModel
         {
             IsClearingData = false;
             await RefreshStorageStatsAsync();
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportChatsAsync()
+    {
+        await ExportLocalFileAsync(ChatDataPath, "Chat history", "chats");
+    }
+
+    [RelayCommand]
+    private async Task ExportPrayersAsync()
+    {
+        await ExportLocalFileAsync(PrayerDataPath, "Prayers", "prayers");
+    }
+
+    [RelayCommand]
+    private async Task ExportReflectionsAsync()
+    {
+        await ExportLocalFileAsync(ReflectionDataPath, "Reflections", "reflections");
+    }
+
+    [RelayCommand]
+    private async Task ExportBookmarksAsync()
+    {
+        await ExportLocalFileAsync(BookmarkDataPath, "Bookmarks", "bookmarks");
+    }
+
+    private async Task ExportLocalFileAsync(string sourcePath, string label, string filePrefix)
+    {
+        try
+        {
+            if (!File.Exists(sourcePath))
+            {
+                await _dialogService.ShowAlertAsync("No Data", $"{label} file not found on this device.");
+                return;
+            }
+
+            Directory.CreateDirectory(ExportDirectory);
+            var fileName = $"{filePrefix}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.json";
+            var destination = Path.Combine(ExportDirectory, fileName);
+            File.Copy(sourcePath, destination, overwrite: true);
+
+            await _dialogService.ShowAlertAsync(
+                "Export Complete",
+                $"Exported {label} to:\n{destination}");
+
+            await ShareFileAsync(destination);
+            await RefreshStorageStatsAsync();
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Export Failed", ex.Message);
         }
     }
 
@@ -985,6 +1122,45 @@ public partial class SettingsViewModel : BaseViewModel
         var researchPreference = Preferences.Get("autonomous_research_enabled", true);
         var configResearchEnabled = _configuration?["AutonomousResearch:Enabled"] == "true";
         IsAutonomousResearchEnabled = researchPreference && configResearchEnabled;
+    }
+
+    [RelayCommand]
+    private Task RefreshUsageInsightsAsync()
+    {
+        if (_usageMetrics == null)
+        {
+            UsageSummary = "Usage metrics unavailable";
+            return Task.CompletedTask;
+        }
+
+        var insights = _usageMetrics.GetInsights();
+        UsageSummary = $"Conversations: {insights.TotalConversations} | Prayers: {insights.TotalPrayers} | Searches: {insights.TotalBibleSearches}";
+        FavoriteCharacter = insights.FavoriteCharacter != null
+            ? $"{insights.FavoriteCharacter} ({insights.FavoriteCharacterCount})"
+            : "—";
+        MostSearchedBook = insights.MostSearchedBook != null
+            ? $"{insights.MostSearchedBook} ({insights.MostSearchedBookCount})"
+            : "—";
+
+        return Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private async Task ResetUsageMetricsAsync()
+    {
+        if (_usageMetrics == null)
+            return;
+
+        var confirm = await _dialogService.ShowConfirmAsync(
+            "Reset Usage Metrics",
+            "This will clear local usage stats (conversations, prayers, searches). Continue?",
+            "Reset", "Cancel");
+
+        if (!confirm)
+            return;
+
+        _usageMetrics.ResetMetrics();
+        await RefreshUsageInsightsAsync();
     }
 
     [RelayCommand]
@@ -1316,3 +1492,5 @@ public partial class SettingsViewModel : BaseViewModel
         }
     }
 }
+
+public record AiBackendOption(string Value, string Label);

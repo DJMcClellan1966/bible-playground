@@ -125,6 +125,7 @@ public static class MauiProgram
 		// Monetization services - conversation quotas and subscription management
 		builder.Services.AddSingleton<IConversationQuotaService, ConversationQuotaService>();
 		builder.Services.AddSingleton<IPaymentService, StripePaymentService>();
+		builder.Services.AddSingleton<IUsageMetricsService, UsageMetricsService>();
 		
 		// Device capability detection and adaptive configuration
 		builder.Services.AddSingleton<IDeviceCapabilityService, DeviceCapabilityService>();

@@ -78,6 +78,11 @@
                                            TextColor="{AppThemeBinding Light={StaticResource TextColor}, Dark={StaticResource TextColorDark}}"
                                            FontSize="{StaticResource BodyFontSize}"
                                            LineBreakMode="WordWrap"/>
+                                    <Label Text="{Binding InlineReferencesText}"
+                                           IsVisible="{Binding HasContextualReferences}"
+                                           FontSize="{StaticResource CaptionFontSize}"
+                                           FontAttributes="Italic"
+                                           TextColor="{DynamicResource Gray600}"/>
                                     <Label Text="Sources available"
                                            IsVisible="{Binding HasContextualReferences}"
                                            FontSize="{StaticResource CaptionFontSize}"

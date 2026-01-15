@@ -15,6 +15,7 @@ public partial class PrayerViewModel : BaseViewModel
     private readonly IPrayerRepository _prayerRepository;
     private readonly IReflectionRepository _reflectionRepository;
     private readonly IDialogService _dialogService;
+    private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
     private string prayerRequest = string.Empty;
@@ -66,12 +67,18 @@ public partial class PrayerViewModel : BaseViewModel
     public List<PrayerTradition> AvailableTraditions => Enum.GetValues<PrayerTradition>().ToList();
     public List<TimeOfDayContext> AvailableTimeContexts => Enum.GetValues<TimeOfDayContext>().ToList();
 
-    public PrayerViewModel(IAIService aiService, IPrayerRepository prayerRepository, IReflectionRepository reflectionRepository, IDialogService dialogService)
+    public PrayerViewModel(
+        IAIService aiService,
+        IPrayerRepository prayerRepository,
+        IReflectionRepository reflectionRepository,
+        IDialogService dialogService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _aiService = aiService;
         _prayerRepository = prayerRepository;
         _reflectionRepository = reflectionRepository;
         _dialogService = dialogService;
+        _usageMetrics = usageMetrics;
         Title = "Prayer Generator";
         
         // Auto-detect time context
@@ -160,6 +167,7 @@ public partial class PrayerViewModel : BaseViewModel
             }
             
             GeneratedPrayer = prayer;
+            _usageMetrics?.TrackPrayerGenerated(PrayerRequest, SelectedMood?.ToString());
         }
         catch (Exception ex)
         {
@@ -225,6 +233,16 @@ public partial class PrayerViewModel : BaseViewModel
     {
         PrayerRequest = string.Empty;
         GeneratedPrayer = string.Empty;
+    }
+
+    [RelayCommand]
+    private async Task CopyPrayer()
+    {
+        if (string.IsNullOrWhiteSpace(GeneratedPrayer))
+            return;
+
+        await Clipboard.Default.SetTextAsync(GeneratedPrayer);
+        await _dialogService.ShowAlertAsync("Copied", "Prayer copied to clipboard.");
     }
 
     [RelayCommand]

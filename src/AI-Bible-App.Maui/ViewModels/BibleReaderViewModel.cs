@@ -23,6 +23,7 @@ public partial class BibleReaderViewModel : BaseViewModel
     private readonly IBibleVerseIndexService _verseIndexService;
     private readonly ICharacterVoiceService _voiceService;
     private readonly IDialogService _dialogService;
+    private readonly IUsageMetricsService? _usageMetrics;
     
     // Default voice config for Bible reading
     private static readonly VoiceConfig _defaultBibleVoice = new()
@@ -118,12 +119,14 @@ public partial class BibleReaderViewModel : BaseViewModel
         IBibleLookupService bibleLookupService,
         IBibleVerseIndexService verseIndexService,
         ICharacterVoiceService voiceService,
-        IDialogService dialogService)
+        IDialogService dialogService,
+        IUsageMetricsService? usageMetrics = null)
     {
         _bibleLookupService = bibleLookupService;
         _verseIndexService = verseIndexService;
         _voiceService = voiceService;
         _dialogService = dialogService;
+        _usageMetrics = usageMetrics;
         Title = "Bible Reader";
     }
     
@@ -258,6 +261,12 @@ public partial class BibleReaderViewModel : BaseViewModel
                         Relevance = 1.0
                     });
                 }
+
+                var normalizedBook = NormalizeBookName(book);
+                if (!string.IsNullOrEmpty(normalizedBook))
+                {
+                    _usageMetrics?.TrackBibleSearch(normalizedBook, chapter);
+                }
             }
             else
             {
@@ -271,6 +280,13 @@ public partial class BibleReaderViewModel : BaseViewModel
                         Text = result.Text,
                         Relevance = result.Relevance
                     });
+                }
+
+                var detectedBook = DetectBookFromQuery(SearchQuery)
+                    ?? TryExtractBookFromReference(SearchResults.FirstOrDefault()?.Reference);
+                if (!string.IsNullOrEmpty(detectedBook))
+                {
+                    _usageMetrics?.TrackBibleSearch(detectedBook);
                 }
             }
             
@@ -294,6 +310,48 @@ public partial class BibleReaderViewModel : BaseViewModel
         SearchQuery = string.Empty;
         SearchResults.Clear();
         SearchResultCount = 0;
+    }
+
+    private static string? DetectBookFromQuery(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return null;
+
+        foreach (var book in AllBooks.OrderByDescending(b => b.Length))
+        {
+            if (query.StartsWith(book, StringComparison.OrdinalIgnoreCase))
+            {
+                return book;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? TryExtractBookFromReference(string? reference)
+    {
+        if (string.IsNullOrWhiteSpace(reference))
+            return null;
+
+        var match = Regex.Match(reference, @"^(.+?)\s+\d+:\d+", RegexOptions.IgnoreCase);
+        return match.Success ? NormalizeBookName(match.Groups[1].Value) : null;
+    }
+
+    private static string? NormalizeBookName(string book)
+    {
+        if (string.IsNullOrWhiteSpace(book))
+            return null;
+
+        var cleaned = book.Trim();
+        foreach (var known in AllBooks)
+        {
+            if (string.Equals(known, cleaned, StringComparison.OrdinalIgnoreCase))
+            {
+                return known;
+            }
+        }
+
+        return cleaned;
     }
     
     [RelayCommand]
