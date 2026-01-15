@@ -4,6 +4,7 @@ using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Maui.Services;
 using AI_Bible_App.Infrastructure.Services;
 using System.Runtime.ExceptionServices;
+using Microsoft.Maui.Storage;
 
 namespace AI_Bible_App.Maui;
 
@@ -127,12 +128,14 @@ public partial class App : Application
 				}
 				
 				// Start background schedulers (non-blocking)
-				if (_researchScheduler != null)
+				var researchEnabled = Preferences.Get("autonomous_research_enabled", true);
+				if (_researchScheduler != null && researchEnabled)
 				{
 					_researchScheduler.Start();
 				}
 
-				if (_learningScheduler != null)
+				var learningEnabled = Preferences.Get("autonomous_learning_enabled", true);
+				if (_learningScheduler != null && learningEnabled)
 				{
 					_learningScheduler.Start();
 				}

@@ -167,6 +167,12 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty]
     private string researchWindowText = "Not configured";
 
+    [ObservableProperty]
+    private bool isAutonomousLearningEnabled;
+
+    [ObservableProperty]
+    private bool isAutonomousResearchEnabled;
+
     // Performance & Debug Properties
     [ObservableProperty]
     private bool isPerformanceModeEnabled;
@@ -622,6 +628,16 @@ public partial class SettingsViewModel : BaseViewModel
         RagStatsSummary = IsRagDebugEnabled ? BuildRagStatsSummary() : "RAG debug is disabled";
     }
 
+    partial void OnIsAutonomousLearningEnabledChanged(bool value)
+    {
+        Preferences.Set("autonomous_learning_enabled", value);
+    }
+
+    partial void OnIsAutonomousResearchEnabledChanged(bool value)
+    {
+        Preferences.Set("autonomous_research_enabled", value);
+    }
+
     private void LoadModelConfig()
     {
         if (_configuration == null)
@@ -964,6 +980,11 @@ public partial class SettingsViewModel : BaseViewModel
             var endHour = int.TryParse(_configuration["AutonomousResearch:EndHour"], out var eh) ? eh : 6;
             ResearchWindowText = enabled ? $"{startHour:00}:00–{endHour:00}:00" : "Disabled";
         }
+
+        IsAutonomousLearningEnabled = Preferences.Get("autonomous_learning_enabled", true);
+        var researchPreference = Preferences.Get("autonomous_research_enabled", true);
+        var configResearchEnabled = _configuration?["AutonomousResearch:Enabled"] == "true";
+        IsAutonomousResearchEnabled = researchPreference && configResearchEnabled;
     }
 
     [RelayCommand]

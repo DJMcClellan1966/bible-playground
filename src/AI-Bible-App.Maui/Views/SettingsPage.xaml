@@ -316,6 +316,24 @@
                                TextColor="{StaticResource HallowTextSecondary}"/>
                     </Grid>
 
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                        <Label Grid.Column="0"
+                               Text="Enable Autonomous Learning"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsAutonomousLearningEnabled}"
+                                OnColor="{StaticResource HallowAccentPurple}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Enable Autonomous Research"
+                               TextColor="{StaticResource HallowTextPrimary}"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsAutonomousResearchEnabled}"
+                                OnColor="{StaticResource HallowAccentPurple}"/>
+                    </Grid>
+
                     <Button Text="🔄 Refresh Learning Status"
                             Command="{Binding RefreshLearningStatsCommand}"
                             BackgroundColor="{StaticResource HallowCardHover}"
