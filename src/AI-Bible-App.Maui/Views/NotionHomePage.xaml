@@ -31,30 +31,57 @@
                            FontAttributes="Bold"/>
                 </VerticalStackLayout>
                 
-                <!-- User Avatar -->
-                <Border Grid.Column="1" 
-                        WidthRequest="48" HeightRequest="48"
-                        StrokeThickness="2"
-                        Stroke="{StaticResource HallowAccentPurple}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="24"/>
-                    </Border.StrokeShape>
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
-                            <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
-                        </LinearGradientBrush>
-                    </Border.Background>
-                    <Label Text="{Binding UserEmoji}"
-                           FontSize="24"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
-                </Border>
+                <!-- User Avatar + Settings -->
+                <HorizontalStackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center">
+                    <Border WidthRequest="48" HeightRequest="48"
+                            StrokeThickness="2"
+                            Stroke="{StaticResource HallowAccentPurple}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="24"/>
+                        </Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="{StaticResource HallowAccentPurple}" Offset="0.0" />
+                                <GradientStop Color="{StaticResource HallowRose}" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Label Text="{Binding UserEmoji}"
+                               FontSize="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Border>
+                    <Button Text="⚙️"
+                            Command="{Binding OpenSettingsCommand}"
+                            BackgroundColor="{StaticResource HallowCardBackground}"
+                            TextColor="{StaticResource HallowTextPrimary}"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            CornerRadius="20"
+                            Padding="0"
+                            ToolTipProperties.Text="Open settings"/>
+                </HorizontalStackLayout>
             </Grid>
             
             <!-- ═══════════════════════════════════════════════════════════════════ -->
             <!-- QUICK ACTIONS - Notion-style action blocks                          -->
             <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <HorizontalStackLayout Spacing="10" Margin="0,0,0,6">
+                <Button Text="Switch User"
+                        Command="{Binding SwitchUserCommand}"
+                        BackgroundColor="{StaticResource HallowCardHover}"
+                        TextColor="{StaticResource HallowTextPrimary}"
+                        CornerRadius="14"
+                        HeightRequest="36"
+                        ToolTipProperties.Text="Switch to another profile"/>
+                <Button Text="Sign Out"
+                        Command="{Binding SignOutCommand}"
+                        BackgroundColor="{StaticResource HallowRose}"
+                        TextColor="White"
+                        CornerRadius="14"
+                        HeightRequest="36"
+                        ToolTipProperties.Text="Sign out of this account"/>
+            </HorizontalStackLayout>
+
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
                 <!-- New Chat -->
                 <Border Grid.Column="0" Padding="16" HeightRequest="100"

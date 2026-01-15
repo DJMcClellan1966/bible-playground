@@ -96,22 +96,35 @@ public class BibleVerseIndexService : IBibleVerseIndexService
         {
             var results = new List<VerseSearchResult>();
             var queryWords = NormalizeAndSplit(query);
+            if (queryWords.Count == 0)
+                return results;
 
-            foreach (var kvp in _verseIndex)
+            var candidateCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            foreach (var word in queryWords)
             {
-                var verseWords = NormalizeAndSplit(kvp.Value);
-                var matchCount = queryWords.Count(qw => verseWords.Contains(qw));
-                
-                if (matchCount > 0)
+                if (!_wordIndex.TryGetValue(word, out var refs))
+                    continue;
+
+                foreach (var reference in refs)
                 {
-                    var relevance = (double)matchCount / queryWords.Count;
-                    results.Add(new VerseSearchResult
-                    {
-                        Reference = kvp.Key,
-                        Text = kvp.Value,
-                        Relevance = relevance
-                    });
+                    candidateCounts.TryGetValue(reference, out var count);
+                    candidateCounts[reference] = count + 1;
                 }
+            }
+
+            foreach (var (reference, matchCount) in candidateCounts)
+            {
+                if (!_verseIndex.TryGetValue(reference, out var text))
+                    continue;
+
+                var relevance = (double)matchCount / queryWords.Count;
+                results.Add(new VerseSearchResult
+                {
+                    Reference = reference,
+                    Text = text,
+                    Relevance = relevance
+                });
             }
 
             return results

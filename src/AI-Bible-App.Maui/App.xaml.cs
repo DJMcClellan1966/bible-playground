@@ -4,6 +4,8 @@ using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Maui.Services;
 using AI_Bible_App.Infrastructure.Services;
 using System.Runtime.ExceptionServices;
+using System.Text.Json;
+using System.Linq;
 using Microsoft.Maui.Storage;
 
 namespace AI_Bible_App.Maui;
@@ -100,26 +102,36 @@ public partial class App : Application
 					{
 						try
 						{
-							// Load Bible verses from bundled data
-							var bibleFiles = new[] { "web.json", "kjv.json", "asv.json", "youngs.json", "darby.json" };
-							foreach (var fileName in bibleFiles)
+							// Load Bible verses from bundled data (single default translation for faster startup)
+							var preferredPath = GetPreferredBiblePath();
+							var fallbackPaths = new[]
+							{
+								preferredPath,
+								"Data/Bible/web.json",
+								"Data/Bible/kjv.json"
+							}.Where(path => !string.IsNullOrWhiteSpace(path))
+							 .Distinct()
+							 .ToArray();
+
+							foreach (var path in fallbackPaths)
 							{
 								try
 								{
-									using var stream = await FileSystem.OpenAppPackageFileAsync($"Data/Bible/{fileName}");
-									using var reader = new StreamReader(stream);
-									var json = await reader.ReadToEndAsync();
-									var verses = System.Text.Json.JsonSerializer.Deserialize<List<AI_Bible_App.Core.Models.BibleVerse>>(json);
+									if (string.IsNullOrWhiteSpace(path))
+										continue;
+
+									using var stream = await FileSystem.OpenAppPackageFileAsync(path);
+									var verses = await JsonSerializer.DeserializeAsync<List<AI_Bible_App.Core.Models.BibleVerse>>(stream);
 									if (verses != null && verses.Count > 0)
 									{
 										await _bibleIndexService.InitializeWithVersesAsync(verses);
-										System.Diagnostics.Debug.WriteLine($"[App] Bible index ready: {_bibleIndexService.TotalVersesIndexed} verses from {fileName}");
+										System.Diagnostics.Debug.WriteLine($"[App] Bible index ready: {_bibleIndexService.TotalVersesIndexed} verses from {path}");
 										break;
 									}
 								}
 								catch (Exception fileEx)
 								{
-									System.Diagnostics.Debug.WriteLine($"[App] Could not load {fileName}: {fileEx.Message}");
+									System.Diagnostics.Debug.WriteLine($"[App] Could not load {path}: {fileEx.Message}");
 								}
 							}
 						}
@@ -179,5 +191,20 @@ public partial class App : Application
 		};
 		
 		return window;
+	}
+
+	private string? GetPreferredBiblePath()
+	{
+		if (_configuration == null)
+			return null;
+
+		var defaultTranslation = _configuration["Bible:DefaultTranslation"] ?? "WEB";
+		var dataPath = _configuration["Bible:DataPath"];
+		var webPath = _configuration["Bible:WebDataPath"];
+
+		if (defaultTranslation.Equals("WEB", StringComparison.OrdinalIgnoreCase))
+			return string.IsNullOrWhiteSpace(webPath) ? dataPath : webPath;
+
+		return dataPath;
 	}
 }

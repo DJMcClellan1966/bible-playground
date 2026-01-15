@@ -20,6 +20,8 @@ public partial class HomeViewModel : BaseViewModel
     private readonly IPrayerRepository _prayerRepository;
     private readonly IUserService _userService;
     private readonly INavigationService _navigationService;
+    private readonly IAuthenticationService _authService;
+    private readonly IDialogService _dialogService;
     private readonly IUsageMetricsService? _usageMetrics;
 
     [ObservableProperty]
@@ -46,6 +48,8 @@ public partial class HomeViewModel : BaseViewModel
         IPrayerRepository prayerRepository,
         IUserService userService,
         INavigationService navigationService,
+        IAuthenticationService authService,
+        IDialogService dialogService,
         IUsageMetricsService? usageMetrics = null)
     {
         _characterRepository = characterRepository;
@@ -53,6 +57,8 @@ public partial class HomeViewModel : BaseViewModel
         _prayerRepository = prayerRepository;
         _userService = userService;
         _navigationService = navigationService;
+        _authService = authService;
+        _dialogService = dialogService;
         _usageMetrics = usageMetrics;
         
         Title = "Home";
@@ -166,6 +172,41 @@ public partial class HomeViewModel : BaseViewModel
     private async Task ViewAllPrayers()
     {
         await Shell.Current.GoToAsync("//prayer");
+    }
+
+    [RelayCommand]
+    private async Task OpenSettings()
+    {
+        await _navigationService.NavigateToAsync("//settings");
+    }
+
+    [RelayCommand]
+    private async Task SwitchUser()
+    {
+        await _navigationService.NavigateToAsync("//userselection");
+    }
+
+    [RelayCommand]
+    private async Task SignOut()
+    {
+        var confirm = await _dialogService.ShowConfirmAsync(
+            "Sign Out",
+            "Are you sure you want to sign out? You'll need to sign in again to access your data.");
+
+        if (!confirm)
+            return;
+
+        try
+        {
+            Preferences.Remove("stay_logged_in");
+            Preferences.Remove("onboarding_profile");
+            await _authService.SignOutAsync();
+            await _navigationService.NavigateToAsync("//login");
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Error", $"Failed to sign out: {ex.Message}");
+        }
     }
 
     [RelayCommand]

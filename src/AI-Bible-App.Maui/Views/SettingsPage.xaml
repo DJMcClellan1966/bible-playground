@@ -75,14 +75,6 @@
                                 Padding="15,0"/>
                     </Grid>
                     
-                    <!-- Sign Out Button -->
-                    <Button Text="🚪 Sign Out"
-                            Command="{Binding SignOutCommand}"
-                            BackgroundColor="{StaticResource HallowRose}"
-                            TextColor="White"
-                            CornerRadius="15"
-                            HeightRequest="44"
-                            Margin="0,10,0,0"/>
                 </VerticalStackLayout>
             </Frame>
             

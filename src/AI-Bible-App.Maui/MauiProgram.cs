@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Maui.Storage;
 using AI_Bible_App.Core.Interfaces;
 using AI_Bible_App.Core.Models;
 using AI_Bible_App.Core.Services;
@@ -41,6 +42,23 @@ public static class MauiProgram
 				.AddJsonStream(stream)
 				.Build();
 			builder.Configuration.AddConfiguration(config);
+		}
+		else
+		{
+			try
+			{
+				using var assetStream = FileSystem.OpenAppPackageFileAsync("appsettings.json")
+					.GetAwaiter()
+					.GetResult();
+				var config = new ConfigurationBuilder()
+					.AddJsonStream(assetStream)
+					.Build();
+				builder.Configuration.AddConfiguration(config);
+			}
+			catch
+			{
+				// Config is optional; app can run with defaults.
+			}
 		}
 		builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

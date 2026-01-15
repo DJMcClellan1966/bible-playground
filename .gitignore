@@ -60,8 +60,7 @@ asv/
 darby/
 bible/youngs/
 
-# Allow MAUI app config and bundled Bible assets
-!src/AI-Bible-App.Maui/appsettings.json
+# Allow MAUI bundled Bible assets
 !src/AI-Bible-App.Maui/Data/
 !src/AI-Bible-App.Maui/Data/Bible/
 !src/AI-Bible-App.Maui/Data/Bible/*.json

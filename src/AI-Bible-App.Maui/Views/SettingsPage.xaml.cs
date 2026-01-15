@@ -15,6 +15,14 @@ public partial class SettingsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.InitializeAsync();
+        try
+        {
+            await _viewModel.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Settings] Initialize failed: {ex}");
+            await DisplayAlert("Settings Error", "Unable to load settings. Please try again.", "OK");
+        }
     }
 }

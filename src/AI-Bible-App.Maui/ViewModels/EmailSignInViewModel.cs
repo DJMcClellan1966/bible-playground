@@ -205,6 +205,10 @@ public partial class EmailSignInViewModel : BaseViewModel
                     }
                 }
             }
+            else
+            {
+                ShowError("Could not send reset email. Check your email and try again.");
+            }
         }
         catch (Exception ex)
         {
