@@ -8,9 +8,10 @@ namespace AI_Bible_App.Maui.ViewModels;
 public partial class EmailSignInViewModel : BaseViewModel
 {
     private readonly IAuthenticationService _authService;
-    private const string SavedEmailKey = "saved_email";
+    private const string SavedUsernameKey = "saved_username";
     private const string SavedPasswordKey = "saved_password";
-    private string? _savedEmail;
+    private const string UsernameEmailKeyPrefix = "username_email_";
+    private string? _savedUsername;
     private string? _savedPassword;
     private bool _promptedUseSaved;
     private const int MaxFailedAttempts = 5;
@@ -20,16 +21,16 @@ public partial class EmailSignInViewModel : BaseViewModel
     private bool _lockoutTimerRunning;
     
     [ObservableProperty]
-    private string email = string.Empty;
+    private string username = string.Empty;
+
+    [ObservableProperty]
+    private string recoveryEmail = string.Empty;
     
     [ObservableProperty]
     private string password = string.Empty;
     
     [ObservableProperty]
     private string confirmPassword = string.Empty;
-    
-    [ObservableProperty]
-    private string displayName = string.Empty;
     
     [ObservableProperty]
     private string errorMessage = string.Empty;
@@ -58,7 +59,7 @@ public partial class EmailSignInViewModel : BaseViewModel
     {
         try
         {
-            _savedEmail = Preferences.Get(SavedEmailKey, string.Empty);
+            _savedUsername = Preferences.Get(SavedUsernameKey, string.Empty);
             _savedPassword = await SecureStorage.GetAsync(SavedPasswordKey);
             _promptedUseSaved = false;
         }
@@ -68,7 +69,7 @@ public partial class EmailSignInViewModel : BaseViewModel
         }
     }
 
-    partial void OnEmailChanged(string value)
+    partial void OnUsernameChanged(string value)
     {
         _ = MaybePromptUseSavedAsync(value);
     }
@@ -123,9 +124,15 @@ public partial class EmailSignInViewModel : BaseViewModel
             IsBusy = true;
             ClearError();
             
-            if (string.IsNullOrWhiteSpace(Email))
+            if (string.IsNullOrWhiteSpace(Username))
             {
-                ShowError("Please enter your email address");
+                ShowError("Please enter your username");
+                return;
+            }
+
+            if (Username.Contains('@'))
+            {
+                ShowError("Username cannot be an email address");
                 return;
             }
             
@@ -135,12 +142,20 @@ public partial class EmailSignInViewModel : BaseViewModel
                 return;
             }
             
-            var result = await _authService.SignInWithEmailAsync(Email.Trim(), Password);
+            var email = await ResolveEmailForUsernameAsync(Username.Trim());
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                ShowError("Username not found on this device. Please enter your recovery email to continue.");
+                return;
+            }
+
+            var result = await _authService.SignInWithEmailAsync(email.Trim(), Password);
             
             if (result.Success)
             {
                 ResetLockout();
-                await PromptToSaveCredentialsAsync(Email.Trim(), Password);
+                await PromptToSaveCredentialsAsync(Username.Trim(), Password);
+                SaveUsernameEmailMapping(Username.Trim(), email.Trim());
                 await Shell.Current.GoToAsync("//home");
             }
             else
@@ -166,15 +181,21 @@ public partial class EmailSignInViewModel : BaseViewModel
             IsBusy = true;
             ClearError();
             
-            if (string.IsNullOrWhiteSpace(DisplayName))
+            if (string.IsNullOrWhiteSpace(Username))
             {
-                ShowError("Please enter your name");
+                ShowError("Please choose a username");
+                return;
+            }
+
+            if (Username.Contains('@'))
+            {
+                ShowError("Username cannot be an email address");
                 return;
             }
             
-            if (string.IsNullOrWhiteSpace(Email))
+            if (string.IsNullOrWhiteSpace(RecoveryEmail))
             {
-                ShowError("Please enter your email address");
+                ShowError("Please enter a recovery email address");
                 return;
             }
             
@@ -196,12 +217,13 @@ public partial class EmailSignInViewModel : BaseViewModel
                 return;
             }
             
-            var result = await _authService.SignUpWithEmailAsync(Email.Trim(), Password, DisplayName.Trim());
+            var result = await _authService.SignUpWithEmailAsync(RecoveryEmail.Trim(), Password, Username.Trim());
             
             if (result.Success)
             {
                 ResetLockout();
-                await PromptToSaveCredentialsAsync(Email.Trim(), Password);
+                await PromptToSaveCredentialsAsync(Username.Trim(), Password);
+                SaveUsernameEmailMapping(Username.Trim(), RecoveryEmail.Trim());
                 await Shell.Current.GoToAsync("//home");
             }
             else
@@ -223,12 +245,6 @@ public partial class EmailSignInViewModel : BaseViewModel
     [RelayCommand]
     private async Task ForgotPassword()
     {
-        if (string.IsNullOrWhiteSpace(Email))
-        {
-            ShowError("Please enter your email address first");
-            return;
-        }
-
         if (IsLockedOut)
         {
             ShowError($"Too many attempts. Try again in {GetRemainingLockoutSeconds()}s.");
@@ -240,7 +256,28 @@ public partial class EmailSignInViewModel : BaseViewModel
             IsBusy = true;
             ClearError();
             
-            var sent = await _authService.SendPasswordResetAsync(Email.Trim());
+            var email = RecoveryEmail;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                var page = GetMainPage();
+                if (page != null)
+                {
+                    email = await page.DisplayPromptAsync(
+                        "Recovery Email",
+                        "Enter the recovery email for this account:",
+                        "Send",
+                        "Cancel",
+                        keyboard: Keyboard.Email);
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                ShowError("Recovery email is required to reset your password");
+                return;
+            }
+
+            var sent = await _authService.SendPasswordResetAsync(email.Trim());
             
             if (sent)
             {
@@ -343,12 +380,12 @@ public partial class EmailSignInViewModel : BaseViewModel
         HasError = true;
     }
 
-    private static async Task SaveCredentialsAsync(string email, string password)
+    private static async Task SaveCredentialsAsync(string username, string password)
     {
         try
         {
-            if (!string.IsNullOrWhiteSpace(email))
-                Preferences.Set(SavedEmailKey, email);
+            if (!string.IsNullOrWhiteSpace(username))
+                Preferences.Set(SavedUsernameKey, username);
 
             if (!string.IsNullOrWhiteSpace(password))
                 await SecureStorage.SetAsync(SavedPasswordKey, password);
@@ -359,53 +396,53 @@ public partial class EmailSignInViewModel : BaseViewModel
         }
     }
 
-    private async Task PromptToSaveCredentialsAsync(string email, string password)
+    private async Task PromptToSaveCredentialsAsync(string username, string password)
     {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             return;
 
         var page = GetMainPage();
         if (page == null)
         {
-            await SaveCredentialsAsync(email, password);
+            await SaveCredentialsAsync(username, password);
             return;
         }
 
         var shouldSave = await page.DisplayAlert(
             "Save Login?",
-            "Would you like to save your email and password on this device?",
+            "Would you like to save your username and password on this device?",
             "Save",
             "Not now");
 
         if (shouldSave)
         {
-            await SaveCredentialsAsync(email, password);
-            _savedEmail = email;
+            await SaveCredentialsAsync(username, password);
+            _savedUsername = username;
             _savedPassword = password;
         }
         else
         {
-            _savedEmail = null;
+            _savedUsername = null;
             _savedPassword = null;
         }
     }
 
-    private async Task MaybePromptUseSavedAsync(string currentEmail)
+    private async Task MaybePromptUseSavedAsync(string currentUsername)
     {
         if (_promptedUseSaved)
             return;
 
-        if (string.IsNullOrWhiteSpace(currentEmail))
+        if (string.IsNullOrWhiteSpace(currentUsername))
             return;
 
-        if (string.IsNullOrWhiteSpace(_savedEmail) || string.IsNullOrWhiteSpace(_savedPassword))
+        if (string.IsNullOrWhiteSpace(_savedUsername) || string.IsNullOrWhiteSpace(_savedPassword))
             return;
 
-        // Prompt when typed length reaches a minimum and matches saved email prefix.
-        if (currentEmail.Length < 5)
+        // Prompt when typed length reaches a minimum and matches saved username prefix.
+        if (currentUsername.Length < 3)
             return;
 
-        if (!_savedEmail.StartsWith(currentEmail, StringComparison.OrdinalIgnoreCase))
+        if (!_savedUsername.StartsWith(currentUsername, StringComparison.OrdinalIgnoreCase))
             return;
 
         var page = GetMainPage();
@@ -415,15 +452,50 @@ public partial class EmailSignInViewModel : BaseViewModel
         _promptedUseSaved = true;
         var useSaved = await page.DisplayAlert(
             "Use Saved Login?",
-            "We found saved login details for this email. Use them?",
+            "We found saved login details for this username. Use them?",
             "Use Saved",
             "Keep Typing");
 
         if (useSaved)
         {
-            Email = _savedEmail;
+            Username = _savedUsername;
             Password = _savedPassword;
         }
+    }
+
+    private void SaveUsernameEmailMapping(string username, string email)
+    {
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email))
+            return;
+
+        var key = $"{UsernameEmailKeyPrefix}{username.Trim().ToLowerInvariant()}";
+        Preferences.Set(key, email.Trim());
+    }
+
+    private async Task<string?> ResolveEmailForUsernameAsync(string username)
+    {
+        var key = $"{UsernameEmailKeyPrefix}{username.Trim().ToLowerInvariant()}";
+        var email = Preferences.Get(key, string.Empty);
+        if (!string.IsNullOrWhiteSpace(email))
+            return email;
+
+        var page = GetMainPage();
+        if (page == null)
+            return null;
+
+        var enteredEmail = await page.DisplayPromptAsync(
+            "Recovery Email",
+            "Enter the recovery email for this username:",
+            "Continue",
+            "Cancel",
+            keyboard: Keyboard.Email);
+
+        if (string.IsNullOrWhiteSpace(enteredEmail))
+            return null;
+
+        SaveUsernameEmailMapping(username, enteredEmail);
+        RecoveryEmail = enteredEmail;
+        return enteredEmail;
     }
 
     private static Page? GetMainPage()
@@ -431,7 +503,7 @@ public partial class EmailSignInViewModel : BaseViewModel
         if (Application.Current?.Windows?.Count > 0)
             return Application.Current.Windows[0].Page;
 
-        return Application.Current?.MainPage;
+        return null;
     }
 
     private void RegisterFailedAttempt()

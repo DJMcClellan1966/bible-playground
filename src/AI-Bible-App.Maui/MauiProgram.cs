@@ -115,7 +115,8 @@ public static class MauiProgram
 		// User management and content moderation
 		builder.Services.AddSingleton<IUserRepository, JsonUserRepository>();
 		builder.Services.AddSingleton<IUserService, UserService>();
-		builder.Services.AddSingleton<IAuthenticationService, FirebaseAuthenticationService>();
+		builder.Services.AddSingleton<FirebaseAuthenticationService>();
+		builder.Services.AddSingleton<IAuthenticationService, MauiAuthenticationService>();
 		builder.Services.AddSingleton<IContentModerationService, ContentModerationService>();
 		
 		// Training data collection services

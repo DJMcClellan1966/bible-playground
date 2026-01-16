@@ -4,6 +4,7 @@ using AI_Bible_App.Infrastructure.Services;
 using AI_Bible_App.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Storage;
 using System.Collections.ObjectModel;
 
 namespace AI_Bible_App.Maui.ViewModels;
@@ -28,7 +29,7 @@ public partial class HomeViewModel : BaseViewModel
     private string greeting = "Good morning";
 
     [ObservableProperty]
-    private string userName = "Friend";
+    private string userName = "User";
 
     [ObservableProperty]
     private string userEmoji = "👤";
@@ -85,6 +86,12 @@ public partial class HomeViewModel : BaseViewModel
             UserName = user.Name;
             UserEmoji = user.AvatarEmoji ?? "👤";
         }
+        else
+        {
+            var savedUsername = Preferences.Get("saved_username", string.Empty);
+            UserName = string.IsNullOrWhiteSpace(savedUsername) ? "User" : savedUsername;
+            UserEmoji = "👤";
+        }
     }
 
     public async Task LoadDataAsync()
@@ -129,9 +136,16 @@ public partial class HomeViewModel : BaseViewModel
     [RelayCommand]
     private async Task NewChat()
     {
-        await Shell.Current.GoToAsync("//characters");
-        // Fire event to auto-refresh recent chats
-        ChatCreated?.Invoke();
+        try
+        {
+            await _navigationService.NavigateToAsync("//characters");
+            // Fire event to auto-refresh recent chats
+            ChatCreated?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Navigation Error", $"Could not open Characters: {ex.Message}");
+        }
     }
 
     public async Task RefreshRecentChatsAsync()
@@ -159,7 +173,7 @@ public partial class HomeViewModel : BaseViewModel
             if (string.IsNullOrWhiteSpace(session.CharacterName) && characterMap.TryGetValue(session.CharacterId, out var character))
             {
                 session.CharacterName = character.Name;
-                session.CharacterEmoji = character.AvatarEmoji ?? character.Emoji;
+                session.CharacterEmoji = ResolveCharacterEmoji(character);
             }
 
             if (string.IsNullOrWhiteSpace(session.CharacterName))
@@ -181,6 +195,19 @@ public partial class HomeViewModel : BaseViewModel
             .ToList();
     }
 
+    private static string ResolveCharacterEmoji(BiblicalCharacter character)
+    {
+        if (character.Attributes != null)
+        {
+            if (character.Attributes.TryGetValue("Emoji", out var emoji) && !string.IsNullOrWhiteSpace(emoji))
+                return emoji;
+            if (character.Attributes.TryGetValue("emoji", out emoji) && !string.IsNullOrWhiteSpace(emoji))
+                return emoji;
+        }
+
+        return "👤";
+    }
+
     private static bool IsCharacterReady(BiblicalCharacter character)
     {
         if (character == null)
@@ -198,13 +225,27 @@ public partial class HomeViewModel : BaseViewModel
     [RelayCommand]
     private async Task Prayer()
     {
-        await Shell.Current.GoToAsync("//prayer");
+        try
+        {
+            await _navigationService.NavigateToAsync("//prayer");
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Navigation Error", $"Could not open Prayer: {ex.Message}");
+        }
     }
 
     [RelayCommand]
     private async Task Bible()
     {
-        await Shell.Current.GoToAsync("//BibleReader");
+        try
+        {
+            await _navigationService.NavigateToAsync("//BibleReader");
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Navigation Error", $"Could not open Bible Reader: {ex.Message}");
+        }
     }
 
     [RelayCommand]
@@ -228,13 +269,14 @@ public partial class HomeViewModel : BaseViewModel
     [RelayCommand]
     private async Task OpenSettings()
     {
-        await _navigationService.NavigateToAsync("//settings");
-    }
-
-    [RelayCommand]
-    private async Task SwitchUser()
-    {
-        await _navigationService.NavigateToAsync("//userselection");
+        try
+        {
+            await _navigationService.NavigateToAsync("//settings");
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAlertAsync("Navigation Error", $"Could not open Settings: {ex.Message}");
+        }
     }
 
     [RelayCommand]

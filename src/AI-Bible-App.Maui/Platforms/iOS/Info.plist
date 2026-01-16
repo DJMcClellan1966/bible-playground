@@ -32,5 +32,16 @@
 	<string>Voice input for chatting with biblical characters</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Speech recognition for voice-to-text input</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.828810073591-1chpql2jqhr6s6sfcrrgtkh174uo7flt</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

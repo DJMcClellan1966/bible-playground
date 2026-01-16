@@ -63,6 +63,9 @@
                             <Label Text="{Binding CurrentUserSince, StringFormat='Member since {0:MMM d, yyyy}'}" 
                                    FontSize="12" 
                                    TextColor="{StaticResource HallowTextMuted}"/>
+                            <Label Text="{Binding WindowsPackageFamilyName, StringFormat='Windows PFN: {0}'}"
+                                   FontSize="11"
+                                   TextColor="{StaticResource HallowTextMuted}"/>
                         </VerticalStackLayout>
                         
                         <Button Grid.Column="2"

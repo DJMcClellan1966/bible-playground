@@ -80,17 +80,17 @@
                         </Grid>
                     </Border>
                     
-                    <!-- Name field (Sign Up only) -->
+                    <!-- Username field -->
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding IsSignUpMode}">
-                        <Label Text="Full Name" TextColor="#A78BFA" FontSize="14"/>
+                        <Label Text="Username" TextColor="#A78BFA" FontSize="14"/>
                         <Border StrokeShape="RoundRectangle 12"
                                 StrokeThickness="1"
                                 Stroke="#4C1D95"
                                 BackgroundColor="#1A0A2E"
                                 Padding="16,4"
                                 HeightRequest="56">
-                            <Entry Text="{Binding DisplayName}"
-                                   Placeholder="Enter your name"
+                            <Entry Text="{Binding Username}"
+                                   Placeholder="Choose a username"
                                    PlaceholderColor="#6B7280"
                                    TextColor="White"
                                    FontSize="16"
@@ -99,17 +99,36 @@
                         </Border>
                     </VerticalStackLayout>
                     
-                    <!-- Email field -->
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Email" TextColor="#A78BFA" FontSize="14"/>
+                    <!-- Username field (Sign In) -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding IsSignInMode}">
+                        <Label Text="Username" TextColor="#A78BFA" FontSize="14"/>
                         <Border StrokeShape="RoundRectangle 12"
                                 StrokeThickness="1"
                                 Stroke="#4C1D95"
                                 BackgroundColor="#1A0A2E"
                                 Padding="16,4"
                                 HeightRequest="56">
-                            <Entry Text="{Binding Email}"
-                                   Placeholder="your@email.com"
+                            <Entry Text="{Binding Username}"
+                                   Placeholder="Enter your username"
+                                   PlaceholderColor="#6B7280"
+                                   TextColor="White"
+                                   FontSize="16"
+                                   Keyboard="Text"
+                                   ReturnType="Next"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Recovery Email field (Sign Up only) -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding IsSignUpMode}">
+                        <Label Text="Recovery Email" TextColor="#A78BFA" FontSize="14"/>
+                        <Border StrokeShape="RoundRectangle 12"
+                                StrokeThickness="1"
+                                Stroke="#4C1D95"
+                                BackgroundColor="#1A0A2E"
+                                Padding="16,4"
+                                HeightRequest="56">
+                            <Entry Text="{Binding RecoveryEmail}"
+                                   Placeholder="email used for password reset"
                                    PlaceholderColor="#6B7280"
                                    TextColor="White"
                                    FontSize="16"

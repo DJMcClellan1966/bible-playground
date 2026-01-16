@@ -36,5 +36,16 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.828810073591-1chpql2jqhr6s6sfcrrgtkh174uo7flt</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.Storage;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using System.Linq;
+#if WINDOWS
+using Windows.ApplicationModel;
+#endif
 
 #pragma warning disable MVVMTK0045
 
@@ -88,6 +91,9 @@ public partial class SettingsViewModel : BaseViewModel
 
     [ObservableProperty]
     private DateTime currentUserSince = DateTime.UtcNow;
+
+    [ObservableProperty]
+    private string windowsPackageFamilyName = "Not packaged";
 
     [ObservableProperty]
     private bool isModerationEnabled = true;
@@ -761,12 +767,29 @@ public partial class SettingsViewModel : BaseViewModel
     {
         _usageMetrics?.TrackFeatureUsed("Settings");
         LoadUserProfile();
+        LoadWindowsPackageInfo();
         await RefreshStatsAsync();
         await RefreshModelStatusAsync();
         await RefreshStorageStatsAsync();
         await RefreshLearningStatsAsync();
         await RefreshUsageInsightsAsync();
         RagStatsSummary = IsRagDebugEnabled ? BuildRagStatsSummary() : "RAG debug is disabled";
+    }
+
+    private void LoadWindowsPackageInfo()
+    {
+#if WINDOWS
+        try
+        {
+            WindowsPackageFamilyName = Package.Current?.Id?.FamilyName ?? "Unavailable";
+        }
+        catch
+        {
+            WindowsPackageFamilyName = "Not packaged";
+        }
+#else
+        WindowsPackageFamilyName = "Not packaged";
+#endif
     }
 
     partial void OnIsAutonomousLearningEnabledChanged(bool value)
