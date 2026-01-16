@@ -68,13 +68,28 @@ public partial class CharacterSelectionViewModel : BaseViewModel
         {
             IsBusy = true;
             var chars = await _characterRepository.GetAllCharactersAsync();
-            Characters = new ObservableCollection<BiblicalCharacter>(chars);
-            UpdateUsageSummary(chars);
+            var readyCharacters = chars.Where(IsCharacterReady).ToList();
+            Characters = new ObservableCollection<BiblicalCharacter>(readyCharacters);
+            UpdateUsageSummary(readyCharacters);
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    private static bool IsCharacterReady(BiblicalCharacter character)
+    {
+        if (character == null)
+            return false;
+
+        if (string.IsNullOrWhiteSpace(character.Name))
+            return false;
+
+        var description = character.Description?.Trim() ?? string.Empty;
+        var title = character.Title?.Trim() ?? string.Empty;
+
+        return description.Length >= 20 && title.Length >= 3;
     }
 
     [RelayCommand]

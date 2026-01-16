@@ -18,9 +18,6 @@ public partial class ExistingLoginViewModel : BaseViewModel
     [ObservableProperty]
     private bool hasError;
     
-    [ObservableProperty]
-    private bool stayLoggedIn = true;
-    
     public ExistingLoginViewModel(IAuthenticationService authService)
     {
         _authService = authService;
@@ -39,7 +36,6 @@ public partial class ExistingLoginViewModel : BaseViewModel
             
             if (result.Success)
             {
-                Preferences.Set("stay_logged_in", StayLoggedIn);
                 await Shell.Current.GoToAsync("//home");
             }
             else
@@ -71,7 +67,6 @@ public partial class ExistingLoginViewModel : BaseViewModel
             
             if (result.Success)
             {
-                Preferences.Set("stay_logged_in", StayLoggedIn);
                 await Shell.Current.GoToAsync("//home");
             }
             else
@@ -94,7 +89,6 @@ public partial class ExistingLoginViewModel : BaseViewModel
     [RelayCommand]
     private async Task ShowEmailSignIn()
     {
-        Preferences.Set("stay_logged_in", StayLoggedIn);
         await Shell.Current.GoToAsync("emailsignin?mode=signin");
     }
     

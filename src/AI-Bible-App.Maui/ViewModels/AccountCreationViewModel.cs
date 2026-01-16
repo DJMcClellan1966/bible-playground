@@ -28,9 +28,6 @@ public partial class AccountCreationViewModel : BaseViewModel
     private string errorMessage = string.Empty;
     
     [ObservableProperty]
-    private bool stayLoggedIn = true;
-    
-    [ObservableProperty]
     private OnboardingProfile? onboardingProfile;
     
     public AccountCreationViewModel(IAuthenticationService authService, IUserService userService)
@@ -78,7 +75,6 @@ public partial class AccountCreationViewModel : BaseViewModel
             if (result.Success)
             {
                 await ApplyOnboardingProfile();
-                await SaveLoginPreference();
                 await Shell.Current.GoToAsync("//home");
             }
             else
@@ -111,7 +107,6 @@ public partial class AccountCreationViewModel : BaseViewModel
             if (result.Success)
             {
                 await ApplyOnboardingProfile();
-                await SaveLoginPreference();
                 await Shell.Current.GoToAsync("//home");
             }
             else
@@ -134,8 +129,6 @@ public partial class AccountCreationViewModel : BaseViewModel
     [RelayCommand]
     private async Task ShowEmailSignUp()
     {
-        // Store stay logged in preference for email flow
-        Preferences.Set("stay_logged_in", StayLoggedIn);
         await Shell.Current.GoToAsync("emailsignin?mode=signup");
     }
     
@@ -158,10 +151,7 @@ public partial class AccountCreationViewModel : BaseViewModel
             });
             
             await ApplyOnboardingProfile();
-            
-            // Guests don't stay logged in by default
-            Preferences.Set("stay_logged_in", false);
-            
+
             await Shell.Current.GoToAsync("//home");
         }
         catch (Exception ex)
@@ -201,12 +191,6 @@ public partial class AccountCreationViewModel : BaseViewModel
         {
             System.Diagnostics.Debug.WriteLine($"[AccountCreation] Error applying profile: {ex.Message}");
         }
-    }
-    
-    private Task SaveLoginPreference()
-    {
-        Preferences.Set("stay_logged_in", StayLoggedIn);
-        return Task.CompletedTask;
     }
     
     [RelayCommand]

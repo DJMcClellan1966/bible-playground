@@ -293,10 +293,8 @@
                                Opacity="0.5"/>
                         
                         <!-- Verses -->
-                        <CollectionView ItemsSource="{Binding CurrentVerses}"
-                                        SelectionMode="Single"
-                                        SelectionChanged="OnVerseSelected">
-                            <CollectionView.ItemTemplate>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding CurrentVerses}">
+                            <BindableLayout.ItemTemplate>
                                 <DataTemplate>
                                     <Grid ColumnDefinitions="35,*" Margin="0,8" Padding="5">
                                         <Frame Grid.Column="0"
@@ -320,10 +318,14 @@
                                                LineHeight="1.6"
                                                TextColor="{StaticResource HallowTextPrimary}"
                                                LineBreakMode="WordWrap"/>
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.ShowVerseActionsCommand}"
+                                                                  CommandParameter="{Binding .}"/>
+                                        </Grid.GestureRecognizers>
                                     </Grid>
                                 </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
                         
                         <!-- End Decorative -->
                         <Label Text="✦"

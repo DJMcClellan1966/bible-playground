@@ -31,7 +31,7 @@
                            FontAttributes="Bold"/>
                 </VerticalStackLayout>
                 
-                <!-- User Avatar + Settings -->
+                <!-- User Avatar -->
                 <HorizontalStackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center">
                     <Border WidthRequest="48" HeightRequest="48"
                             StrokeThickness="2"
@@ -50,15 +50,6 @@
                                HorizontalOptions="Center"
                                VerticalOptions="Center"/>
                     </Border>
-                    <Button Text="⚙️"
-                            Command="{Binding OpenSettingsCommand}"
-                            BackgroundColor="{StaticResource HallowCardBackground}"
-                            TextColor="{StaticResource HallowTextPrimary}"
-                            WidthRequest="40"
-                            HeightRequest="40"
-                            CornerRadius="20"
-                            Padding="0"
-                            ToolTipProperties.Text="Open settings"/>
                 </HorizontalStackLayout>
             </Grid>
             
@@ -316,7 +307,7 @@
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding NewChatCommand}"/>
                             </Border.GestureRecognizers>
-                            <Label Text="No conversations yet • Tap to start"
+                            <Label Text="No recent conversations yet • Tap to start"
                                    TextColor="{StaticResource HallowTextMuted}"
                                    FontSize="13"
                                    HorizontalOptions="Center"/>

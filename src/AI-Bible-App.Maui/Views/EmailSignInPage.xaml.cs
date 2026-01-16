@@ -7,4 +7,13 @@ public partial class EmailSignInPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is ViewModels.EmailSignInViewModel vm)
+        {
+            await vm.InitializeAsync();
+        }
+    }
 }

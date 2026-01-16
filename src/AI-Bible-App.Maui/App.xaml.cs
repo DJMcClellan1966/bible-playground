@@ -157,14 +157,8 @@ public partial class App : Application
 
 				_usageMetrics?.TrackSessionStart();
 
-				// Try auto-login ONLY if user opted to stay logged in
-				var stayLoggedIn = Preferences.Get("stay_logged_in", false);
-				var autoLoggedIn = false;
-				
-				if (stayLoggedIn)
-				{
-					autoLoggedIn = await _userService.TryAutoLoginAsync();
-				}
+				// Try auto-login if a session is available
+				var autoLoggedIn = await _userService.TryAutoLoginAsync();
 				
 				// Apply font scale from user settings if logged in
 				if (autoLoggedIn && _userService.CurrentUser != null && _fontScaleService != null)

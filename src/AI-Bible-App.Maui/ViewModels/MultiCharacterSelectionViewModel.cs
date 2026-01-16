@@ -79,6 +79,8 @@ public partial class MultiCharacterSelectionViewModel : BaseViewModel
             var filteredCharacters = SelectedMode == ChatSessionType.Roundtable
                 ? allCharacters.Where(c => c.RoundtableEnabled).ToList()
                 : allCharacters;
+
+            filteredCharacters = filteredCharacters.Where(IsCharacterReady).ToList();
             
             System.Diagnostics.Debug.WriteLine($"[MultiCharacterSelection] Characters with RoundtableEnabled: {allCharacters.Count(c => c.RoundtableEnabled)}");
             System.Diagnostics.Debug.WriteLine($"[MultiCharacterSelection] Filtered characters: {filteredCharacters.Count}");
@@ -117,6 +119,20 @@ public partial class MultiCharacterSelectionViewModel : BaseViewModel
         
         // Reload characters with appropriate filtering for the mode
         await InitializeAsync();
+    }
+
+    private static bool IsCharacterReady(BiblicalCharacter character)
+    {
+        if (character == null)
+            return false;
+
+        if (string.IsNullOrWhiteSpace(character.Name))
+            return false;
+
+        var description = character.Description?.Trim() ?? string.Empty;
+        var title = character.Title?.Trim() ?? string.Empty;
+
+        return description.Length >= 20 && title.Length >= 3;
     }
 
     [RelayCommand]

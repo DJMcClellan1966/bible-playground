@@ -47,14 +47,14 @@
                                     HorizontalOptions="End"
                                     AutomationProperties.IsInAccessibleTree="True"
                                     SemanticProperties.Description="{Binding Content}"
-                                    MaximumWidthRequest="500"
-                                    Padding="15"
-                                    BackgroundColor="{DynamicResource Primary}">
+                                    MaximumWidthRequest="520"
+                                    Padding="14"
+                                    BackgroundColor="{StaticResource HallowCardHover}">
                                 <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="20"/>
+                                    <RoundRectangle CornerRadius="16"/>
                                 </Border.StrokeShape>
                                 <Label Text="{Binding Content}"
-                                       TextColor="{StaticResource White}"
+                                       TextColor="{StaticResource HallowTextPrimary}"
                                        FontSize="{StaticResource BodyFontSize}"
                                        LineBreakMode="WordWrap"/>
                             </Border>
@@ -65,13 +65,13 @@
                                     HorizontalOptions="Start"
                                     AutomationProperties.IsInAccessibleTree="True"
                                     SemanticProperties.Description="{Binding Content}"
-                                    MaximumWidthRequest="500"
-                                    Padding="15"
+                                    MaximumWidthRequest="520"
+                                    Padding="14"
                                     StrokeThickness="1"
-                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
-                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackground}, Dark={StaticResource CardBackgroundDark}}">
+                                    Stroke="{StaticResource HallowDivider}"
+                                    BackgroundColor="{StaticResource HallowCardBackground}">
                                 <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="20"/>
+                                    <RoundRectangle CornerRadius="16"/>
                                 </Border.StrokeShape>
                                 <VerticalStackLayout Spacing="6">
                                     <controls:BibleLinkLabel LinkedText="{Binding Content}"
@@ -87,35 +87,6 @@
                                            IsVisible="{Binding HasContextualReferences}"
                                            FontSize="{StaticResource CaptionFontSize}"
                                            TextColor="{DynamicResource Primary}"/>
-                                    <HorizontalStackLayout Spacing="8" Margin="0,4,0,0">
-                                        <Button Text="📋"
-                                                FontSize="14"
-                                                BackgroundColor="Transparent"
-                                                TextColor="{DynamicResource Gray600}"
-                                                WidthRequest="32"
-                                                HeightRequest="32"
-                                                Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.CopyMessageCommand}"
-                                                CommandParameter="{Binding .}"
-                                                ToolTipProperties.Text="Copy"/>
-                                        <Button Text="👍"
-                                                FontSize="14"
-                                                BackgroundColor="Transparent"
-                                                TextColor="{DynamicResource Gray600}"
-                                                WidthRequest="32"
-                                                HeightRequest="32"
-                                                Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
-                                                CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='1'}"
-                                                ToolTipProperties.Text="Thumbs up"/>
-                                        <Button Text="👎"
-                                                FontSize="14"
-                                                BackgroundColor="Transparent"
-                                                TextColor="{DynamicResource Gray600}"
-                                                WidthRequest="32"
-                                                HeightRequest="32"
-                                                Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
-                                                CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='-1'}"
-                                                ToolTipProperties.Text="Thumbs down"/>
-                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Border>
 

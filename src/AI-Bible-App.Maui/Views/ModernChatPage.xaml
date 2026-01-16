@@ -208,44 +208,6 @@
                                             </VerticalStackLayout>
                                         </Border>
                                         
-                                        <!-- Message Actions (Copy, Regenerate, etc) -->
-                                        <HorizontalStackLayout Spacing="8" 
-                                                               IsVisible="{Binding Role, Converter={StaticResource StringEqualConverter}, ConverterParameter='assistant'}"
-                                                               Opacity="0.7">
-                                            <Button Text="📋" FontSize="14" 
-                                                    BackgroundColor="Transparent"
-                                                    TextColor="{StaticResource HallowTextMuted}"
-                                                    WidthRequest="32" HeightRequest="32"
-                                                    Command="{Binding Path=BindingContext.CopyMessageCommand, Source={x:Reference ThisPage}}"
-                                                    CommandParameter="{Binding}"
-                                                    ToolTipProperties.Text="Copy"/>
-                                            <Button Text="🔄" FontSize="14"
-                                                    BackgroundColor="Transparent"
-                                                    TextColor="{StaticResource HallowTextMuted}"
-                                                    WidthRequest="32" HeightRequest="32"
-                                                    ToolTipProperties.Text="Regenerate"/>
-                                            <Button Text="👍" FontSize="14"
-                                                    BackgroundColor="Transparent"
-                                                    TextColor="{StaticResource HallowTextMuted}"
-                                                    WidthRequest="32" HeightRequest="32"
-                                                    Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
-                                                    CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='1'}"
-                                                    ToolTipProperties.Text="Thumbs up"/>
-                                            <Button Text="👎" FontSize="14"
-                                                    BackgroundColor="Transparent"
-                                                    TextColor="{StaticResource HallowTextMuted}"
-                                                    WidthRequest="32" HeightRequest="32"
-                                                    Command="{Binding Path=BindingContext.RateMessageCommand, Source={x:Reference ThisPage}}"
-                                                    CommandParameter="{Binding ., Converter={StaticResource MessageToRatingTupleConverter}, ConverterParameter='-1'}"
-                                                    ToolTipProperties.Text="Thumbs down"/>
-                                            <Button Text="🔊" FontSize="14"
-                                                    BackgroundColor="Transparent"
-                                                    TextColor="{StaticResource HallowTextMuted}"
-                                                    WidthRequest="32" HeightRequest="32"
-                                                    Command="{Binding Path=BindingContext.ToggleVoiceCommand, Source={x:Reference ThisPage}}"
-                                                    CommandParameter="{Binding}"
-                                                    ToolTipProperties.Text="Read aloud"/>
-                                        </HorizontalStackLayout>
                                     </VerticalStackLayout>
                                 </Grid>
                             </Border>

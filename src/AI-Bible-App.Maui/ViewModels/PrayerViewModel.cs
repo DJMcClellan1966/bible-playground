@@ -72,15 +72,17 @@ public partial class PrayerViewModel : BaseViewModel
     public List<PrayerLength> AvailableLengths => Enum.GetValues<PrayerLength>().ToList();
     public List<PrayerTradition> AvailableTraditions => Enum.GetValues<PrayerTradition>().ToList();
     public List<TimeOfDayContext> AvailableTimeContexts => Enum.GetValues<TimeOfDayContext>().ToList();
-    public ObservableCollection<string> QuickPrompts { get; } = new()
-    {
+    private static readonly string[] DefaultQuickPrompts =
+    [
         "Peace and anxiety relief",
         "Guidance for a big decision",
         "Strength in hardship",
         "Healing for a loved one",
         "Gratitude and thanksgiving",
         "Forgiveness and renewal"
-    };
+    ];
+
+    public ObservableCollection<string> QuickPrompts { get; } = new(DefaultQuickPrompts);
 
     public PrayerViewModel(
         IAIService aiService,
@@ -131,7 +133,19 @@ public partial class PrayerViewModel : BaseViewModel
     public async Task InitializeAsync()
     {
         _usageMetrics?.TrackFeatureUsed("PrayerGenerator");
+        EnsureQuickPrompts();
         await LoadSavedPrayersAsync();
+    }
+
+    private void EnsureQuickPrompts()
+    {
+        if (QuickPrompts.Count > 0)
+            return;
+
+        foreach (var prompt in DefaultQuickPrompts)
+        {
+            QuickPrompts.Add(prompt);
+        }
     }
 
     private async Task LoadSavedPrayersAsync()

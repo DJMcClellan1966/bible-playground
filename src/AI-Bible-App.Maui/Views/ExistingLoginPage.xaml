@@ -132,30 +132,6 @@
                             CornerRadius="28"
                             ToolTipProperties.Text="Sign in with email and password"/>
                     
-                    <!-- Stay Logged In Toggle -->
-                    <Border StrokeShape="RoundRectangle 12"
-                            BackgroundColor="#2D1B4E"
-                            Stroke="#4C1D95"
-                            StrokeThickness="1"
-                            Padding="16"
-                            Margin="0,8,0,0">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                <Label Text="Stay logged in"
-                                       FontSize="16"
-                                       TextColor="White"/>
-                                <Label Text="Skip login screen on next launch"
-                                       FontSize="12"
-                                       TextColor="#A78BFA"/>
-                            </VerticalStackLayout>
-                            <Switch Grid.Column="1"
-                                    IsToggled="{Binding StayLoggedIn}"
-                                    OnColor="#8B5CF6"
-                                    ThumbColor="White"
-                                    ToolTipProperties.Text="Stay signed in on this device"/>
-                        </Grid>
-                    </Border>
-                    
                     <!-- Loading indicator -->
                     <ActivityIndicator IsRunning="{Binding IsBusy}"
                                        IsVisible="{Binding IsBusy}"

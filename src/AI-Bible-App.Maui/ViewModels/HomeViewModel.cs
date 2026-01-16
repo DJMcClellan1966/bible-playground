@@ -99,19 +99,18 @@ public partial class HomeViewModel : BaseViewModel
 
             // Load featured characters (first 8)
             var characters = await _characterRepository.GetAllCharactersAsync();
+            var readyCharacters = characters.Where(IsCharacterReady).ToList();
             FeaturedCharacters = new ObservableCollection<BiblicalCharacter>(
-                characters.Take(8));
+                readyCharacters.Take(8));
 
             // Load recent chats (last 5)
-            var userId = _userService.CurrentUser?.Id ?? "default";
-            var allChats = await _chatRepository.GetAllSessionsAsync();
-            var userChats = allChats.Where(c => c.UserId == userId || string.IsNullOrEmpty(c.UserId));
-            RecentChats = new ObservableCollection<ChatSession>(
-                userChats.OrderByDescending(c => c.StartedAt).Take(5));
+            var recentChats = await BuildRecentChatsAsync();
+            RecentChats = new ObservableCollection<ChatSession>(recentChats);
 
             // ...existing code...
 
             // Load recent prayers (last 6)
+            var userId = _userService.CurrentUser?.Id ?? "default";
             var allPrayers = await _prayerRepository.GetAllPrayersAsync();
             var userPrayers = allPrayers.Where(p => p.UserId == userId || string.IsNullOrEmpty(p.UserId));
             RecentPrayers = new ObservableCollection<Prayer>(
@@ -137,11 +136,63 @@ public partial class HomeViewModel : BaseViewModel
 
     public async Task RefreshRecentChatsAsync()
     {
+        var recentChats = await BuildRecentChatsAsync();
+        RecentChats = new ObservableCollection<ChatSession>(recentChats);
+    }
+
+    private async Task<List<ChatSession>> BuildRecentChatsAsync()
+    {
         var userId = _userService.CurrentUser?.Id ?? "default";
         var allChats = await _chatRepository.GetAllSessionsAsync();
-        var userChats = allChats.Where(c => c.UserId == userId || string.IsNullOrEmpty(c.UserId));
-        RecentChats = new ObservableCollection<ChatSession>(
-            userChats.OrderByDescending(c => c.StartedAt).Take(5));
+        var userChats = allChats.Where(c => c.UserId == userId || string.IsNullOrEmpty(c.UserId)).ToList();
+        var characterMap = (await _characterRepository.GetAllCharactersAsync())
+            .ToDictionary(c => c.Id, c => c);
+
+        foreach (var session in userChats)
+        {
+            var lastMessage = session.Messages.LastOrDefault(m => !string.IsNullOrWhiteSpace(m.Content));
+            if (string.IsNullOrWhiteSpace(session.LastMessagePreview) && lastMessage != null)
+            {
+                session.LastMessagePreview = lastMessage.Content.Replace("\n", " ").Trim();
+            }
+
+            if (string.IsNullOrWhiteSpace(session.CharacterName) && characterMap.TryGetValue(session.CharacterId, out var character))
+            {
+                session.CharacterName = character.Name;
+                session.CharacterEmoji = character.AvatarEmoji ?? character.Emoji;
+            }
+
+            if (string.IsNullOrWhiteSpace(session.CharacterName))
+            {
+                session.CharacterName = session.SessionType switch
+                {
+                    ChatSessionType.Roundtable => "Roundtable",
+                    ChatSessionType.WisdomCouncil => "Wisdom Council",
+                    ChatSessionType.PrayerChain => "Prayer Chain",
+                    _ => "Conversation"
+                };
+                session.CharacterEmoji = "👥";
+            }
+        }
+
+        return userChats
+            .OrderByDescending(c => c.Messages.LastOrDefault()?.Timestamp ?? c.StartedAt)
+            .Take(5)
+            .ToList();
+    }
+
+    private static bool IsCharacterReady(BiblicalCharacter character)
+    {
+        if (character == null)
+            return false;
+
+        if (string.IsNullOrWhiteSpace(character.Name))
+            return false;
+
+        var description = character.Description?.Trim() ?? string.Empty;
+        var title = character.Title?.Trim() ?? string.Empty;
+
+        return description.Length >= 20 && title.Length >= 3;
     }
 
     [RelayCommand]
@@ -201,11 +252,33 @@ public partial class HomeViewModel : BaseViewModel
             Preferences.Remove("stay_logged_in");
             Preferences.Remove("onboarding_profile");
             await _authService.SignOutAsync();
-            await _navigationService.NavigateToAsync("//login");
+            try
+            {
+                await _navigationService.NavigateToAsync("//login");
+            }
+            catch
+            {
+                await Shell.Current.GoToAsync("//login");
+            }
         }
         catch (Exception ex)
         {
-            await _dialogService.ShowAlertAsync("Error", $"Failed to sign out: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Home] Sign out failed: {ex}");
+            try
+            {
+                await _dialogService.ShowAlertAsync("Error", $"Failed to sign out: {ex.Message}");
+            }
+            catch
+            {
+                if (Application.Current?.Windows?.Count > 0)
+                {
+                    var page = Application.Current.Windows[0].Page;
+                    if (page != null)
+                    {
+                        await page.DisplayAlert("Error", "Failed to sign out.", "OK");
+                    }
+                }
+            }
         }
     }
 

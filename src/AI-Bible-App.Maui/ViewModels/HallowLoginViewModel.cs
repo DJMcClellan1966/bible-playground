@@ -28,19 +28,13 @@ public partial class HallowLoginViewModel : BaseViewModel
             IsBusy = true;
             HasError = false;
             
-            // Check if "stay logged in" is enabled
-            var stayLoggedIn = Preferences.Get("stay_logged_in", false);
+            // Try to restore existing session if available
+            var restored = await _authService.TryRestoreSessionAsync();
             
-            if (stayLoggedIn)
+            if (restored && _authService.IsAuthenticated)
             {
-                // Try to restore existing session only if user opted to stay logged in
-                var restored = await _authService.TryRestoreSessionAsync();
-                
-                if (restored && _authService.IsAuthenticated)
-                {
-                    // Session restored - go to home
-                    await Shell.Current.GoToAsync("//home");
-                }
+                // Session restored - go to home
+                await Shell.Current.GoToAsync("//home");
             }
         }
         catch (Exception ex)
